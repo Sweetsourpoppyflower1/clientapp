@@ -1,0 +1,109 @@
+﻿import React, {useState,useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./styles/homepage.css";
+
+function Homepage() {
+    const navigate = useNavigate();
+
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // actieve product en volgende producten
+    const activeProduct = products[0];
+    const nextProducts = products.slice(1, 4);
+
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch("https://localhost:7036/api/veilingsproducten");
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                const data = await response.json();
+                const firstProduct = data[1];
+                setProducts(data);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    return (
+        <div className="homepage-container">
+            {/* linker kolom Actief Veilingproduct */}
+            <div className="homepage-column left-column">
+                <h3 className="column-title">{activeProduct.naam}</h3>
+                <div className="product-card active-product">
+                    <div className="product-image-container">
+                        <img src={activeProduct.Foto} alt={activeProduct.naam} className="product-image" />
+                    </div>
+                    <div className="product-info">
+                        <h4 className="product-name">{activeProduct.naam}</h4>
+                        <p className="product-description">
+                            {activeProduct.beschrijving}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* homepagina - welkomsectie */}
+            <div className="homepage-column center-column">
+                <div className="welcome-section">
+                    <p className="welcome-text">
+                        Welcome to the HomePage of Flauction; the best Flora Auction Clock to date! Navigate to the Auction from here, or log out.
+                    </p>
+                    
+                    <div className="button-section">
+                        <h4 className="button-title">Go to Auction</h4>
+                        <p className="button-subtitle">Click below to go to the live Auction</p>
+                        <button className="auction-button" onClick={() => navigate('/auction')}>
+                            AUCTION
+                        </button>
+                    </div>
+
+                    <div className="button-section">
+                        <p className="button-subtitle">Click below to view the next Products</p>
+                        <button className="next-products-button" onClick={() => navigate('/products')}>
+                            NEXT PRODUCTS
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Rechterkolom volgende veilingsproducten */}
+            <div className="homepage-column right-column">
+                <h3 className="column-title">Next Auction Products</h3>
+                <div className="next-products-list">
+                    {nextProducts.map((product) => (
+                        <div key={product.veilingsproductID} className="product-card next-product">
+                            <div className="product-image-container-small">
+                                <img src={product.Foto} alt={product.naam} className="product-image-small" />
+                            </div>
+                            <div className="product-info-small">
+                                <h4 className="product-name-small">{product.naam}</h4>
+                                <p className="product-description-small">
+                                    {product.beschrijving}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Homepage;
