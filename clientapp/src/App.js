@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Register from "./pages/register";
 import Login from "./pages/login";
 import Homepage from "./pages/homepage";
+import ActiveAuctions from "./pages/ActiveAuctions";
+import UpcomingAuctions from "./pages/UpcomingAuctions"
 import Navbar from "./components/Navbar";
 
 
@@ -15,6 +17,8 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/homepage" element={<Homepage />} />
+                <Route path="/ActiveAuctions" element={<ActiveAuctions />} />
+                <Route path="/UpcomingAuctions" element={<UpcomingAuctions />} />
             </Routes>
         </Router>
     );

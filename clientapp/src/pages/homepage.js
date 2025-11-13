@@ -5,6 +5,7 @@ import "./styles/homepage.css";
 function Homepage() {
     const navigate = useNavigate();
 
+    // UseState, een tijdelijk opslag van de productenlijst
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -17,13 +18,18 @@ function Homepage() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                console.log("Gestart met ophalen uit Veilingsproducten... ~ lex");
                 const response = await fetch("https://localhost:7036/api/veilingsproducten");
+                if (response.ok) {
+                    console.log("Netwerk reactie was ok...");
+                }
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
                 }
+                console.log("Antwoord ontvangen, omzetten naar JSON... ~ lex");
                 const data = await response.json();
-                const firstProduct = data[1];
                 setProducts(data);
+                console.log("Laden is gelukt! ~ lex");
             } catch (error) {
                 setError(error.message);
             } finally {
