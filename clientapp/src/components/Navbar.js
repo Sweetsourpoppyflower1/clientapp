@@ -13,6 +13,8 @@ function Navbar() {
                     <Link to="/homepage" className="navbar-link">Homepage</Link>
                     <Link to="/login" className="navbar-link">Inloggen</Link>
                     <Link to="/register" className="navbar-link">Registreren</Link>
+                    <Link to="/ActiveAuctions" className="navbar-link">Active Auctions</Link>
+                    <Link to="/UpcomingAuctions" className="navbar-link">Upcoming Auctions</Link>
                 </div>
             </div>
         </nav>
