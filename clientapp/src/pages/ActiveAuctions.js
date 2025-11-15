@@ -10,7 +10,7 @@ function ActiveAuctions() {
     useEffect(() => {
         const fetchAuctions = async () => {
             try {
-                const response = await fetch("https://localhost:7036/api/veilingen/actief");
+                const response = await fetch("https://localhost:7036/api/Auction");
                 if (!response.ok) {
                     throw new Error("Er is een netwerkfout opgetreden");
                 }
@@ -31,8 +31,8 @@ function ActiveAuctions() {
             <h2>Active Auctions</h2>
             <div className="auctions-list">
                 {auctions.map((auction) => (
-                    <div key={"VeilingsID =" + auction.veilingsID} className="auction-card">
-                        <h3>VeilingsID = {auction.veilingsID} <br /> Veilingsmeester = {auction.veilingmeesterID}</h3>
+                    <div key={"VeilingsID =" + auction.auction_id} className="auction-card">
+                        <h3>VeilingsID = {auction.auction_id} <br /> Veilingsmeester = {auction.a}</h3>
                         <p>{auction.veilingmeester}</p>
                     </div>
                 ))}

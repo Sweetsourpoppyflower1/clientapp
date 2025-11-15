@@ -19,7 +19,7 @@ function Homepage() {
         const fetchProducts = async () => {
             try {
                 console.log("Gestart met ophalen uit Veilingsproducten... ~ lex");
-                const response = await fetch("https://localhost:7036/api/veilingsproducten");
+                const response = await fetch("https://localhost:7036/api/plant");
                 if (response.ok) {
                     console.log("Netwerk reactie was ok...");
                 }
@@ -51,15 +51,15 @@ function Homepage() {
         <div className="homepage-container">
             {/* linker kolom Actief Veilingproduct */}
             <div className="homepage-column left-column">
-                <h3 className="column-title">{activeProduct.naam}</h3>
+                <h3 className="column-title">{activeProduct.p_productname}</h3>
                 <div className="product-card active-product">
                     <div className="product-image-container">
-                        <img src={activeProduct.Foto} alt={activeProduct.naam} className="product-image" />
+                        <img src={activeProduct.Foto} alt={activeProduct.p_productname} className="product-image" />
                     </div>
                     <div className="product-info">
-                        <h4 className="product-name">{activeProduct.naam}</h4>
+                        <h4 className="product-name">{activeProduct.p_productname}</h4>
                         <p className="product-description">
-                            {activeProduct.beschrijving}
+                            {activeProduct.p_desc}
                         </p>
                     </div>
                 </div>
@@ -75,7 +75,7 @@ function Homepage() {
                     <div className="button-section">
                         <h4 className="button-title">Go to Auction</h4>
                         <p className="button-subtitle">Click below to go to the live Auction</p>
-                        <button className="auction-button" onClick={() => navigate('/auction')}>
+                        <button className="auction-button" onClick={() => navigate('/ActiveAuctions')}>
                             AUCTION
                         </button>
                     </div>
@@ -94,14 +94,14 @@ function Homepage() {
                 <h3 className="column-title">Next Auction Products</h3>
                 <div className="next-products-list">
                     {nextProducts.map((product) => (
-                        <div key={product.veilingsproductID} className="product-card next-product">
+                        <div key={product.plant_id} className="product-card next-product">
                             <div className="product-image-container-small">
-                                <img src={product.Foto} alt={product.naam} className="product-image-small" />
+                                <img src={product.Foto} alt={product.p_productname} className="product-image-small" />
                             </div>
                             <div className="product-info-small">
-                                <h4 className="product-name-small">{product.naam}</h4>
+                                <h4 className="product-name-small">{product.p_productname}</h4>
                                 <p className="product-description-small">
-                                    {product.beschrijving}
+                                    {product.p_desc}
                                 </p>
                             </div>
                         </div>
