@@ -6,6 +6,7 @@ import Homepage from "./pages/homepage";
 import ActiveAuctions from "./pages/ActiveAuctions";
 import UpcomingAuctions from "./pages/UpcomingAuctions"
 import Navbar from "./components/Navbar";
+import Clock from "./pages/Clock";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/ActiveAuctions" element={<ActiveAuctions />} />
                 <Route path="/UpcomingAuctions" element={<UpcomingAuctions />} />
+                <Route path="/clock" element={<Clock />} />
             </Routes>
         </Router>
     );
