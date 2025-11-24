@@ -30,7 +30,6 @@ function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Navigate directly to login without validation
         navigate("/login");
     };
 
