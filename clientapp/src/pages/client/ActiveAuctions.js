@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./styles/Auctions.css";
+import "../styles/Auctions.css";
 
-function UpcomingAuctions() {
+function ActiveAuctions() {
     // UseState, een tijdelijk opslag voor de Actieve Veilingen
-    const [auctions, setUpcomingAuctions] = useState([]);
+    const [auctions, setAuctions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -15,7 +15,7 @@ function UpcomingAuctions() {
                     throw new Error("Er is een netwerkfout opgetreden");
                 }
                 const data = await response.json();
-                setUpcomingAuctions(data);
+                setAuctions(data);
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -27,13 +27,12 @@ function UpcomingAuctions() {
     }, []);
 
     return (
-        <div className="upcoming-auctions-container">
-            
-            <h2>Upcoming Auctions</h2>
+        <div className="active-auctions-container">
+            <h2>Active Auctions</h2>
             <div className="auctions-list">
                 {auctions.map((auction) => (
                     <div key={"VeilingsID =" + auction.auction_id} className="auction-card">
-                        <h3>VeilingsID = {auction.auction_id} <br /> Veilingsmeester = {auction.auctionmaster_id}</h3>
+                        <h3>VeilingsID = {auction.auction_id} <br /> Veilingsmeester = {auction.a}</h3>
                         <p>{auction.veilingmeester}</p>
                     </div>
                 ))}
@@ -41,4 +40,4 @@ function UpcomingAuctions() {
         </div>
     )
 }
-export default UpcomingAuctions;
+export default ActiveAuctions;
