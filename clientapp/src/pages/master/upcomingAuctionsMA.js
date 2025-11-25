@@ -199,4 +199,4 @@ function UpcomingAuctionsMA() {
     );
 }
 
-export default UpcomingAuctionsMA;      
+export default UpcomingAuctionsMA;
