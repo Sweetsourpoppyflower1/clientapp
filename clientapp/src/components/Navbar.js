@@ -15,6 +15,7 @@ function Navbar() {
                     <Link to="/register" className="navbar-link">Registreren</Link>
                     <Link to="/ActiveAuctions" className="navbar-link">Active Auctions</Link>
                     <Link to="/UpcomingAuctions" className="navbar-link">Upcoming Auctions</Link>
+                    <Link to="/auctionmasterDashboard" className="navbar-link">Auctionmaster Dashboard</Link>
                 </div>
             </div>
         </nav>
