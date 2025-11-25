@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import AuctionMasterDashboard from "./pages/master/auctionmasterDashboard";
 import AuctionMasterActiveAuctions from "./pages/master/activeAuctionsMA";
 import AuctionMasterUpcomingAuctions from "./pages/master/upcomingAuctionsMA";
+import AuctionMasterCreateAuctions from "./pages/master/createAuctionsMA";
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/auctionmasterDashboard" element={<AuctionMasterDashboard />} />
                 <Route path="/activeAuctionsMA" element={<AuctionMasterActiveAuctions />} />
                 <Route path="/upcomingAuctionsMA" element={<AuctionMasterUpcomingAuctions />} />
+                <Route path="/createAuctionMA" element={<AuctionMasterCreateAuctions /> } />
             </Routes>
         </Router>
     );

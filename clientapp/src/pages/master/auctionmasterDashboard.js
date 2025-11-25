@@ -22,8 +22,11 @@ function AuctionMasterDashboard() {
         }
 
         try {
-            const parsed = JSON.parse(stored);
+            const parsed = JSON.parse(stored); // parse (ontleden) de opgehaalde auctionmaster
 
+            // hij houdt rekening met het ophalen van gegevens, dat deze in verschillende manieren kunnen komen
+            // de database kan het namelijk sturen als AuctionMasterId, auctionMasterId, etc...
+            // de vraagteken staat voor dat hij het wellicht in die staat vindt, anders gaat hij door naar de volgende waarde
             const normalized = {
                 AuctionMasterId:
                     parsed?.AuctionMasterId ??
@@ -44,10 +47,14 @@ function AuctionMasterDashboard() {
                     ""
             };
 
+            // checken van de juiste inloggegevens
             if (!normalized.AuctionMasterId && !normalized.Email) throw new Error("invalid user");
 
+            // dan weet het 'dashboard' wie er ingelogd is
             setUser(normalized);
         } catch {
+            // als er foute inloggegevens worden gegeven, worden deze ingevulde gegevens verwijderd en 
+            // de user wordt teruggestuurd naar de inlogpagina
             localStorage.removeItem("auctionMaster");
             navigate("/login", { replace: true });
             return;
@@ -68,21 +75,27 @@ function AuctionMasterDashboard() {
 
         (async () => {
             try {
+                // probeert de connectie met de database te maken
                 const resp = await fetch(url);
                 if (!resp.ok) {
                     const txt = await resp.text();
                     throw new Error(txt || "Failed to fetch auctions");
                 }
+                // als het geen array terugkrijgt, stuurt het een error
                 const data = await resp.json();
                 if (!Array.isArray(data)) throw new Error("Unexpected response format from auctions API");
 
                 const now = new Date();
                 const ownerId = Number(user?.AuctionMasterId);
 
+                // ---------------------- deze functie loopt door elke soort auction heen en update de count van elke auction
                 const counts = data.reduce(
                     (acc, a) => {
+                        // net als eerst, laten de vraagtekens toe dat het op verschillende manieren uit de database kan komen
                         const raw = (a?.au_status ?? a?.status ?? "")?.toString()?.toLowerCase()?.trim() ?? "";
 
+                        // deze zorgt ervoor dat de status goed wordt opgehaald en houdt rekening met verschillende manieren 
+                        // om de status aan te geven
                         let status = "";
                         if (raw) {
                             if (raw.includes("active")) status = "active";
@@ -90,6 +103,7 @@ function AuctionMasterDashboard() {
                             else if (raw.includes("complete") || raw.includes("finished") || raw.includes("closed")) status = "completed";
                         }
 
+                        // als er geen status is gevonden, kijkt hij naar de datum en de huidige datum en bepaalt daarmee zelf de status
                         if (!status) {
                             const s = a?.au_start_time ?? a?.startTime ?? a?.au_start_time ?? null;
                             const e = a?.au_end_time ?? a?.endTime ?? a?.au_end_time ?? null;
@@ -103,6 +117,7 @@ function AuctionMasterDashboard() {
                             }
                         }
 
+                        // checkt auction master en houdt wederom rekening met verschillende formats
                         const aOwnerId = Number(
                             a?.auctionmaster_id ??
                             a?.auctionMasterId ??
@@ -111,6 +126,7 @@ function AuctionMasterDashboard() {
                             NaN
                         );
 
+                        // als een auction hoort bij de ingelogde auction master, count +1
                         if (!Number.isNaN(aOwnerId) && aOwnerId === ownerId) {
                             if (status === "active") acc.active++;
                             else if (status === "upcoming") acc.upcoming++;
@@ -121,6 +137,7 @@ function AuctionMasterDashboard() {
                     },
                     { active: 0, upcoming: 0, completed: 0 }
                 );
+                // --------------------------------------------------------
 
                 if (!cancelled) setStats(counts);
             } catch (ex) {
@@ -135,6 +152,7 @@ function AuctionMasterDashboard() {
         };
     }, [user]);
 
+    // log out functie
     const handleLogout = () => {
         localStorage.removeItem("auctionMaster");
         navigate("/login", { replace: true });
@@ -153,9 +171,6 @@ function AuctionMasterDashboard() {
                 </div>
 
                 <div className="header-actions">
-                    <button className="button" onClick={() => navigate("/homepage")} style={{ marginRight: 8 }}>
-                        Home
-                    </button>
                     <button className="button" onClick={handleLogout}>Logout</button>
                 </div>
             </header>
