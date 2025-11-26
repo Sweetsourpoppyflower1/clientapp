@@ -50,7 +50,6 @@ export default function CreateAuctionsMA() {
 
             setUser(normalized);
 
-            // IMPORTANT: set the auctionmaster_id in the form from the authenticated user
             if (normalized.AuctionMasterId) {
               setForm((s) => ({ ...s, auctionmaster_id: String(normalized.AuctionMasterId) }));
             }
@@ -109,7 +108,7 @@ export default function CreateAuctionsMA() {
     if (err) {
       setMessage({ type: "error", text: err });
       return;
-    }
+      }
 
     setLoading(true);
     const payload = {
@@ -119,7 +118,7 @@ export default function CreateAuctionsMA() {
       au_end_time: form.au_end_time,
       au_start_price: Number(form.au_start_price),
       au_min_increment: Number(form.au_min_increment),
-      au_status: "Upcoming",
+      au_status: "upcoming",
     };
 
     try {
@@ -130,7 +129,6 @@ export default function CreateAuctionsMA() {
       });
 
       if (!res.ok) {
-        // surface server error details to help debugging
         const text = await res.text().catch(() => res.statusText);
         throw new Error(`Server error: ${res.status} ${text}`);
       }
