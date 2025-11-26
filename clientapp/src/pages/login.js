@@ -2,21 +2,75 @@
 import { useNavigate } from "react-router-dom";
 import "../pages/styles/Login.css";
 
-function Login() { 
+function Login() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
-        Gebruikersnaam: "",
+        Email: "",
         Wachtwoord: "",
     });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        setError("");
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const looksLikeAuctionMaster = (obj) => {
+        if (!obj || typeof obj !== "object") return false;
+        return (
+            "auctionMasterId" in obj ||
+            "AuctionMasterId" in obj ||
+            "email" in obj ||
+            "Email" in obj ||
+            "name" in obj ||
+            "Name" in obj
+        );
+    };
 
-        navigate('/homepage');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+
+        try {
+            const resp = await fetch("https://localhost:7036/api/AuctionMaster/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Username: form.Email,
+                    Password: form.Wachtwoord,
+                }),
+            });
+
+            if (!resp.ok) {
+                if (resp.status === 401) {
+                    setError("Invalid email or password.");
+                } else {
+                    const txt = await resp.text();
+                    setError(txt || "Login failed.");
+                }
+                return;
+            }
+
+            const data = await resp.json();
+
+            const auctionMaster =
+                data?.auctionMaster ?? data?.AuctionMaster ?? (looksLikeAuctionMaster(data) ? data : null);
+
+            if (auctionMaster) {
+                localStorage.setItem("auctionMaster", JSON.stringify(auctionMaster));
+                navigate("/auctionmasterDashboard");
+            } else {
+                localStorage.removeItem("auctionMaster");
+                navigate("/homepage");
+            }
+        } catch (ex) {
+            console.error(ex);
+            setError("Network error.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -24,11 +78,11 @@ function Login() {
             <h2>Inloggen</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Gebruikersnaam:</label>
+                    <label>Email:</label>
                     <input
                         type="text"
-                        name="Gebruikersnaam"
-                        value={form.Gebruikersnaam}
+                        name="Email"
+                        value={form.Email}
                         onChange={handleChange}
                         required
                     />
@@ -43,7 +97,12 @@ function Login() {
                         required
                     />
                 </div>
-                <button type="submit">Inloggen</button>
+
+                {error && <div className="login-error" style={{ color: "crimson", marginTop: 8 }}>{error}</div>}
+
+                <button type="submit" disabled={loading} style={{ marginTop: 12 }}>
+                    {loading ? "Inloggen..." : "Inloggen"}
+                </button>
             </form>
         </div>
     );
