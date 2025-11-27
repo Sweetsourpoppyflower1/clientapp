@@ -9,7 +9,7 @@ export default function CreateAuctionsMA() {
          au_start_time: "",
          au_end_time: "",
          au_start_price: "",
-         au_min_increment: "",
+         au_min_price: "",
     });
 
     const [loading, setLoading] = useState(false);
@@ -97,7 +97,8 @@ export default function CreateAuctionsMA() {
     if (!form.au_start_time || !form.au_end_time) return "Start and end time are required.";
     if (new Date(form.au_start_time) >= new Date(form.au_end_time)) return "Start time must be before end time.";
     if (!form.au_start_price || isNaN(Number(form.au_start_price))) return "Start price is required and must be a number.";
-    if (!form.au_min_increment || isNaN(Number(form.au_min_increment))) return "Min increment is required and must be a number.";
+    if (form.au_min_price !== "" && isNaN(Number(form.au_min_price))) return "Min price must be a number if provided.";
+    if (form.au_min_price !== "" && Number(form.au_min_price) > Number(form.au_start_price)) return "Min price must not exceed the start price.";
     return null;
   }
 
@@ -111,15 +112,33 @@ export default function CreateAuctionsMA() {
       }
 
     setLoading(true);
+
+    const now = new Date();
+    const start = new Date(form.au_start_time);
+    const end = new Date(form.au_end_time);
+    let computedStatus = "upcoming";
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      computedStatus = "upcoming";
+    } else if (now < start) {
+      computedStatus = "upcoming";
+    } else if (now > end) {
+      computedStatus = "completed";
+    } else {
+      computedStatus = "active";
+    }
+
     const payload = {
       auctionmaster_id: Number(form.auctionmaster_id),
       plant_id: Number(form.plant_id),
       au_start_time: form.au_start_time,
       au_end_time: form.au_end_time,
       au_start_price: Number(form.au_start_price),
-      au_min_increment: Number(form.au_min_increment),
-      au_status: "upcoming",
+      au_status: computedStatus,
     };
+
+    if (form.au_min_price !== "") {
+      payload.au_min_price = Number(form.au_min_price);
+    }
 
     try {
       const res = await fetch("/api/Auctions", {
@@ -142,7 +161,7 @@ export default function CreateAuctionsMA() {
         au_start_time: "",
         au_end_time: "",
         au_start_price: "",
-        au_min_increment: "",
+        au_min_price: "",
       }));
     } catch (err) {
       console.error(err);
@@ -211,8 +230,8 @@ export default function CreateAuctionsMA() {
         </div>
 
         <div className="form-group">
-          <label>Decreasing Amount per second</label>
-          <input name="au_min_increment" value={form.au_min_increment} onChange={handleChange} className="form-control" type="number" step="0.01" />
+          <label>Min Price (reserve if unsold)</label>
+          <input name="au_min_price" value={form.au_min_price} onChange={handleChange} className="form-control" type="number" step="0.01" />
         </div>
 
         <div style={{ marginTop: 12 }}>

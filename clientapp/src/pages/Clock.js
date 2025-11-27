@@ -186,7 +186,8 @@ export default function Clock({
       </svg>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <label>Start Euros:</label>
           <input
             type="number"
             min="0"
@@ -195,7 +196,8 @@ export default function Clock({
             onChange={(e) => setEurosInput(e.target.value)}
             style={{ width: 110, padding: "6px 8px" }}
             aria-label="Start euros"
-          />
+                  />
+          <label>Min Euros:</label>
           <input
             type="number"
             min="0"
@@ -204,7 +206,8 @@ export default function Clock({
             onChange={(e) => setMinCostInput(e.target.value)}
             style={{ width: 80, padding: "6px 8px" }}
             aria-label="Min Euros"
-          />
+                  />
+          <label>Duration in Seconds:</label>
           <input
             type="number"
             min="0"

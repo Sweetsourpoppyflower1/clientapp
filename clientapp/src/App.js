@@ -11,6 +11,7 @@ import AuctionMasterDashboard from "./pages/master/auctionmasterDashboard";
 import AuctionMasterActiveAuctions from "./pages/master/activeAuctionsMA";
 import AuctionMasterUpcomingAuctions from "./pages/master/upcomingAuctionsMA";
 import AuctionMasterCreateAuctions from "./pages/master/createAuctionsMA";
+import SupplierDashboard from "./pages/supplier/supplierDashboard";
 
 
 function App() {
@@ -28,7 +29,8 @@ function App() {
                 <Route path="/auctionmasterDashboard" element={<AuctionMasterDashboard />} />
                 <Route path="/activeAuctionsMA" element={<AuctionMasterActiveAuctions />} />
                 <Route path="/upcomingAuctionsMA" element={<AuctionMasterUpcomingAuctions />} />
-                <Route path="/createAuctionMA" element={<AuctionMasterCreateAuctions /> } />
+                <Route path="/createAuctionMA" element={<AuctionMasterCreateAuctions />} />
+                <Route path="/supplierDashboard" element={<SupplierDashboard />} />
             </Routes>
         </Router>
     );
