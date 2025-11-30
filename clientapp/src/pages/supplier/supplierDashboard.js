@@ -154,8 +154,6 @@ function SupplierDashboard() {
                     <div className="actions">
                         <button className="button" onClick={() => navigate("/createPlant")}>Add Plant</button>
                         <button className="button" onClick={() => navigate("/myPlants")}>My Plants</button>
-                        <button className="button" onClick={() => navigate("/orders")}>Orders</button>
-                        <button className="button" onClick={() => navigate("/voorbeeld")}>voorbeeldlol</button>
                     </div>
                 </section>
 

@@ -136,9 +136,6 @@ function UpcomingAuctionsMA() {
                     <button className="button" onClick={() => navigate("/auctionmasterDashboard")} style={{ marginRight: 8 }}>
                         Dashboard
                     </button>
-                    <button className="button" onClick={() => navigate("/homepage")} style={{ marginRight: 8 }}>
-                        Home
-                    </button>
                     <button className="button" onClick={() => { localStorage.removeItem("auctionMaster"); navigate("/login"); }}>
                         Logout
                     </button>

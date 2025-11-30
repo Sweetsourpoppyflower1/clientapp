@@ -181,7 +181,7 @@ function AuctionMasterDashboard() {
                         <button className="button" onClick={() => navigate("/createAuctionMA")}>Create Auction</button>
                         <button className="button" onClick={() => navigate("/activeAuctionsMA")}>Active Auctions</button>
                         <button className="button" onClick={() => navigate("/upcomingAuctionsMA")}>Upcoming Auctions</button>
-                        <button className="button" onClick={() => navigate("/acceptancesMA")}>Review Acceptances</button>
+                        <button className="button" onClick={() => navigate("/acceptancesMA")}>Completed Auctions</button>
                     </div>
                 </section>
 

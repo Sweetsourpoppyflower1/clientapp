@@ -1,20 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 
-/**
- * Circular countdown that counts down euros instead of seconds.
- *
- * Controls:
- *  - "Start Euros" input: initial euros to count down from
- *  - "Min Euros" input: the value at which the timer should stop
- *  - "Duration (s)" input: how many seconds until the euros reach the min value
- *  - "Set" button: applies inputs and resets timer
- *  - Start / Pause / Reset controls
- *
- * Display:
- *  - Circular SVG arc whose curved length decreases proportional to remaining euros (between total and min)
- *  - Centered euro amount (formatted as €0.00)
- *  - Read-only field that shows how many euros are removed per tick (based on duration)
- */
 export default function Clock({
   initialSeconds = 10,
   initialEuros = 100,
