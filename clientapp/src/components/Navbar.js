@@ -13,8 +13,11 @@ function Navbar() {
                     <Link to="/homepage" className="navbar-link">Homepage</Link>
                     <Link to="/login" className="navbar-link">Inloggen</Link>
                     <Link to="/register" className="navbar-link">Registreren</Link>
-                    <Link to="/ActiveAuctions" className="navbar-link">Active Auctions</Link>
-                    <Link to="/UpcomingAuctions" className="navbar-link">Upcoming Auctions</Link>
+                    {/*<Link to="/ActiveAuctions" className="navbar-link">Active Auctions</Link>*/}
+                    {/*<Link to="/UpcomingAuctions" className="navbar-link">Upcoming Auctions</Link>*/}
+                    <Link to="/auctionmasterDashboard" className="navbar-link">Auctionmaster Dashboard</Link>
+                    <Link to="/SupplierDashboard" className="navbar-link"> Supplier Dashboard</Link>
+                    <Link to="/clock" className="navbar-link">Clock</Link>
                 </div>
             </div>
         </nav>

@@ -1,6 +1,6 @@
 ﻿import React, {useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./styles/homepage.css";
+import "../styles/homepage.css";
 
 function Homepage() {
     const navigate = useNavigate();
@@ -82,7 +82,7 @@ function Homepage() {
 
                     <div className="button-section">
                         <p className="button-subtitle">Click below to view the next Products</p>
-                        <button className="next-products-button" onClick={() => navigate('/products')}>
+                        <button className="next-products-button" onClick={() => navigate('/UpcomingAuctions')}>
                             NEXT PRODUCTS
                         </button>
                     </div>
