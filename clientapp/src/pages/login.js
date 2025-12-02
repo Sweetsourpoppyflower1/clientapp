@@ -6,7 +6,7 @@ function Login() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
         Email: "",
-        Wachtwoord: "",
+        Password: "",
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -41,16 +41,28 @@ function Login() {
         );
     };
 
-    const tryLogin = async (url) => {
-        const resp = await fetch(url, {
+    //const tryLogin = async (url) => {
+    //    const resp = await fetch(url, {
+    //        method: "POST",
+    //        headers: { "Content-Type": "application/json" },
+    //        body: JSON.stringify({
+    //            Username: form.Email,
+    //            Password: form.Wachtwoord,
+    //        }),
+    //    });
+    //    return resp;
+    //};
+
+    const tryLogin = async (url, Email, Password) => {
+        const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                Username: form.Email,
-                Password: form.Wachtwoord,
-            }),
+            body: JSON.stringify({ Username: Email, Password })
         });
-        return resp;
+
+        if (!res.ok) throw new Error("Login failed");
+        const data = await res.json(); // zit de token in { token: "eyJhbGciOi..." }
+        localStorage.setItem("token", data.token);
     };
 
     const handleSubmit = async (e) => {
@@ -63,10 +75,10 @@ function Login() {
         const supUrl = `${API_BASE}/api/Supplier/login`;
 
         try {
-            let resp = await tryLogin(amUrl);
+            let resp = await tryLogin(amUrl, form.Email, form.Password);
 
             if (!resp.ok) {
-                const respSup = await tryLogin(supUrl);
+                const respSup = await tryLogin(supUrl, form.Email, form.Password);
 
                 if (!respSup.ok) {
                     if (resp.status === 401 && respSup.status === 401) {
@@ -132,11 +144,11 @@ function Login() {
                     />
                 </div>
                 <div>
-                    <label>Wachtwoord:</label>
+                    <label>Password:</label>
                     <input
                         type="password"
-                        name="Wachtwoord"
-                        value={form.Wachtwoord}
+                        name="Password"
+                        value={form.Password}
                         onChange={handleChange}
                         required
                     />
@@ -145,7 +157,7 @@ function Login() {
                 {error && <div className="login-error" style={{ color: "crimson", marginTop: 8 }}>{error}</div>}
 
                 <button type="submit" disabled={loading} style={{ marginTop: 12 }}>
-                    {loading ? "Inloggen..." : "Inloggen"}
+                    {loading ? "Logging in..." : "Log in"}
                 </button>
             </form>
         </div>
