@@ -41,29 +41,29 @@ function Login() {
         );
     };
 
-    //const tryLogin = async (url) => {
-    //    const resp = await fetch(url, {
-    //        method: "POST",
-    //        headers: { "Content-Type": "application/json" },
-    //        body: JSON.stringify({
-    //            Username: form.Email,
-    //            Password: form.Wachtwoord,
-    //        }),
-    //    });
-    //    return resp;
-    //};
-
-    const tryLogin = async (url, Email, Password) => {
-        const res = await fetch(url, {
+    const tryLogin = async (url) => {
+        const resp = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ Username: Email, Password })
+            body: JSON.stringify({
+                Username: form.Email,
+                Password: form.Password,
+            }),
         });
-
-        if (!res.ok) throw new Error("Login failed");
-        const data = await res.json(); // zit de token in { token: "eyJhbGciOi..." }
-        localStorage.setItem("token", data.token);
+        return resp;
     };
+
+    //const tryLogin = async (url, Email, Password) => {
+    //    const res = await fetch(url, {
+    //        method: "POST",
+    //        headers: { "Content-Type": "application/json" },
+    //        body: JSON.stringify({ Username: Email, Password })
+    //    });
+
+    //    if (!res.ok) throw new Error("Login failed");
+    //    const data = await res.json(); // zit de token in { token: "eyJhbGciOi..." }
+    //    localStorage.setItem("token", data.token);
+    //};
 
     const handleSubmit = async (e) => {
         e.preventDefault();

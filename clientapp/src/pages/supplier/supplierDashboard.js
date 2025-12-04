@@ -162,15 +162,15 @@ function SupplierDashboard() {
                     <div className="stats">
                         <div className="stat-card">
                             <div className="stat-label">Total Plants</div>
-                            <div className="stat-value">{statsLoading ? "ó" : stats.total}</div>
+                            <div className="stat-value">{statsLoading ? "ÅE : stats.total}</div>
                         </div>
                         <div className="stat-card">
                             <div className="stat-label">Active Plants</div>
-                            <div className="stat-value">{statsLoading ? "ó" : stats.active}</div>
+                            <div className="stat-value">{statsLoading ? "ÅE : stats.active}</div>
                         </div>
                         <div className="stat-card">
                             <div className="stat-label">Draft / Pending</div>
-                            <div className="stat-value">{statsLoading ? "ó" : stats.draft}</div>
+                            <div className="stat-value">{statsLoading ? "ÅE : stats.draft}</div>
                         </div>
                     </div>
 

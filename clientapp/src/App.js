@@ -12,6 +12,7 @@ import AuctionMasterActiveAuctions from "./pages/master/activeAuctionsMA";
 import AuctionMasterUpcomingAuctions from "./pages/master/upcomingAuctionsMA";
 import AuctionMasterCreateAuctions from "./pages/master/createAuctionsMA";
 import SupplierDashboard from "./pages/supplier/supplierDashboard";
+import CreatePlant from "./pages/supplier/createPlant"; // <-- new import
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/upcomingAuctionsMA" element={<AuctionMasterUpcomingAuctions />} />
                 <Route path="/createAuctionMA" element={<AuctionMasterCreateAuctions />} />
                 <Route path="/supplierDashboard" element={<SupplierDashboard />} />
+                <Route path="/createPlant" element={<CreatePlant />} />
             </Routes>
         </Router>
     );
