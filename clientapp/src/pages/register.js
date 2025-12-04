@@ -88,22 +88,22 @@ function Register() {
                         </div>
                     </div>
 
-                    <div>
-                        <label>Contact Person Name:</label>
-                        <input
-                            type="text"
-                            name="ContactPersonName"
-                            value={form.ContactPersonName}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+                    {/*<div>*/}
+                    {/*    <label>Contact Person Name:</label>*/}
+                    {/*    <input*/}
+                    {/*        type="text"*/}
+                    {/*        name="ContactPersonName"*/}
+                    {/*        value={form.ContactPersonName}*/}
+                    {/*        onChange={handleChange}*/}
+                    {/*        required*/}
+                    {/*    />*/}
+                    {/*</div>*/}
 
                     <div>
-                        <label>Contact Person Phone Number:</label>
+                        <label>Company Phone Number:</label>
                         <input
                             type="tel"
-                            name="ContactPersonPhoneNumber"
+                            name="CompanyPhoneNumber"
                             value={form.ContactPersonPhoneNumber}
                             onChange={handleChange}
                             required
@@ -111,10 +111,10 @@ function Register() {
                     </div>
 
                     <div>
-                        <label>Contact Person Email:</label>
+                        <label>Company Email:</label>
                         <input
                             type="email"
-                            name="ContactPersonEmail"
+                            name="CompanyEmail"
                             value={form.ContactPersonEmail}
                             onChange={handleChange}
                             required
