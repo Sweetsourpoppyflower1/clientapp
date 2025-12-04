@@ -52,4 +52,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="clientapp\src\styles\supplierPages\" />
+  </ItemGroup>
 </Project>
