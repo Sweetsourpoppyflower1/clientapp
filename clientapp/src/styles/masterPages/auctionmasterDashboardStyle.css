@@ -1,0 +1,120 @@
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 100vh;
+}
+
+.section-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    padding: 0 20px;
+    background-color: white;
+}
+
+.section-middle {
+    height: 100px;
+    background-color: #FFE1E3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.section-bottom {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.banner {
+    width: 90%;
+    max-width: 1100px;
+    padding: 12px 18px;
+    background-color: transparent;
+    border-radius: 6px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.banner-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+}
+
+.banner-text {
+    margin: 8px 0 0 0;
+    font-size: 18px;
+    color: #111;
+    line-height: 1.2;
+}
+
+.tiles-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 1100px;
+    box-sizing: border-box;
+}
+
+.tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 340px;
+    height: 440px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    background-clip: padding-box;
+}
+
+.tile1 {
+    background-color: #5A786B;
+    border-radius: 10px 0 0 10px;
+}
+
+.tile2 {
+    background-color: #B35678;
+    border-radius: 0;
+}
+
+.tile3 {
+    background-color: #5A786B;
+    border-radius: 0;
+}
+
+.tile4 {
+    background-color: #B35678;
+    border-radius: 0 10px 10px 0;
+}
+
+.tile-img {
+    max-width: 70%;
+    max-height: 70%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.tile:focus {
+    outline: 3px solid rgba(0,0,0,0.12);
+    outline-offset: 2px;
+}
