@@ -1,0 +1,51 @@
+.button {
+    background-color: #B62B49;
+    text-align: center;
+    align-self: center;
+}
+
+.register-btn {
+    background-color: #B62B49;
+    text-align: center;
+    align-self: center;
+    
+}
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; 
+    padding-top: 20vh; 
+    box-sizing: border-box;
+}
+
+.login-container {
+    width: 420px;
+    max-width: calc(100% - 32px);
+    margin: 0 auto; 
+    padding: 20px;
+    padding-bottom: 20px;
+    border: 2px solid black;
+    border-radius: 8px;
+    align-content: center;
+    text-align: center;
+}
+
+.header {
+    color: #B62B49;
+}
+
+.bold {
+    font-weight: 500;
+}
+
+.form {
+    align-self: center;
+    margin-top: 80px;
+}
+
+.register {
+    padding-top: 50px;
+
+}

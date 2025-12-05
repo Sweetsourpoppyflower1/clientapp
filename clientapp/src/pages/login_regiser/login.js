@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../../styles/login_registerPages/loginStyle.css";
 
 const AUTH_ENDPOINT = "/api/Auth/login"; 
 
@@ -112,39 +113,54 @@ export default function Login() {
     }
 
     return (
-        <div style={{ maxWidth: 420, margin: "2rem auto" }}>
-            <h2>Log in</h2>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Email
-                    <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="username"
-                        style={{ display: "block", width: "100%", marginBottom: 8 }}
-                    />
-                </label>
+        <html>
+            <head>
+                <h2 className="header">Log in</h2>
+            </head>
+            <body>
+                <div className="login-page">
+                    <div className="login-container" style={{ maxWidth: 420 }}>
+                        <div className="form">
+                            <form onSubmit={handleSubmit}>
+                                <label className="bold">
+                                    Email
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        autoComplete="username"
+                                        style={{ display: "block", width: "100%", marginBottom: 10 }}
+                                    />
+                                </label>
 
-                <label>
-                    Password
-                    <input
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
-                        style={{ display: "block", width: "100%", marginBottom: 12 }}
-                    />
-                </label>
+                                <label className="bold">
+                                    Password
+                                    <input
+                                        type="password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        autoComplete="current-password"
+                                        style={{ display: "block", width: "100%", marginBottom: 50 }}
+                                    />
+                                </label>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign in"}
-                </button>
+                                <button className="button" type="submit" disabled={loading}>
+                                    {loading ? "Signing in..." : "Sign in"}
+                                </button>
 
-                {error && <div style={{ marginTop: 12, color: "crimson" }}>{error}</div>}
-            </form>
-        </div>
+                                {error && <div style={{ marginTop: 12, color: "crimson" }}>{error}</div>}
+                            </form>
+                            <div className="register">
+                                <p className="no-account">No account? Register here: </p>
+                                <button className="register-btn">Register</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </html>
+        
     );
 }
