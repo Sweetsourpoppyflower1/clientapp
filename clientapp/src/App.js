@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import RegisterCompany from "./pages/login_regiser/registerCompany.js";
 import RegisterSupplier from "./pages/login_regiser/registerSupplier.js";
+import LoginUser from "./pages/login_regiser/login.js";
+import AOverviewUpcomingAuctions from "./pages/master/a_overviewUpcomingAuctions.js";
 
 function App() {
     return (
@@ -10,6 +12,8 @@ function App() {
                 <Route path="/" element={<Navigate to="/login_register/registerCompany" replace />} />
                 <Route path="/login_register/registerCompany" element={<RegisterCompany />} />
                 <Route path="/login_register/registerSupplier" element={<RegisterSupplier />} />
+                <Route path="/login_register/login" element={<LoginUser /> } />
+                <Route path="/master/a_overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
             </Routes>
         </Router>
     );
