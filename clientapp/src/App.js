@@ -5,6 +5,7 @@ import RegisterSupplier from "./pages/login_regiser/registerSupplier.js";
 import LoginUser from "./pages/login_regiser/login.js";
 import AOverviewUpcomingAuctions from "./pages/master/a_overviewUpcomingAuctions.js";
 import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
+import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
 
 function App() {
     return (
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/login_register/registerSupplier" element={<RegisterSupplier />} />
                 <Route path="/login_register/login" element={<LoginUser /> } />
                 <Route path="/master/a_overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
+                <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
             </Routes>
         </Router>
