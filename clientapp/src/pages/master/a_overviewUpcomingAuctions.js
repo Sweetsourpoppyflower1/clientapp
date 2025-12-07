@@ -6,10 +6,25 @@ import { useNavigate } from "react-router-dom";
 
 export default function AOverviewUpcomingAuctions() {
     const [upcoming, setUpcoming] = useState([]);
+    const [logo, setLogo] = useState(null);
     const [plantMap, setPlantMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const mediaId = 1;
+        fetch(`/api/Media/${mediaId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch media');
+                return res.json();
+            })
+            .then(m => {
+                const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
+                setLogo({ url: normalizedUrl, alt: m.alt_text });
+            })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         let mounted = true;
@@ -75,58 +90,65 @@ export default function AOverviewUpcomingAuctions() {
     return (
         <div className="au-page">
 
-            <div className="au-header">
-                <h1 className="au-title">Flauction</h1>
+            <div className="logo-au-header">
+                {logo ? (
+                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                ) : (
+                    <span className="loading-label">Loading…</span>
+                )}
             </div>
 
-            <div>
-                <h2 className="upcoming-header">Upcoming Auctions</h2>
-            </div>
+            <div className="body-upc">
+                <div>
+                    <h2 className="upcoming-header">Upcoming Auctions</h2>
+                </div>
 
-            <div className="au-panels">
-                <div className="au-panel au-today">
-                    <div className="au-panel-header">Today</div>
+                <div className="au-panels">
+                    <div className="au-panel au-today">
+                        <div className="au-panel-header">Today</div>
 
-                    <div className="au-panel-body">
+                        <div className="au-panel-body">
+
+                        </div>
 
                     </div>
 
-                </div>
-
-                <div className="au-panel au-rest">
-                    <div className="au-panel-header au-rest-header">Rest</div>
-                    <div className="au-panel-body au-rest-body">
-                        {upcoming.length === 0 && <div className="au-no-items">No upcoming auctions found.</div>}
-                        <ul className="au-list">
-                            {upcoming.map((a) => {
-                                const plantKey = String(a.plant_id ?? a.PlantId ?? a.plantId);
-                                const plantName = plantMap[plantKey];
-                                return (
-                                    <li key={a.auction_id} className="au-list-item">
-                                        <div><strong>Plant: </strong> {plantName ?? a.plant_id}</div>
-                                        <div>
-                                            <strong>Start:</strong>{" "}
-                                            {a.start_time
-                                                ? new Date(a.start_time).toLocaleString()
-                                                : "N/A"}
-                                        </div>
-                                        <div>
-                                            <strong>End:</strong> {a.end_time ? new Date(a.end_time).toLocaleString() : "N/A"}
-                                        </div>
-                                        <div><strong>Start Price:</strong> {a.start_price}</div>
-                                        <div><strong>Min Price:</strong> {a.min_price}</div>
-                                        <hr />
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                    <div className="au-panel au-rest">
+                        <div className="au-panel-header au-rest-header">Rest</div>
+                        <div className="au-panel-body au-rest-body">
+                            {upcoming.length === 0 && <div className="au-no-items">No upcoming auctions found.</div>}
+                            <ul className="au-list">
+                                {upcoming.map((a) => {
+                                    const plantKey = String(a.plant_id ?? a.PlantId ?? a.plantId);
+                                    const plantName = plantMap[plantKey];
+                                    return (
+                                        <li key={a.auction_id} className="au-list-item">
+                                            <div><strong>Plant: </strong> {plantName ?? a.plant_id}</div>
+                                            <div>
+                                                <strong>Start:</strong>{" "}
+                                                {a.start_time
+                                                    ? new Date(a.start_time).toLocaleString()
+                                                    : "N/A"}
+                                            </div>
+                                            <div>
+                                                <strong>End:</strong> {a.end_time ? new Date(a.end_time).toLocaleString() : "N/A"}
+                                            </div>
+                                            <div><strong>Start Price:</strong> {a.start_price}</div>
+                                            <div><strong>Min Price:</strong> {a.min_price}</div>
+                                            <hr />
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div>            
 
             <NavigationDropdownMenu navigateFn={(p) => navigate(p)} />
 
             <AccountDropdownMenu />
+
         </div>
     );
 }
