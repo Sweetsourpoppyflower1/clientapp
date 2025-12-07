@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/masterPages/a_overviewUpcomingAuctionsStyle.css";
+import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
+import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
+import { useNavigate } from "react-router-dom";
 
 export default function AOverviewUpcomingAuctions() {
     const [upcoming, setUpcoming] = useState([]);
     const [plantMap, setPlantMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         let mounted = true;
@@ -119,6 +123,10 @@ export default function AOverviewUpcomingAuctions() {
                     </div>
                 </div>
             </div>
+
+            <NavigationDropdownMenu navigateFn={(p) => navigate(p)} />
+
+            <AccountDropdownMenu />
         </div>
     );
 }

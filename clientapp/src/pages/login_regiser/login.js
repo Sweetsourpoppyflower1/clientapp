@@ -22,9 +22,9 @@ export default function Login() {
   function redirectForRole(role) {
     if (!role) return;
     const r = String(role).toLowerCase();
-    if (r === "client") window.location.href = "/companyDashboard";
-    else if (r === "supplier") window.location.href = "/supplierDashboard";
-    else if (r === "admin") window.location.href = "/auctionmasterDashboard";
+    if (r === "client") window.location.href = "/company/companyDashboard";
+    else if (r === "supplier") window.location.href = "/supplier/supplierDashboard";
+    else if (r === "admin") window.location.href = "/master/auctionmasterDashboard";
     else window.location.href = "/login_register/login";
   }
 

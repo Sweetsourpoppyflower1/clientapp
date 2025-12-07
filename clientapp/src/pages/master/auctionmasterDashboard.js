@@ -46,19 +46,19 @@ export default function AuctionmasterDashboard() {
     }, []);
 
     const handleCreateAuction = () => {
-        window.location.href = '/master/createAuction';
+        window.location.href = '/master/a_createAuction';
     };
 
-    const handleOverviewAuctionCalendar = () => {
-        window.location.href = '/master/overviewAuctionCalendar';
+    const handleUpcomingAuctions = () => {
+        window.location.href = '/master/a_overviewUpcomingAuctions';
     };
 
     const handleOverviewStock = () => {
-        window.location.href = '/master/overviewStock';
+        window.location.href = '/master/a_overviewStock';
     };
 
     const handleOverviewAcceptances = () => {
-        window.location.href = '/master/overviewAcceptances';
+        window.location.href = '/master/a_overviewAcceptances';
     };
 
     const renderTileContent = (index, placeholderSvg) => {
@@ -109,7 +109,7 @@ export default function AuctionmasterDashboard() {
                         {renderTileContent(0, placeholderSvg)}
                     </button>
 
-                    <button className="tile tile2" aria-label="Auction Calendar" onClick={handleOverviewAuctionCalendar}>
+                    <button className="tile tile2" aria-label="Upcoming Auctions" onClick={handleUpcomingAuctions}>
                         {renderTileContent(1, placeholderSvg)}
                     </button>
 

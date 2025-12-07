@@ -3,7 +3,6 @@ import "./account_dropdown_menu.css";
 
 export default function AccountDropdownMenu({
   userName = "<user>",
-  userRole = "<userRole>",
   logoutFn,
   logoutUrl = "http://localhost:3000/login",
 }) {
@@ -65,7 +64,6 @@ export default function AccountDropdownMenu({
             <div className="acc-logged-as">Logged in as:</div>
             <div className="acc-user">
               <span className="acc-username">{userName}</span>
-              <span className="acc-role"> ({userRole})</span>
             </div>
           </div>
         </div>
