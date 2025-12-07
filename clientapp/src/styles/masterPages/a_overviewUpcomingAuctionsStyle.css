@@ -1,19 +1,18 @@
-/* Page container */
 .au-page {
     padding: 20px 20px;
     box-sizing: border-box;
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
 }
 
-/* Title centered */
-.au-title {
-    text-align: center;
-    margin-bottom: 5vw;
-    font-weight: 500;
-    color: #222;
+.body-upc {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
 }
 
-/* Panels layout */
 .au-panels {
     display: flex;
     gap: 20px;
@@ -22,7 +21,6 @@
     width: 100vw;
 }
 
-/* Generic panel */
 .au-panel {
     box-shadow: none;
     border-radius: 2px;
@@ -31,45 +29,42 @@
     flex-direction: column;
 }
 
-/* Panel header (thin dark bar) */
 .au-panel-header {
     padding: 12px 16px;
     color: #fff;
     font-weight: 600;
+    border: 1px solid black;
+    border-radius: 10px 10px 0px 0px;
 }
 
-/* Panel body (big colored area) */
-/* Use fixed height so panels don't expand the page.
-   Allow the Rest panel to scroll internally. */
 .au-panel-body {
     height: 520px;
     padding: 12px;
     box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 0px 0px 10px 10px;
 }
 
-/* Today panel styles (green) */
 .au-today .au-panel-header {
-    background: #2f6b54; /* darker green header */
+    background: #2f6b54;
     width: 30vw;
 }
 .au-today .au-panel-body {
-    background: #4fb087; /* green body */
+    background-color: #5A786B;
     width: 30vw;
 }
 
-/* Rest panel styles (pink) */
 .au-rest .au-panel-header {
-    background: #b42b42; /* dark red header */
+    background: #b42b42;
     width: 50vw;
 }
 .au-rest .au-panel-body {
-    background: #fee6e8; /* pale pink body */
-    overflow-y: auto; /* enable internal scrolling instead of expanding the page */
+    background-color: #B35678;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     width: 50vw;
 }
 
-/* Optional: nicer thin scrollbar for desktop */
 .au-rest .au-panel-body::-webkit-scrollbar {
     width: 10px;
 }
@@ -83,16 +78,15 @@
     background-clip: padding-box;
 }
 
-/* List styling inside rest panel */
 .au-list {
     list-style: none;
     margin: 0;
-    padding: 6px; /* slight inner padding so cards don't touch edges */
+    padding: 6px;
     color: #222;
 }
 
 .au-list-item {
-    background: #ffffff; /* white card background */
+    background: #ffffff; 
     color: #111;
     margin-bottom: 12px;
     padding: 12px 14px;
@@ -107,24 +101,30 @@
     margin: 10px 0 0 0;
 }
 
-/* Small helper styles */
 .au-no-items {
     color: #333;
     opacity: 0.9;
 }
 
-/* Loading / error */
 .au-loading, .au-error {
     padding: 20px;
     text-align: center;
 }
 
-au-header {
-    width: 100vw;
+logo-au-header {
+    display: flex;
+    justify-content: center;
+    align-content: center;
 }
 
 .upcoming-header {
     display: flex;
     justify-content: center;
     margin-bottom: 2vw;
+}
+
+.u-top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
 }
