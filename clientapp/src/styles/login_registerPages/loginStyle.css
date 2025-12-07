@@ -1,51 +1,81 @@
-.button {
-    background-color: #B62B49;
-    text-align: center;
-    align-self: center;
-}
-
-.register-btn {
-    background-color: #B62B49;
-    text-align: center;
-    align-self: center;
-    
-}
-
-.login-page {
-    min-height: 100vh;
+.login-form {
     display: flex;
-    justify-content: center; 
-    align-items: flex-start; 
-    padding-top: 20vh; 
+    justify-content: center;
+    width: 33vw;
+    align-self: center;
     box-sizing: border-box;
 }
 
-.login-container {
-    width: 420px;
-    max-width: calc(100% - 32px);
-    margin: 0 auto; 
-    padding: 20px;
-    padding-bottom: 20px;
-    border: 2px solid black;
-    border-radius: 8px;
-    align-content: center;
-    text-align: center;
+.login-btn {
+  background-color: #B62B49;
+  border: 1px solid black;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.register-btn {
+  background-color: #FFE1E3;
+  border: 1px solid rgba(0,0,0,0.12);
+  color: #B62B49;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.register-placeholder {
+    margin-top: 20px;
+}
+
+.parent {
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: 1fr minmax(320px, 600px) 1fr;
+  gap: 24px;
+  align-items: start;
+  justify-items: center;
+  min-height: calc(100vh - 120px);
+}
+
+.login-infocard {
+  width: 33vw;
+  display: flex;
+  justify-content: center;
 }
 
 .header {
-    color: #B62B49;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  width: 100vw;
 }
 
-.bold {
-    font-weight: 500;
+.login {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    justify-content: center;
 }
 
-.form {
-    align-self: center;
-    margin-top: 80px;
+.empty {
+    width: 33vw;
 }
 
-.register {
-    padding-top: 50px;
-
+.infocard {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px;
+    border: 2px solid rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    margin: 0;
+    width: 300px;
+    height: 100px;
 }

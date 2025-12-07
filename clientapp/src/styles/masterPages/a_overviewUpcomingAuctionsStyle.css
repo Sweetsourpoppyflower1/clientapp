@@ -1,0 +1,130 @@
+/* Page container */
+.au-page {
+    padding: 20px 20px;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Title centered */
+.au-title {
+    text-align: center;
+    margin-bottom: 5vw;
+    font-weight: 500;
+    color: #222;
+}
+
+/* Panels layout */
+.au-panels {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100vw;
+}
+
+/* Generic panel */
+.au-panel {
+    box-shadow: none;
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel header (thin dark bar) */
+.au-panel-header {
+    padding: 12px 16px;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Panel body (big colored area) */
+/* Use fixed height so panels don't expand the page.
+   Allow the Rest panel to scroll internally. */
+.au-panel-body {
+    height: 520px;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+/* Today panel styles (green) */
+.au-today .au-panel-header {
+    background: #2f6b54; /* darker green header */
+    width: 30vw;
+}
+.au-today .au-panel-body {
+    background: #4fb087; /* green body */
+    width: 30vw;
+}
+
+/* Rest panel styles (pink) */
+.au-rest .au-panel-header {
+    background: #b42b42; /* dark red header */
+    width: 50vw;
+}
+.au-rest .au-panel-body {
+    background: #fee6e8; /* pale pink body */
+    overflow-y: auto; /* enable internal scrolling instead of expanding the page */
+    -webkit-overflow-scrolling: touch;
+    width: 50vw;
+}
+
+/* Optional: nicer thin scrollbar for desktop */
+.au-rest .au-panel-body::-webkit-scrollbar {
+    width: 10px;
+}
+.au-rest .au-panel-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.au-rest .au-panel-body::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.12);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* List styling inside rest panel */
+.au-list {
+    list-style: none;
+    margin: 0;
+    padding: 6px; /* slight inner padding so cards don't touch edges */
+    color: #222;
+}
+
+.au-list-item {
+    background: #ffffff; /* white card background */
+    color: #111;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.au-list-item hr {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    margin: 10px 0 0 0;
+}
+
+/* Small helper styles */
+.au-no-items {
+    color: #333;
+    opacity: 0.9;
+}
+
+/* Loading / error */
+.au-loading, .au-error {
+    padding: 20px;
+    text-align: center;
+}
+
+au-header {
+    width: 100vw;
+}
+
+.upcoming-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2vw;
+}
