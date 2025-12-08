@@ -1,0 +1,150 @@
+
+body {
+    background: #fff; 
+}
+
+.stock-page {
+    max-width: 980px;
+    margin: 20px auto;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #222;
+    background-color: #fff; 
+    padding: 18px; 
+    border-radius: 6px;
+}
+
+.stock-header {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.stock-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 4px auto;
+}
+
+.stock-title {
+    font-size: 24px;
+    margin: 6px 0 0 0;
+}
+
+.stock-table-wrapper {
+    height: 420px; 
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #ddd inset;
+    background: #fff;
+}
+
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.stock-th {
+    background: #2f7a62;
+    color: #fff;
+    padding: 12px 10px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.stock-td {
+    padding: 14px 10px;
+    border-bottom: 1px solid #e6efe9;
+    background: #59b889;
+    color: #fff;
+    word-break: break-word;
+}
+
+.stock-plant-name { cursor: pointer; }
+.stock-supplier { }
+
+.no-stock {
+    text-align: center;
+    background: #f8f8f8;
+    color: #666;
+}
+
+.stock-details-row {
+    background: #FFE1E3;
+    padding: 16px;
+    color: #111;
+}
+
+.stock-details-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.stock-picture-box {
+    width: 150px;
+    height: 120px;
+    background: transparent;
+    border: none; 
+    box-shadow: none; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.stock-picture {
+    max-width: 140px;
+    max-height: 110px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.stock-details-content {
+    flex: 1;
+}
+
+.stock-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    color: #111;
+}
+
+.stock-label {
+    font-weight: 600;
+    margin-right: 6px;
+    color: #111;
+}
+
+@media (max-width: 720px) {
+    .stock-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stock-table-wrapper {
+        height: 360px;
+    }
+
+    .stock-logo {
+        max-height: 54px;
+    }
+
+    .stock-picture-box {
+        width: 120px;
+        height: 96px;
+    }
+
+    .stock-picture {
+        max-width: 110px;
+        max-height: 86px;
+    }
+}
