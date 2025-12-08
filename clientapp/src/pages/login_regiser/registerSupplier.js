@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/registerStyle.css";
+import * as IBAN from "iban";
+
 export default function RegisterSupplier() {
     const [form, setForm] = useState({
         email: "",
@@ -13,13 +15,45 @@ export default function RegisterSupplier() {
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [logo, setLogo] = useState(null);
+    const isValidPostalCode = (code) => /^[0-9]{4}[A-Za-z]{2}$/.test(code);
+    const countries = ["Netherlands", "Belgium", "Luxemburg"];
 
     const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+    useEffect(() => {
+        const mediaId = 1;
+        fetch(`/api/Media/${mediaId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch media');
+                return res.json();
+            })
+            .then(m => {
+                const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
+                setLogo({ url: normalizedUrl, alt: m.alt_text });
+            })
+            .catch(() => { });
+    }, []);
 
     const onSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
+
+        if (!IBAN.isValid(form.iban)) {
+            setError("Invalid IBAN number.");
+            return;
+        }
+
+        if (!isValidPostalCode(form.postalCode)) {
+            setError("Invalid postal code. Format must be 4 digits followed by 2 letters.");
+            return;
+        }
+
+        if (!countries.includes(form.country)) {
+            setError("Invalid country selected.");
+            return;
+        }
 
         const payload = {
             SupplierEmail: form.email,
@@ -66,7 +100,11 @@ export default function RegisterSupplier() {
         <div className="r-parent">
 
             <div className="r-header">
-                <h2>Flauction</h2>
+                {logo ? (
+                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                ) : (
+                    <span className="loading-label">Loading…</span>
+                )}
             </div>
 
             {error && <div style={{ color: "red" }}>{typeof error === "string" ? error : JSON.stringify(error)}</div>}
@@ -104,8 +142,17 @@ export default function RegisterSupplier() {
                         </div>
                         <div>
                             <label>Country</label>
-                            <input name="country" value={form.country} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <select
+                                name="country"
+                                value={form.country}
+                                onChange={onChange}
+                                required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
+                            >
+                                {countries.map((c) => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label>IBAN</label>

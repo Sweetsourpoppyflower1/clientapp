@@ -13,7 +13,7 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Navigate to="/login_register/registerOptions" replace />} />
+                <Route path="/" element={<Navigate to="/login_register/login" replace />} />
                 <Route path="/login_register/registerOptions" element={<RegisterOptions />} />
                 <Route path="/login_register/registerCompany" element={<RegisterCompany />} />
                 <Route path="/login_register/registerSupplier" element={<RegisterSupplier />} />
