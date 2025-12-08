@@ -234,7 +234,11 @@ export default function CreateAuction() {
       <div className="create-auction-grid">
         <div className="left-panel">
           <div className="carousel">
-            <button aria-label="prev" onClick={onPrevImage} className="arrow-button">&lt;</button>
+            <button aria-label="previous image" onClick={onPrevImage} className="arrow-button" type="button">
+              <svg className="icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
             <div className="image-wrapper">
               {selectedImage ? (
                 <img src={resolveMediaUrl(selectedImage.url)} alt={selectedImage.alt_text || "plant image"} />
@@ -242,7 +246,11 @@ export default function CreateAuction() {
                 <div style={{ color: "#333" }}>No image</div>
               )}
             </div>
-            <button aria-label="next" onClick={onNextImage} className="arrow-button">&gt;</button>
+            <button aria-label="next image" onClick={onNextImage} className="arrow-button" type="button">
+              <svg className="icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
 
           <div className="thumbnails">
@@ -275,7 +283,7 @@ export default function CreateAuction() {
           <input className="input" type="text" readOnly value={selectedPlant?.min_price ?? ""} />
 
           <label className="label">Description</label>
-          <textarea className="input" readOnly value={selectedPlant?.desc ?? ""} rows={16} />
+          <textarea className="input" readOnly value={selectedPlant?.desc ?? ""} rows={7} />
         </div>
 
         <div className="right-panel">
