@@ -17,7 +17,7 @@ function App() {
                 <Route path="/login_register/login" element={<LoginUser /> } />
                 <Route path="/master/a_overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
                 <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
-                <Route path="/login_register/registerOptions" element={<RegisterOptions /> } />
+                <Route path="/login_regiser/registerOptions" element={<RegisterOptions /> } />
             </Routes>
         </Router>
     );

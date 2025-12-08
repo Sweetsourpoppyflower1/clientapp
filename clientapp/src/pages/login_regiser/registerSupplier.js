@@ -51,6 +51,8 @@ export default function RegisterSupplier() {
                     iban: "",
                     desc: ""
                 });
+                window.location.href = "/login_register/login";
+
             } else {
                 const body = await res.json().catch(() => null);
                 setError(body || JSON.stringify(body) || `Status ${res.status}`);

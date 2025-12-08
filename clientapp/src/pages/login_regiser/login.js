@@ -25,7 +25,7 @@ export default function Login() {
     if (r === "client") window.location.href = "/company/companyDashboard";
     else if (r === "supplier") window.location.href = "/supplier/supplierDashboard";
     else if (r === "admin") window.location.href = "/master/auctionmasterDashboard";
-    else window.location.href = "/login_register/login";
+    else window.location.href = "/login_regiser/login";
   }
 
   async function handleSubmit(e) {
