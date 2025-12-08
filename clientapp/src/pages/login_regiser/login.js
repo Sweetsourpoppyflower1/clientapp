@@ -49,6 +49,9 @@ export default function Login() {
 
       const roles = data?.roles ?? data?.Roles ?? null;
       if (Array.isArray(roles) && roles.length > 0) {
+        localStorage.setItem("user_email", data?.email ?? data?.Email ?? "");
+        localStorage.setItem("user_roles", JSON.stringify(roles));
+        if (data?.data) localStorage.setItem("user_data", JSON.stringify(data.data));
         redirectForRole(roles[0]);
         return;
       }

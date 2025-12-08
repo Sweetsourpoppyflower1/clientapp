@@ -2,12 +2,22 @@ import React, { useEffect, useRef, useState } from "react";
 import "./account_dropdown_menu.css";
 
 export default function AccountDropdownMenu({
-  userName = "<user>",
+  userName,
   logoutFn,
-  logoutUrl = "http://localhost:3000/login",
+  logoutUrl = "/login_register/login",
 }) {
   const [open, setOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState(userName ?? "<user>");
   const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!userName) {
+      const stored = localStorage.getItem("user_email");
+      if (stored) setUserEmail(stored);
+    } else {
+      setUserEmail(userName);
+    }
+  }, [userName]);
 
   useEffect(() => {
     function onDocClick(e) {
@@ -28,12 +38,22 @@ export default function AccountDropdownMenu({
     }
   }, [open]);
 
+  function clearUserStorage() {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_roles");
+    localStorage.removeItem("user_data");
+  }
+
   function handleLogout() {
     setOpen(false);
+    clearUserStorage();
+
     if (typeof logoutFn === "function") {
       logoutFn();
       return;
     }
+
     window.location.href = logoutUrl;
   }
 
@@ -63,7 +83,7 @@ export default function AccountDropdownMenu({
           <div className="acc-logged-in">
             <div className="acc-logged-as">Logged in as:</div>
             <div className="acc-user">
-              <span className="acc-username">{userName}</span>
+              <span className="acc-username">{userEmail ?? "<user>"}</span>
             </div>
           </div>
         </div>
