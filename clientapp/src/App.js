@@ -8,6 +8,8 @@ import AOverviewUpcomingAuctions from "./pages/master/a_overviewUpcomingAuctions
 import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
 import AStockOverview from "./pages/master/a_stockOverview.js";
 import ACreateAuction from "./pages/master/a_createAuction.js";
+import RegisterOptions from "./pages/login_regiser/registerOptions.js"
+import Auctions from "./pages/company/c_auctions.js"
 
 function App() {
     return (
@@ -22,6 +24,8 @@ function App() {
                 <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/master/a_overviewStock" element={<AStockOverview />} />
                 <Route path="/master/a_createAuction" element={<ACreateAuction />} />
+                <Route path="/login_register/registerOptions" element={<RegisterOptions />} />
+                <Route path="/company/auctions" element={<Auctions />} />
             </Routes>
         </Router>
     );
