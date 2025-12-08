@@ -1,0 +1,130 @@
+.au-page {
+    padding: 20px 20px;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.body-upc {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+}
+
+.au-panels {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100vw;
+}
+
+.au-panel {
+    box-shadow: none;
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.au-panel-header {
+    padding: 12px 16px;
+    color: #fff;
+    font-weight: 600;
+    border: 1px solid black;
+    border-radius: 10px 10px 0px 0px;
+}
+
+.au-panel-body {
+    height: 520px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 0px 0px 10px 10px;
+}
+
+.au-today .au-panel-header {
+    background: #2f6b54;
+    width: 30vw;
+}
+.au-today .au-panel-body {
+    background-color: #5A786B;
+    width: 30vw;
+}
+
+.au-rest .au-panel-header {
+    background: #b42b42;
+    width: 50vw;
+}
+.au-rest .au-panel-body {
+    background-color: #B35678;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 50vw;
+}
+
+.au-rest .au-panel-body::-webkit-scrollbar {
+    width: 10px;
+}
+.au-rest .au-panel-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.au-rest .au-panel-body::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.12);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.au-list {
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    color: #222;
+}
+
+.au-list-item {
+    background: #ffffff; 
+    color: #111;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.au-list-item hr {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    margin: 10px 0 0 0;
+}
+
+.au-no-items {
+    color: #333;
+    opacity: 0.9;
+}
+
+.au-loading, .au-error {
+    padding: 20px;
+    text-align: center;
+}
+
+logo-au-header {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.upcoming-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2vw;
+}
+
+.u-top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+}

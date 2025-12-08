@@ -1,4 +1,5 @@
 ﻿import React, { useState } from "react";
+import "../../styles/login_registerPages/registerStyle.css";
 
 export default function RegisterCompany() {
     const [form, setForm] = useState({
@@ -64,49 +65,109 @@ export default function RegisterCompany() {
     };
 
     return (
-        <div>
-            <h2>Register Company</h2>
+        <div className="r-parent">
+
+            <div className="r-header">
+                <h2>Flauction</h2>
+            </div>
+
             {error && <div style={{ color: "red" }}>{error}</div>}
             {success && <div style={{ color: "green" }}>Registration successful</div>}
-            <form onSubmit={onSubmit}>
-                <div>
-                    <label>Email</label>
-                    <input name="email" type="email" value={form.email} onChange={onChange} required />
+
+            <div className="r-register">
+
+                {/*<div className="r-register-infocard">*/}
+
+                {/*    <div class="r-infocard">*/}
+                {/*        <h2>Register</h2>*/}
+                {/*        <p>Register your account at Flauction</p>*/}
+                {/*    </div>*/}
+
+                {/*</div>  */}
+
+                <div className="r-register-form">
+
+                    <form className="form" onSubmit={onSubmit}>
+
+                        <div>
+                            <label>Email Address</label>
+                            <input name="email" type="email" value={form.email} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>Password</label>
+                            <input name="password" type="password" value={form.password} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>Company Name</label>
+                            <input name="companyName" value={form.companyName} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>Company Address</label>
+                            <input name="address" value={form.address} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>Postal Code</label>
+                            <input name="postalCode" value={form.postalCode} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>Country</label>
+                            <input name="country" value={form.country} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>VAT Number</label>
+                            <input name="vat" value={form.vat} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>IBAN</label>
+                            <input name="iban" value={form.iban} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <div>
+                            <label>BIC / SWIFT</label>
+                            <input name="bic" value={form.bic} onChange={onChange} required
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                        </div>
+
+                        <button className="r-register-btn" type="submit">Register</button>
+
+                        <div className="r-login-placeholder">
+                            Already a member? Log in here:
+                        </div>
+
+                        <button
+                            type="button"
+                            className="r-login-btn"
+                            onClick={() => (window.location.href = "/login_register/login")}
+                        >
+                            Login
+                        </button>
+
+                    </form>
+
                 </div>
-                <div>
-                    <label>Password</label>
-                    <input name="password" type="password" value={form.password} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>Company name</label>
-                    <input name="companyName" value={form.companyName} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>Address</label>
-                    <input name="address" value={form.address} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>Postal code</label>
-                    <input name="postalCode" value={form.postalCode} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>Country</label>
-                    <input name="country" value={form.country} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>VAT</label>
-                    <input name="vat" value={form.vat} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>IBAN</label>
-                    <input name="iban" value={form.iban} onChange={onChange} required />
-                </div>
-                <div>
-                    <label>BIC / Swift</label>
-                    <input name="bic" value={form.bic} onChange={onChange} required />
-                </div>
-                <button type="submit">Register</button>
-            </form>
+
+            </div>
+
+            <div className="r-empty">
+
+            </div>
+
         </div>
     );
+
 }
