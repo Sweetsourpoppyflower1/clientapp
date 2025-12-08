@@ -6,6 +6,7 @@ import LoginUser from "./pages/login_regiser/login.js";
 import AOverviewUpcomingAuctions from "./pages/master/a_overviewUpcomingAuctions.js";
 import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
 import ACreateAuction from "./pages/master/a_createAuction.js";
+import RegisterOptions from "./pages/login_regiser/registerOptions.js"
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/master/a_overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
                 <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/master/a_createAuction" element={<ACreateAuction />} />
+                <Route path="/login_register/registerOptions" element={<RegisterOptions /> } />
             </Routes>
         </Router>
     );
