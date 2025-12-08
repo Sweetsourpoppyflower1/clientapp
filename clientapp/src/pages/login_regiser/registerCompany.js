@@ -1,5 +1,6 @@
 ﻿import React, { useState } from "react";
 import "../../styles/login_registerPages/registerStyle.css";
+import * as IBAN from "iban";
 
 export default function RegisterCompany() {
     const [form, setForm] = useState({
@@ -22,6 +23,11 @@ export default function RegisterCompany() {
         e.preventDefault();
         setError(null);
         setSuccess(false);
+
+        if (!IBAN.isValid(form.iban)) {
+            setError("Invalid IBAN number.");
+            return;
+        }
 
         const payload = {
             CompanyEmail: form.email,
@@ -55,6 +61,8 @@ export default function RegisterCompany() {
                     iban: "",
                     bic: ""
                 });
+                window.location.href = "/login_regiser/login";
+
             } else {
                 const body = await res.json();
                 setError(body?.error || JSON.stringify(body));
@@ -63,6 +71,7 @@ export default function RegisterCompany() {
             setError(ex.message);
         }
     };
+
 
     return (
         <div className="r-parent">
