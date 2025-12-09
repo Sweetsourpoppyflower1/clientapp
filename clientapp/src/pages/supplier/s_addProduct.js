@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../../styles/supplierPages/supplierDashboardStyle.css';
+import '../../styles/supplierPages/s_addProductStyle.css';
 import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 
@@ -18,23 +18,19 @@ export default function SAddProduct() {
   const [primaryImageFile, setPrimaryImageFile] = useState(null);
   const [secondaryImages, setSecondaryImages] = useState([]);
 
-    const [logo, setLogo] = useState(null);
+  const [logo, setLogo] = useState(null);
+  const userName = 'user';
+  const userRole = 'Supplier';
 
-    const userName = 'user';
-    const userRole = 'Supplier';
-
-
-  // New auction lot fields
+  const [startPrice, setStartPrice] = useState(0);
+  const [minPrice, setMinPrice] = useState(0);
   const [unitPerContainer, setUnitPerContainer] = useState(1);
-  const [containersInLot, setContainersInLot] = useState(1);
   const [minPickup, setMinPickup] = useState(1);
-  const [startQuantity, setStartQuantity] = useState(1);
+  const [totalQuantity, setTotalQuantity] = useState(1);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-
-  const API_ENDPOINT = "/api/supplier/plants"; // adjust to your backend route
 
   function resetForm() {
     setProductName("");
@@ -47,28 +43,52 @@ export default function SAddProduct() {
     setMaturity("");
     setPrimaryImageFile(null);
     setSecondaryImages([]);
-
-    // reset new fields
+    setStartPrice(0);
+    setMinPrice(0);
     setUnitPerContainer(1);
-    setContainersInLot(1);
     setMinPickup(1);
-    setStartQuantity(1);
+    setTotalQuantity(1);
+  }
+
+  useEffect(() => {
+    const mediaId = 1;
+    fetch(`/api/Media/${mediaId}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch media');
+        return res.json();
+      })
+      .then(m => {
+        const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
+        setLogo({ url: normalizedUrl, alt: m.alt_text || m.altText || '' });
+      })
+      .catch(() => { /* silent fallback */ });
+  }, []);
+
+  async function uploadPlantMedia(file, plantId, isPrimary, token) {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("plant_id", String(plantId));
+    fd.append("alt_text", file.name || "");
+    fd.append("is_primary", isPrimary ? "true" : "false");
+
+    const res = await fetch("/api/MediaPlant/upload", {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: fd,
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => null);
+      throw new Error(txt || `MediaPlant upload failed (${res.status})`);
     }
 
-    useEffect(() => {
-        // Top logo (media id 1)
-        const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch media');
-                return res.json();
-            })
-            .then(m => {
-                const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
-            })
-            .catch(() => { /* silent fallback */ });
-    }, []);
+    const json = await res.json().catch(() => null);
+    return {
+      url: json.url || json.Url || json.imageUrl || json.url_path || (json?.data && json.data.url),
+      alt_text: json.alt_text || json.AltText || file.name,
+      mediaplant_id: json.mediaplant_id || json.MediaPlantId || json.id,
+    };
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -84,46 +104,78 @@ export default function SAddProduct() {
 
     try {
       const token = localStorage.getItem("auth_token");
+      const userDataStr = localStorage.getItem("user_data");
+      const userData = userDataStr ? JSON.parse(userDataStr) : null;
+      
+      if (!userData || !userData.supplierId) {
+        setError("User data not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
 
-      const formData = new FormData();
-      formData.append("productname", productName);
-      formData.append("desc", description);
-      formData.append("category", category);
-      formData.append("form", form);
-      formData.append("quality", quality);
-      formData.append("min_stem", String(minStem));
-      formData.append("stems_bunch", String(stemsBunch));
-      formData.append("maturity", maturity);
+      const plantPayload = {
+        supplier_id: userData.supplierId,
+        productname: productName,
+        desc: description,
+        category: category,
+        form: form,
+        quality: quality,
+        min_stem: String(minStem),
+        stems_bunch: String(stemsBunch),
+        maturity: maturity,
+        start_price: Number(startPrice),
+        min_price: Number(minPrice)
+      };
 
-      // append new auction lot fields
-      formData.append("UnitPerContainer", String(unitPerContainer));
-      formData.append("ContainersInLot", String(containersInLot));
-      formData.append("MinPickup", String(minPickup));
-      formData.append("StartQuantity", String(startQuantity));
+      const plantRes = await fetch("/api/Plants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(plantPayload),
+      });
+
+      if (!plantRes.ok) {
+        const txt = await plantRes.text().catch(() => null);
+        throw new Error(txt || `Failed to create plant (${plantRes.status})`);
+      }
+
+      const createdPlant = await plantRes.json();
+      const plantId = createdPlant.plant_id || createdPlant.PlantId || createdPlant.id;
+      if (!plantId) throw new Error("Server did not return a plant id.");
+
+      const lotPayload = {
+        plant_id: Number(plantId),
+        unit_per_container: Number(unitPerContainer),
+        min_pickup: Number(minPickup),
+        start_quantity: Number(totalQuantity),
+        remaining_quantity: Number(totalQuantity)
+      };
+
+      const lotRes = await fetch("/api/AuctionLots", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(lotPayload),
+      });
+
+      if (!lotRes.ok) {
+        const txt = await lotRes.text().catch(() => null);
+        throw new Error(txt || `Failed to create auction lot (${lotRes.status})`);
+      }
 
       if (primaryImageFile) {
-        // primary image (only one allowed)
-        formData.append("image", primaryImageFile);
+        await uploadPlantMedia(primaryImageFile, plantId, true, token);
       }
 
-      // append any secondary images (multiple allowed)
-      secondaryImages.forEach((file) => {
-        formData.append("secondaryImages", file);
-      });
-
-      const res = await fetch(API_ENDPOINT, {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => null);
-        throw new Error(txt || `Request failed (${res.status})`);
+      for (const file of secondaryImages) {
+        await uploadPlantMedia(file, plantId, false, token);
       }
 
-      await res.json().catch(() => null);
-      setSuccessMsg("Product added successfully.");
+      setSuccessMsg("Product, auction lot and media saved successfully.");
       resetForm();
 
       setTimeout(() => {
@@ -136,7 +188,6 @@ export default function SAddProduct() {
     }
   }
 
-  // add new secondary files (appends, avoids duplicates by name)
   function handleSecondaryFiles(e) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -147,7 +198,6 @@ export default function SAddProduct() {
       return [...prev, ...toAdd];
     });
 
-    // reset input value so same file can be selected again if removed
     e.target.value = "";
   }
 
@@ -157,7 +207,7 @@ export default function SAddProduct() {
 
   return (
     <div className="sd-page">
-      <header className="sd-topbar" style={{ position: "relative" }}>
+      <header className="sd-topbar">
         <div className="sd-left" aria-hidden>
           <button aria-label="menu" className="sd-icon-btn sd-hamburger">
             <span />
@@ -166,19 +216,19 @@ export default function SAddProduct() {
           </button>
         </div>
 
-              <div className="sd-logo">
-                  {logo ? (
-                      <img src={logo.url} alt={logo.alt} className="top-logo" />
-                  ) : (
-                      <span className="loading-label">Loading…</span>
-                  )}
-              </div>
+        <div className="sd-logo">
+          {logo ? (
+            <img src={logo.url} alt={logo.alt} className="top-logo" />
+          ) : (
+            <span className="loading-label">Loading…</span>
+          )}
+        </div>
 
         <div className="sd-right" aria-hidden />
       </header>
 
-      <main className="sd-main" style={{ gridTemplateColumns: "1fr", paddingTop: 20 }}>
-        <section style={{ width: "100%" }}>
+      <main className="sd-main">
+        <section>
           <div className="sd-stock">
             <div className="sd-stock-header">
               <div className="sd-stock-icon">＋</div>
@@ -186,232 +236,245 @@ export default function SAddProduct() {
             </div>
 
             <div className="sd-stock-body" role="region" aria-label="Add product form">
-              <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12, maxWidth: 700 }}>
-                <label>
-                  Product name
-                  <input
-                    type="text"
-                    required
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    style={{ display: "block", width: "100%", marginTop: 6 }}
-                  />
-                </label>
+              <form onSubmit={handleSubmit} className="add-product-form">
+                
+                {/* Column 1: Basic Info */}
+                <div className="form-column">
+                  <div className="form-group">
+                    <label className="form-label form-required">Product name</label>
+                    <input
+                      type="text"
+                      required
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
 
-                <label>
-                  Category
-                  <input
-                    type="text"
-                    required
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="e.g. Roses, Succulents"
-                    style={{ display: "block", width: "100%", marginTop: 6 }}
-                  />
-                </label>
+                  <div className="form-group">
+                    <label className="form-label form-required">Category</label>
+                    <input
+                      type="text"
+                      required
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      placeholder="e.g. Roses, Succulents"
+                      className="form-input"
+                    />
+                  </div>
 
-                <div style={{ display: "flex", gap: 12 }}>
-                  <label style={{ flex: 1 }}>
-                    Form
+                  <div className="form-group">
+                    <label className="form-label">Form</label>
                     <select
                       value={form}
                       onChange={(e) => setForm(e.target.value)}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      className="form-select"
                     >
                       <option value="">Select form</option>
                       <option value="cut">Cut</option>
                       <option value="potted">Potted</option>
                       <option value="bare-root">Bare-root</option>
                     </select>
-                  </label>
+                  </div>
 
-                  <label style={{ flex: 1 }}>
-                    Quality
+                  <div className="form-group">
+                    <label className="form-label">Quality</label>
                     <select
                       value={quality}
                       onChange={(e) => setQuality(e.target.value)}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      className="form-select"
                     >
                       <option value="">Select quality</option>
                       <option value="A">A</option>
                       <option value="B">B</option>
                       <option value="C">C</option>
                     </select>
-                  </label>
-                </div>
+                  </div>
 
-                <div style={{ display: "flex", gap: 12 }}>
-                  <label style={{ flex: 1 }}>
-                    Min stems
+                  <div className="form-group">
+                    <label className="form-label">Min stems</label>
                     <input
                       type="number"
                       min="1"
                       value={minStem}
                       onChange={(e) => setMinStem(Math.max(1, Number(e.target.value) || 1))}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      className="form-input"
                     />
-                  </label>
+                  </div>
 
-                  <label style={{ flex: 1 }}>
-                    Stems per bunch
+                  <div className="form-group">
+                    <label className="form-label">Stems per bunch</label>
                     <input
                       type="number"
                       min="1"
                       value={stemsBunch}
                       onChange={(e) => setStemsBunch(Math.max(1, Number(e.target.value) || 1))}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      className="form-input"
                     />
-                  </label>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Maturity</label>
+                    <select
+                      value={maturity}
+                      onChange={(e) => setMaturity(e.target.value)}
+                      className="form-select"
+                    >
+                      <option value="">Select maturity</option>
+                      <option value="bud">Bud</option>
+                      <option value="half-open">Half-open</option>
+                      <option value="open">Open</option>
+                    </select>
+                  </div>
                 </div>
 
-                {/* Auction lot fields */}
-                <div style={{ display: "flex", gap: 12 }}>
-                  <label style={{ flex: 1 }}>
-                    Unit per container
+                {/* Column 2: Pricing & Auction */}
+                <div className="form-column">
+                  <div className="form-group">
+                    <label className="form-label">Start Price</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={startPrice}
+                      onChange={(e) => setStartPrice(Math.max(0, Number(e.target.value) || 0))}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Min Price</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value) || 0))}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Unit per container</label>
                     <input
                       type="number"
                       min="1"
                       value={unitPerContainer}
                       onChange={(e) => setUnitPerContainer(Math.max(1, Number(e.target.value) || 1))}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      className="form-input"
                     />
-                  </label>
+                  </div>
 
-                  <label style={{ flex: 1 }}>
-                    Containers in lot
-                    <input
-                      type="number"
-                      min="1"
-                      value={containersInLot}
-                      onChange={(e) => setContainersInLot(Math.max(1, Number(e.target.value) || 1))}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
-                    />
-                  </label>
-                </div>
-
-                <div style={{ display: "flex", gap: 12 }}>
-                  <label style={{ flex: 1 }}>
-                    Min pickup
+                  <div className="form-group">
+                    <label className="form-label">Min pickup</label>
                     <input
                       type="number"
                       min="1"
                       value={minPickup}
                       onChange={(e) => setMinPickup(Math.max(1, Number(e.target.value) || 1))}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      className="form-input"
                     />
-                  </label>
+                  </div>
 
-                  <label style={{ flex: 1 }}>
-                    Start quantity
+                  <div className="form-group">
+                    <label className="form-label">Total quantity</label>
                     <input
                       type="number"
                       min="0"
-                      value={startQuantity}
-                      onChange={(e) => setStartQuantity(Math.max(0, Number(e.target.value) || 0))}
-                      style={{ display: "block", width: "100%", marginTop: 6 }}
+                      value={totalQuantity}
+                      onChange={(e) => setTotalQuantity(Math.max(0, Number(e.target.value) || 0))}
+                      className="form-input"
                     />
-                  </label>
-                </div>
-
-                <label>
-                  Maturity
-                  <select
-                    value={maturity}
-                    onChange={(e) => setMaturity(e.target.value)}
-                    style={{ display: "block", width: "100%", marginTop: 6 }}
-                  >
-                    <option value="">Select maturity</option>
-                    <option value="bud">Bud</option>
-                    <option value="half-open">Half-open</option>
-                    <option value="open">Open</option>
-                  </select>
-                </label>
-
-                <label>
-                  Description
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={4}
-                    style={{ display: "block", width: "100%", marginTop: 6 }}
-                  />
-                </label>
-
-                <label>
-                  Primary Image
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setPrimaryImageFile(e.target.files?.[0] ?? null)}
-                    style={{ display: "block", width: "100%", marginTop: 6 }}
-                  />
-                  {primaryImageFile && (
-                    <div style={{ marginTop: 8 }}>
-                      Selected: {primaryImageFile.name}
-                      <button type="button" onClick={() => setPrimaryImageFile(null)} style={{ marginLeft: 8 }}>
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </label>
-
-                <label>
-                  Secondary Images
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleSecondaryFiles}
-                    style={{ display: "block", width: "100%", marginTop: 6 }}
-                  />
-                </label>
-
-                {secondaryImages.length > 0 && (
-                  <div style={{ marginTop: 8 }}>
-                    <div style={{ fontWeight: 700, marginBottom: 6 }}>Secondary images:</div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {secondaryImages.map((f, i) => (
-                        <li key={`${f.name}-${i}`} style={{ marginBottom: 6 }}>
-                          {f.name}
-                          <button
-                            type="button"
-                            onClick={() => removeSecondaryAt(i)}
-                            style={{ marginLeft: 10 }}
-                          >
-                            Remove
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
-                )}
-
-                <div style={{ display: "flex", gap: 12 }}>
-                  <button className="sd-logout" type="submit" disabled={loading} style={{ padding: "8px 14px" }}>
-                    {loading ? "Saving..." : "Save product"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => navigate("/supplier/dashboard")}
-                    className="sd-settings"
-                    style={{ padding: "8px 14px", background: "transparent", color: "inherit" }}
-                  >
-                    Cancel
-                  </button>
                 </div>
 
-                {error && <div style={{ color: "crimson" }}>{error}</div>}
-                {successMsg && <div style={{ color: "green" }}>{successMsg}</div>}
+                {/* Column 3: Description & Media */}
+                <div className="form-column">
+                  <div className="form-group">
+                    <label className="form-label">Description</label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="form-textarea"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Primary Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setPrimaryImageFile(e.target.files?.[0] ?? null)}
+                      className="form-file"
+                    />
+                    {primaryImageFile && (
+                      <div className="file-feedback file-feedback-success">
+                        ✓ {primaryImageFile.name}
+                        <button type="button" onClick={() => setPrimaryImageFile(null)} className="btn-danger">
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Secondary Images</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleSecondaryFiles}
+                      className="form-file"
+                    />
+                    {secondaryImages.length > 0 && (
+                      <div className="file-feedback">
+                        <div style={{ fontWeight: 600, marginBottom: 4 }}>({secondaryImages.length}) files:</div>
+                        <ul className="file-feedback-list">
+                          {secondaryImages.map((f, i) => (
+                            <li key={`${f.name}-${i}`} className="file-feedback-item">
+                              {f.name}
+                              <button type="button" onClick={() => removeSecondaryAt(i)} className="btn-danger">
+                                ✕
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </form>
+            </div>
+
+            {/* Footer with buttons */}
+            <div className="form-footer">
+              <button onClick={handleSubmit} disabled={loading} className="btn btn-primary">
+                {loading ? "Saving..." : "Save product"}
+              </button>
+
+              <button type="button" onClick={() => navigate("/supplier/dashboard")} className="btn btn-secondary">
+                Cancel
+              </button>
+
+              {error && (
+                <div className="form-footer-status status-error">
+                  <span className="status-icon">⚠</span>
+                  <span>{error}</span>
+                </div>
+              )}
+              {successMsg && (
+                <div className="form-footer-status status-success">
+                  <span className="status-icon">✓</span>
+                  <span>{successMsg}</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
-          </main>
+      </main>
 
-          <SupplierNavigationDropdownMenu navigateFn={(p) => navigate(p)} />
-          <AccountDropdownMenu userName={userName} userRole={userRole} />
-
+      <SupplierNavigationDropdownMenu navigateFn={(p) => navigate(p)} />
+      <AccountDropdownMenu userName={userName} userRole={userRole} />
     </div>
   );
 }

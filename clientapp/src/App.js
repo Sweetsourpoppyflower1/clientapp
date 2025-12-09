@@ -31,7 +31,9 @@ function App() {
                 <Route path="/company/auctions" element={<Auctions />} />
                 <Route path="/master/a_overviewAuctionCalendar" element={<AuctionCalender />} />
                 <Route path="/supplier/supplierDashboard" element={<SupplierDashboard />} />
-                <Route path="/supplier/s_addProduct" element={<SAddProduct /> } />
+                <Route path="/supplier/s_addProduct" element={<SAddProduct />} />
+                <Route path="/company/myOrders" element={<CMyOrders />} />
+                <Route path="/company/companyDashboard" element={<CompanyDashboard />} />
             </Routes>
         </Router>
     );
