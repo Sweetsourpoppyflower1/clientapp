@@ -1,150 +1,161 @@
-import React, { useState } from "react";
+﻿import React, { useEffect, useState } from "react";
+import "../../styles/login_registerPages/loginStyle.css";
 
-const AUTH_ENDPOINT = "/api/Auth/login"; 
+const AUTH_ENDPOINT = "/api/Auth/login";
 
 function decodeJwt(token) {
-    try {
-        const payload = token.split(".")[1];
-        const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-        return decoded;
-    } catch (e) {
-        return null;
-    }
+  try {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    return decoded;
+  } catch (e) {
+    return null;
+  }
 }
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [logo, setLogo] = useState(null);
 
-    function redirectForRole(role) {
-        if (!role) return;
-        const r = String(role).toLowerCase();
-        if (r === "client" || r === "Client") {
-            window.location.href = "/companyDashboard";
-        } else if (r === "supplier" || r === "Supplier") {
-            window.location.href = "/supplierDashboard";
-        } else if (r === "admin" || r === "Admin") {
-            window.location.href = "/auctionmasterDashboard";
-        } else {
-            window.location.href = "/login_register/login";
-        }
+    useEffect(() => {
+        const mediaId = 1;
+        fetch(`/api/Media/${mediaId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch media');
+                return res.json();
+            })
+            .then(m => {
+                const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
+                setLogo({ url: normalizedUrl, alt: m.alt_text });
+            })
+            .catch(() => { });
+    }, []);
+
+  function redirectForRole(role) {
+    if (!role) return;
+    const r = String(role).toLowerCase();
+    if (r === "client") window.location.href = "/company/companyDashboard";
+    else if (r === "supplier") window.location.href = "/supplier/supplierDashboard";
+    else if (r === "admin") window.location.href = "/master/auctionmasterDashboard";
+    else window.location.href = "/login_regiser/login";
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(AUTH_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Email: email, Password: password }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => null);
+        throw new Error(text || `Login failed (${res.status})`);
+      }
+
+      const data = await res.json();
+
+      const roles = data?.roles ?? data?.Roles ?? null;
+      if (Array.isArray(roles) && roles.length > 0) {
+        localStorage.setItem("user_email", data?.email ?? data?.Email ?? "");
+        localStorage.setItem("user_roles", JSON.stringify(roles));
+        if (data?.data) localStorage.setItem("user_data", JSON.stringify(data.data));
+        redirectForRole(roles[0]);
+        return;
+      }
+
+      const token = data?.token ?? data?.access_token ?? data?.accessToken;
+      if (token) {
+        localStorage.setItem("auth_token", token);
+        const payload = decodeJwt(token);
+        const claimKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+        const rolesFromToken =
+          payload?.role ||
+          payload?.roles ||
+          payload?.[claimKey] ||
+          [];
+        const firstRole = Array.isArray(rolesFromToken) ? rolesFromToken[0] : rolesFromToken;
+        redirectForRole(firstRole);
+        return;
+      }
+
+      setError("Login succeeded but no role information returned.");
+      setLoading(false);
+    } catch (err) {
+      setError(err.message || "Login failed");
+      setLoading(false);
     }
-
-    async function handleSubmit(e) {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-
-        try {
-            const res = await fetch(AUTH_ENDPOINT, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ Email: email, Password: password }),
-            });
-
-            if (!res.ok) {
-                const text = await res.text().catch(() => null);
-                throw new Error(text || `Login failed (${res.status})`);
-            }
-
-            const data = await res.json();
-
-            const token = data?.token ?? data?.access_token ?? data?.accessToken;
-            if (token) {
-                localStorage.setItem("auth_token", token);
-
-                const payload = decodeJwt(token);
-                let roles = [];
-                if (payload) {
-                    if (payload.role) roles = Array.isArray(payload.role) ? payload.role : [payload.role];
-                    if (payload.roles) roles = roles.concat(Array.isArray(payload.roles) ? payload.roles : [payload.roles]);
-                    const claimKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
-                    if (payload[claimKey]) roles = roles.concat(Array.isArray(payload[claimKey]) ? payload[claimKey] : [payload[claimKey]]);
-                }
-
-                const role = (roles.length && roles[0]) || null;
-                redirectForRole(role);
-                return;
-            }
-
-            if (data) {
-                const roles = data.roles ?? data.role ?? data.Roles ?? data.Role;
-                if (Array.isArray(roles) && roles.length > 0) {
-                    redirectForRole(roles[0]);
-                    return;
-                }
-                if (typeof roles === "string") {
-                    redirectForRole(roles);
-                    return;
-                }
-
-                try {
-                    const whoRes = await fetch(`/api/Auctionmasters/${encodeURIComponent(email)}/${encodeURIComponent(password)}`);
-                    if (whoRes.ok) {
-                        const user = await whoRes.json();
-                        const uroles = user?.roles ?? user?.Roles ?? user?.role;
-                        if (Array.isArray(uroles) && uroles.length) {
-                            redirectForRole(uroles[0]);
-                            return;
-                        }
-                        if (typeof uroles === "string") {
-                            redirectForRole(uroles);
-                            return;
-                        }
-                    }
-                } catch (_) {
-
-                }
-
-                setError("Login succeeded but no role information returned. Check backend response.");
-                setLoading(false);
-                return;
-            }
-
-            setError("Unexpected response from server.");
-            setLoading(false);
-        } catch (err) {
-            setError(err.message || "Login failed");
-            setLoading(false);
-        }
-    }
+  }
 
     return (
-        <div style={{ maxWidth: 420, margin: "2rem auto" }}>
-            <h2>Log in</h2>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Email
-                    <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="username"
-                        style={{ display: "block", width: "100%", marginBottom: 8 }}
-                    />
-                </label>
+        <div className="parent">
 
-                <label>
-                    Password
-                    <input
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
-                        style={{ display: "block", width: "100%", marginBottom: 12 }}
-                    />
-                </label>
+            <div className="header">
+                {logo ? (
+                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                ) : (
+                    <span className="loading-label">Loading…</span>
+                )}
+            </div>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign in"}
-                </button>
+            {error && <div style={{ color: "red" }}>{error}</div>}
 
-                {error && <div style={{ marginTop: 12, color: "crimson" }}>{error}</div>}
-            </form>
+            <div className="login">
+
+                <div className="login-infocard">
+                    <div class="infocard">
+                        <h2>Log in</h2>
+                        <p>Log in to your account at Flauction</p>
+                    </div>
+                    
+                </div>                
+
+                <div className="login-form">
+                    <form className="form" onSubmit={handleSubmit}>
+
+                        <div className="email">
+                            <label className="email-title">Email</label>
+                            <input type="email" required placeholder="Email"
+                                value={email} onChange={(e) => setEmail(e.target.value)}
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }} />
+                        </div>
+
+                        <div className="password">
+                            <label className="password-title">Password</label>
+                            <input type="password" required placeholder="Password"
+                                value={password} onChange={(e) => setPassword(e.target.value)}
+                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }} />
+                        </div>
+
+                        <div style={{ marginBottom: 12 }}>
+                            <button className="login-btn "type="submit" disabled={loading}
+                                style={{ width: "100%", padding: 10 }}> {loading ? "Signing in..." : "Login"}
+                            </button>
+                        </div>
+
+                        <div className="register-placeholder"style={{ textAlign: "center" }}>
+                            <div style={{ marginBottom: 8 }}>No Account? Register here:</div>
+
+                            <button className="register-btn" type="button" onClick={() => (window.location.href = "/login_register/registerOptions")}
+                                style={{ width: "70%", padding: 8 }} > Register
+                            </button>
+                        </div>                    
+
+                    </form>
+                </div>
+
+                <div className="empty">
+
+                </div>
+
+            </div>
         </div>
     );
 }
