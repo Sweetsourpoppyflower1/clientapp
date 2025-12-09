@@ -1,6 +1,8 @@
-﻿import React, { useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../../styles/supplierPages/supplierDashboardStyle.css';
+import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
+import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 
 export default function SAddProduct() {
   const navigate = useNavigate();
@@ -15,6 +17,12 @@ export default function SAddProduct() {
   const [maturity, setMaturity] = useState(""); 
   const [imageFile, setImageFile] = useState(null);
 
+    const [logo, setLogo] = useState(null);
+
+    const userName = 'user';
+    const userRole = 'Supplier';
+
+
   // New auction lot fields
   const [unitPerContainer, setUnitPerContainer] = useState(1);
   const [containersInLot, setContainersInLot] = useState(1);
@@ -25,7 +33,7 @@ export default function SAddProduct() {
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
 
-  const API_ENDPOINT = "/api/supplier/products"; // adjust to your backend route
+  const API_ENDPOINT = "/api/supplier/plants"; // adjust to your backend route
 
   function resetForm() {
     setProductName("");
@@ -43,7 +51,22 @@ export default function SAddProduct() {
     setContainersInLot(1);
     setMinPickup(1);
     setStartQuantity(1);
-  }
+    }
+
+    useEffect(() => {
+        // Top logo (media id 1)
+        const mediaId = 1;
+        fetch(`/api/Media/${mediaId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch media');
+                return res.json();
+            })
+            .then(m => {
+                const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
+                setLogo({ url: normalizedUrl, alt: m.alt_text });
+            })
+            .catch(() => { /* silent fallback */ });
+    }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -114,7 +137,13 @@ export default function SAddProduct() {
           </button>
         </div>
 
-        <div className="sd-logo">Flauction</div>
+              <div className="sd-logo">
+                  {logo ? (
+                      <img src={logo.url} alt={logo.alt} className="top-logo" />
+                  ) : (
+                      <span className="loading-label">Loading…</span>
+                  )}
+              </div>
 
         <div className="sd-right" aria-hidden />
       </header>
@@ -310,7 +339,11 @@ export default function SAddProduct() {
             </div>
           </div>
         </section>
-      </main>
+          </main>
+
+          <SupplierNavigationDropdownMenu navigateFn={(p) => navigate(p)} />
+          <AccountDropdownMenu userName={userName} userRole={userRole} />
+
     </div>
   );
 }
