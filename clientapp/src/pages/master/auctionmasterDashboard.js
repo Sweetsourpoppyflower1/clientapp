@@ -50,7 +50,7 @@ export default function AuctionmasterDashboard() {
     };
 
     const handleUpcomingAuctions = () => {
-        window.location.href = '/master/a_overviewUpcomingAuctions';
+        window.location.href = '/master/a_overviewAuctionCalendar';
     };
 
     const handleOverviewStock = () => {
@@ -109,7 +109,7 @@ export default function AuctionmasterDashboard() {
                         {renderTileContent(0, placeholderSvg)}
                     </button>
 
-                    <button className="tile tile2" aria-label="Upcoming Auctions" onClick={handleUpcomingAuctions}>
+                    <button className="tile tile2" aria-label="Auction Calendar" onClick={handleUpcomingAuctions}>
                         {renderTileContent(1, placeholderSvg)}
                     </button>
 

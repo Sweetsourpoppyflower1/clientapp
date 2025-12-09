@@ -204,10 +204,8 @@ export default function CreateAuction() {
         throw new Error(`Save failed: ${res.status} ${txt}`);
       }
       const created = await res.json();
-      setSuccessMessage("Auction created successfully.");
-      setTimeout(() => {
-        window.location.href = "/master/auctions-upcoming";
-      }, 900);
+        setSuccessMessage("Auction created successfully.");
+        window.location.reload();
     } catch (err) {
       console.error(err);
       setError("Failed to create auction. " + err.message);

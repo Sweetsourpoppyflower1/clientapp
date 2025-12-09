@@ -11,6 +11,9 @@ export default function AOverviewUpcomingAuctions() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const [todayUpcoming, setTodayUpcoming] = useState([]);
+    const [restUpcoming, setRestUpcoming] = useState([]);
+
 
     useEffect(() => {
         const mediaId = 1;
@@ -58,7 +61,15 @@ export default function AOverviewUpcomingAuctions() {
                                     p?.ProductName ??
                                     p?.name ??
                                     p?.Name;
-                                if (id != null) map[String(id)] = name ?? String(id);
+                                const startPrice = p?.start_price ?? p?.StartPrice ?? p?.startPrice;
+                                const minPrice = p?.min_price ?? p?.MinimumPrice ?? p?.minPrice;
+                                if (id != null) {
+                                    map[String(id)] = {
+                                        name: name ?? String(id),
+                                        startPrice: startPrice,
+                                        minPrice: minPrice
+                                    };
+                                }
                             });
                         }
                     }
@@ -66,7 +77,22 @@ export default function AOverviewUpcomingAuctions() {
                 }
 
                 if (mounted) {
-                    setUpcoming(filtered);
+                    const now = new Date();
+                    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+                    const todays = filtered.filter(a => {
+                        const st = a.start_time ? new Date(a.start_time) : null;
+                        return st && st >= startOfToday && st < endOfToday;
+                    });
+
+                    const rest = filtered.filter(a => {
+                        const st = a.start_time ? new Date(a.start_time) : null;
+                        return !st || st < startOfToday || st >= endOfToday;
+                    });
+
+                    setTodayUpcoming(todays);
+                    setRestUpcoming(rest);
                     setPlantMap(map);
                     setLoading(false);
                 }
@@ -108,38 +134,67 @@ export default function AOverviewUpcomingAuctions() {
                         <div className="au-panel-header">Today</div>
 
                         <div className="au-panel-body">
+                            {todayUpcoming.length === 0 && (
+                                <div className="au-no-items">No auctions today.</div>
+                            )}
 
+                            <ul className="au-list">
+                                {todayUpcoming.map((a) => {
+                                    const plantKey = String(a.plant_id ?? a.PlantId ?? a.plantId);
+                                    const plantEntry = plantMap[plantKey];
+                                    const plantName = plantEntry?.name ?? a.plant_id;
+                                    const startPrice = plantEntry?.startPrice ?? a.start_price ?? a.StartPrice ?? null;
+                                    const minPrice = plantEntry?.minPrice ?? a.min_price ?? a.MinimumPrice ?? null;
+
+                                    const fmt = (v) => (v == null ? "N/A" : v);
+
+                                    return (
+                                        <li key={a.auction_id} className="au-list-item">
+                                            <div><strong>Plant: </strong> {plantName}</div>
+                                            <div><strong>Start: </strong>{a.start_time ? new Date(a.start_time).toLocaleString() : "N/A"}</div>
+                                            <div><strong>End: </strong>{a.end_time ? new Date(a.end_time).toLocaleString() : "N/A"}</div>
+                                            <div><strong>Start Price:</strong> {fmt(startPrice)}</div>
+                                            <div><strong>Min Price:</strong> {fmt(minPrice)}</div>
+                                            <hr />
+                                        </li>
+                                    );
+                                })}
+                            </ul>
                         </div>
+
 
                     </div>
 
                     <div className="au-panel au-rest">
                         <div className="au-panel-header au-rest-header">Rest</div>
                         <div className="au-panel-body au-rest-body">
-                            {upcoming.length === 0 && <div className="au-no-items">No upcoming auctions found.</div>}
                             <ul className="au-list">
-                                {upcoming.map((a) => {
+                                {restUpcoming.length === 0 && (
+                                    <div className="au-no-items">No other upcoming auctions.</div>
+                                )}
+
+                                {restUpcoming.map((a) => {
                                     const plantKey = String(a.plant_id ?? a.PlantId ?? a.plantId);
-                                    const plantName = plantMap[plantKey];
+                                    const plantEntry = plantMap[plantKey];
+                                    const plantName = plantEntry?.name ?? a.plant_id;
+                                    const startPrice = plantEntry?.startPrice ?? a.start_price ?? a.StartPrice ?? null;
+                                    const minPrice = plantEntry?.minPrice ?? a.min_price ?? a.MinimumPrice ?? null;
+
+                                    const fmt = (v) => (v == null ? "N/A" : v);
+
                                     return (
                                         <li key={a.auction_id} className="au-list-item">
-                                            <div><strong>Plant: </strong> {plantName ?? a.plant_id}</div>
-                                            <div>
-                                                <strong>Start:</strong>{" "}
-                                                {a.start_time
-                                                    ? new Date(a.start_time).toLocaleString()
-                                                    : "N/A"}
-                                            </div>
-                                            <div>
-                                                <strong>End:</strong> {a.end_time ? new Date(a.end_time).toLocaleString() : "N/A"}
-                                            </div>
-                                            <div><strong>Start Price:</strong> {a.start_price}</div>
-                                            <div><strong>Min Price:</strong> {a.min_price}</div>
+                                            <div><strong>Plant: </strong> {plantName}</div>
+                                            <div><strong>Start:</strong> {a.start_time ? new Date(a.start_time).toLocaleString() : "N/A"}</div>
+                                            <div><strong>End:</strong> {a.end_time ? new Date(a.end_time).toLocaleString() : "N/A"}</div>
+                                            <div><strong>Start Price:</strong> {fmt(startPrice)}</div>
+                                            <div><strong>Min Price:</strong> {fmt(minPrice)}</div>
                                             <hr />
                                         </li>
                                     );
                                 })}
                             </ul>
+
                         </div>
                     </div>
                 </div>

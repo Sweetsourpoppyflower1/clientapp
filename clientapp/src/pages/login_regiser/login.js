@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/loginStyle.css";
 
 const AUTH_ENDPOINT = "/api/Auth/login";
@@ -18,6 +18,21 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [logo, setLogo] = useState(null);
+
+    useEffect(() => {
+        const mediaId = 1;
+        fetch(`/api/Media/${mediaId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch media');
+                return res.json();
+            })
+            .then(m => {
+                const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
+                setLogo({ url: normalizedUrl, alt: m.alt_text });
+            })
+            .catch(() => { });
+    }, []);
 
   function redirectForRole(role) {
     if (!role) return;
@@ -83,7 +98,11 @@ export default function Login() {
         <div className="parent">
 
             <div className="header">
-                <h2>Flauction</h2>
+                {logo ? (
+                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                ) : (
+                    <span className="loading-label">Loading…</span>
+                )}
             </div>
 
             {error && <div style={{ color: "red" }}>{error}</div>}

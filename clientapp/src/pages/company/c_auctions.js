@@ -346,10 +346,10 @@ export default function CAuctions() {
                         <div>
                             <label style={{ marginRight: 8 }}>Sort</label>
                             <select value={sort} onChange={(e) => setSort(e.target.value)} className="c-auctions-input" style={{ width: 220 }}>
-                                <option value="relevance">Relevance</option>
                                 <option value="price-asc">Price: Low → High</option>
                                 <option value="price-desc">Price: High → Low</option>
                                 <option value="newest">Newest</option>
+                                <option value="oldest">Oldest</option>
                             </select>
                         </div>
                     </div>
