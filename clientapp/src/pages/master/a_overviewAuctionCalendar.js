@@ -2,9 +2,9 @@
 import "../../styles/companyPages/c_auctionsStyle.css";
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
-
 
 const inlinePlaceholder =
     "data:image/svg+xml;utf8," +
@@ -96,7 +96,7 @@ export default function AAuctions() {
     const [upcoming, setUpcoming] = useState([]);
     const [loading, setLoading] = useState(true);
     const [logo, setLogo] = useState(null);
-
+    const navigate = useNavigate();
 
     // filters & controls
     const [query, setQuery] = useState("");

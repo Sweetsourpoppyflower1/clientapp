@@ -28,7 +28,7 @@ export default function SupplierDashboard() {
             .catch(() => { /* silent fallback */ });
     }, []);
 
-  const handleAddProducts = () => navigate('/supplier/addProduct');
+  const handleAddProducts = () => navigate('/supplier/s_addProduct');
 
 
   return (
