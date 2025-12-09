@@ -7,6 +7,8 @@ import AOverviewUpcomingAuctions from "./pages/master/a_overviewUpcomingAuctions
 import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
 import SupplierDashboard from "./pages/supplier/supplierDashboard.js";
 import SAddProduct from "./pages/supplier/s_addProduct.js";
+import CMyOrders from "./pages/company/c_myOrders.js";
+import CompanyDashboard from "./pages/company/companyDashboard.js";
 
 function App() {
     return (
@@ -20,6 +22,8 @@ function App() {
                 <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
                 <Route path="/supplier/addproduct" element={<SAddProduct />} />
+                <Route path="/company/myorders" element={<CMyOrders />} />
+                <Route path="/company/dashboard" element={<CompanyDashboard />} />
             </Routes>
         </Router>
     );

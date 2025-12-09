@@ -8,12 +8,13 @@ export default function SAddProduct() {
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [form, setForm] = useState(""); 
-  const [quality, setQuality] = useState(""); 
+  const [form, setForm] = useState("");
+  const [quality, setQuality] = useState("");
   const [minStem, setMinStem] = useState(1);
   const [stemsBunch, setStemsBunch] = useState(10);
-  const [maturity, setMaturity] = useState(""); 
-  const [imageFile, setImageFile] = useState(null);
+  const [maturity, setMaturity] = useState("");
+  const [primaryImageFile, setPrimaryImageFile] = useState(null);
+  const [secondaryImages, setSecondaryImages] = useState([]);
 
   // New auction lot fields
   const [unitPerContainer, setUnitPerContainer] = useState(1);
@@ -36,7 +37,8 @@ export default function SAddProduct() {
     setMinStem(1);
     setStemsBunch(10);
     setMaturity("");
-    setImageFile(null);
+    setPrimaryImageFile(null);
+    setSecondaryImages([]);
 
     // reset new fields
     setUnitPerContainer(1);
@@ -61,8 +63,8 @@ export default function SAddProduct() {
       const token = localStorage.getItem("auth_token");
 
       const formData = new FormData();
-      formData.append("productName", productName);
-      formData.append("description", description);
+      formData.append("productname", productName);
+      formData.append("desc", description);
       formData.append("category", category);
       formData.append("form", form);
       formData.append("quality", quality);
@@ -70,13 +72,21 @@ export default function SAddProduct() {
       formData.append("stems_bunch", String(stemsBunch));
       formData.append("maturity", maturity);
 
-      // append new auction lot fields (snake_case keys sent to API)
-      formData.append("unit_per_container", String(unitPerContainer));
-      formData.append("containers_in_lot", String(containersInLot));
-      formData.append("min_pickup", String(minPickup));
-      formData.append("start_quantity", String(startQuantity));
+      // append new auction lot fields
+      formData.append("UnitPerContainer", String(unitPerContainer));
+      formData.append("ContainersInLot", String(containersInLot));
+      formData.append("MinPickup", String(minPickup));
+      formData.append("StartQuantity", String(startQuantity));
 
-      if (imageFile) formData.append("image", imageFile);
+      if (primaryImageFile) {
+        // primary image (only one allowed)
+        formData.append("image", primaryImageFile);
+      }
+
+      // append any secondary images (multiple allowed)
+      secondaryImages.forEach((file) => {
+        formData.append("secondaryImages", file);
+      });
 
       const res = await fetch(API_ENDPOINT, {
         method: "POST",
@@ -101,6 +111,25 @@ export default function SAddProduct() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // add new secondary files (appends, avoids duplicates by name)
+  function handleSecondaryFiles(e) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setSecondaryImages((prev) => {
+      const existingNames = new Set(prev.map(f => f.name));
+      const toAdd = files.filter(f => !existingNames.has(f.name));
+      return [...prev, ...toAdd];
+    });
+
+    // reset input value so same file can be selected again if removed
+    e.target.value = "";
+  }
+
+  function removeSecondaryAt(index) {
+    setSecondaryImages((prev) => prev.filter((_, i) => i !== index));
   }
 
   return (
@@ -280,14 +309,53 @@ export default function SAddProduct() {
                 </label>
 
                 <label>
-                  Image (optional)
+                  Primary Image
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+                    onChange={(e) => setPrimaryImageFile(e.target.files?.[0] ?? null)}
+                    style={{ display: "block", width: "100%", marginTop: 6 }}
+                  />
+                  {primaryImageFile && (
+                    <div style={{ marginTop: 8 }}>
+                      Selected: {primaryImageFile.name}
+                      <button type="button" onClick={() => setPrimaryImageFile(null)} style={{ marginLeft: 8 }}>
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </label>
+
+                <label>
+                  Secondary Images
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleSecondaryFiles}
                     style={{ display: "block", width: "100%", marginTop: 6 }}
                   />
                 </label>
+
+                {secondaryImages.length > 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>Secondary images:</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {secondaryImages.map((f, i) => (
+                        <li key={`${f.name}-${i}`} style={{ marginBottom: 6 }}>
+                          {f.name}
+                          <button
+                            type="button"
+                            onClick={() => removeSecondaryAt(i)}
+                            style={{ marginLeft: 10 }}
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <div style={{ display: "flex", gap: 12 }}>
                   <button className="sd-logout" type="submit" disabled={loading} style={{ padding: "8px 14px" }}>
