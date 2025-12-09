@@ -12,6 +12,8 @@ import Auctions from "./pages/company/c_auctions.js"
 import AuctionCalender from "./pages/master/a_overviewAuctionCalendar.js";
 import SupplierDashboard from "./pages/supplier/supplierDashboard.js";
 import SAddProduct from "./pages/supplier/s_addProduct.js";
+import CMyOrders from "./pages/company/c_myOrders.js";
+import CompanyDashboard from "./pages/company/companyDashboard.js";
 
 function App() {
     return (
@@ -29,7 +31,9 @@ function App() {
                 <Route path="/company/auctions" element={<Auctions />} />
                 <Route path="/master/a_overviewAuctionCalendar" element={<AuctionCalender />} />
                 <Route path="/supplier/supplierDashboard" element={<SupplierDashboard />} />
-                <Route path="/supplier/s_addProduct" element={<SAddProduct /> } />
+                <Route path="/supplier/s_addProduct" element={<SAddProduct />} />
+                <Route path="/company/myOrders" element={<CMyOrders />} />
+                <Route path="/company/companyDashboard" element={<CompanyDashboard />} />
             </Routes>
         </Router>
     );
