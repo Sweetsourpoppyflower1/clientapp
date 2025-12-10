@@ -1,0 +1,227 @@
+/* enforce white background at the root level */
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.company-dashboard {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    padding: 12px;
+}
+
+.cd-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 22px;
+}
+
+/* Use the same top-logo sizing as auctionmasterDashboardStyle.css */
+.company-dashboard .cd-logo .top-logo,
+.top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.cd-logo h1 {
+    letter-spacing: 8px;
+    margin: 0;
+    font-weight: 600;
+    font-size: 28px;
+}
+
+.cd-logout {
+    position: absolute;
+    right: 8px;
+    top: 0;
+}
+
+.cd-logout-btn {
+    background: #b94b5d;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.cd-panel {
+    max-width: 1120px;
+    margin: 0 auto;
+    background: #b7e3d0;
+    padding: 36px;
+    border-radius: 8px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+    min-height: 440px;
+}
+
+.cd-left,
+.cd-right {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 36px;
+}
+
+.cd-left {
+    flex: 1.2 1 0;
+    position: relative;
+}
+
+.cd-right {
+    width: 320px;
+    min-width: 240px;
+}
+
+/* center title at top */
+.cd-section-title {
+    color: #fff;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    pointer-events: none;
+    padding: 0 8px;
+}
+
+/* make cards stretch and allow internal spacing for footer CTA */
+.cd-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 120px;
+    box-sizing: border-box;
+}
+
+/* ensure right summary card's CTA is pushed to the bottom and centered */
+.cd-summary .cd-cta-wrap {
+    margin-top: auto;
+    text-align: center;
+}
+
+/* keep left card buttons behavior (they may sit where content ends) */
+.cd-left .cd-cta-wrap {
+    text-align: center;
+}
+
+.cd-auction-img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.cd-auction-title {
+    margin: 6px 0;
+}
+
+.cd-muted {
+    color: #666;
+    line-height: 1.4;
+}
+
+.cd-cta-wrap {
+    text-align: center;
+    margin-top: auto;
+}
+
+.cd-cta {
+    background: #9f3550;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.cd-cta-secondary {
+    background: #f5c7cc;
+    color: #5a3a3f;
+    border: 1px solid #e7b6bd;
+}
+
+.cd-cta-light {
+    background: #fde6e9;
+    color: #5a3a3f;
+    border: 1px solid #f3c7cf;
+}
+
+/* center the card heading and keep the text block visually centered */
+.cd-summary h3 {
+    margin-top: 6px;
+    margin-bottom: 8px;
+    font-size: 20px;
+    text-align: center;
+}
+
+/* gray backing for the summary text to match the subtle gray beside the image */
+.cd-summary-text {
+    font-weight: 700;
+    line-height: 1.35;
+    color: #111;
+    background: #f4f4f4;
+    padding: 14px;
+    border-radius: 6px;
+    margin: 8px auto 0;
+    display: block;
+    max-width: 92%;
+    text-align: left;
+}
+
+/* keep override for loading / empty states */
+.cd-loading {
+    color: #444;
+}
+
+@media (max-width: 880px) {
+    .cd-panel {
+        flex-direction: column;
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .cd-right {
+        width: 100%;
+        min-width: auto;
+        padding-top: 16px;
+    }
+
+    .cd-left {
+        padding-top: 16px;
+        position: static;
+    }
+
+    .cd-section-title {
+        position: static;
+        transform: none;
+        text-align: left;
+        margin: 0 0 12px;
+        pointer-events: auto;
+    }
+
+    .cd-topbar { padding: 8px 0; }
+}
