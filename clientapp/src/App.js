@@ -29,7 +29,6 @@ function App() {
                 <Route path="/login" element={<LoginUser /> } />
                 <Route path="/overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
                 <Route path="/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
-                <Route path="/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/aStockOverview" element={<AStockOverview />} />
                 <Route path="/aCreateAuction" element={<ACreateAuction />} />
                 <Route path="/cAuctions" element={<Auctions />} />
@@ -38,6 +37,8 @@ function App() {
                 <Route path="/sAddProduct" element={<SAddProduct />} />
                 <Route path="/cMyOrders" element={<CMyOrders />} />
                 <Route path="/companyDashboard" element={<CompanyDashboard />} />
+                <Route path="/AOverviewAcceptances" element={<AOverviewAcceptances />} />
+                <Route path="/ActiveAuction/:id" element={<ActiveAuction /> } />
             </Routes>
         </Router>
     );
