@@ -175,6 +175,7 @@
     border-radius: 10px;
     align-items: center;
     max-width: 100%;
+    min-width: 600px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 120ms ease, box-shadow 120ms ease;
@@ -455,6 +456,19 @@
 
 .c-auctions-cta-wide:focus {
   box-shadow: 0 0 0 3px rgba(179,86,120,0.2);
+}
+
+/* Button container for dual CTA buttons */
+.c-auctions-button-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.c-auctions-button-row .c-auctions-cta-wide {
+  flex: 1;
+  min-width: 120px;
 }
 
 /* Thumbnails / selected state (if used) */
