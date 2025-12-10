@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import "./navigation_dropdown_menu.css";
 
 const MENU_ITEMS = [
-  { id: "home", title: "Auctionmaster Dashboard", desc: "Navigates to Auctionmaster Dashboard", path: "/master/auctionmasterDashboard" },
-  { id: "create", title: "Create Auction", desc: "Navigates to the Create Auction screen", path: "/master/a_createauction" },
-    { id: "auction", title: "Auction Calender", desc: "Navigates to the Auction Calendar screen", path: "/master/a_overviewAuctionCalendar" },
-    { id: "overview", title: "Overview Stock", desc: "Navigates to the Stock Overview screen", path: "/master/a_overviewStock" },
-    { id: "review", title: "Review Acceptances", desc: "Navigates to the Acceptances Overview screen", path: "/master/a_overviewAcceptances" },
+  { id: "home", title: "Auctionmaster Dashboard", desc: "Navigates to Auctionmaster Dashboard", path: "/auctionmasterDashboard" },
+  { id: "create", title: "Create Auction", desc: "Navigates to the Create Auction screen", path: "/aCreateAuction" },
+    { id: "auction", title: "Auction Calender", desc: "Navigates to the Auction Calendar screen", path: "/auctionCalender" },
+    { id: "overview", title: "Overview Stock", desc: "Navigates to the Stock Overview screen", path: "/aStockOverview" },
+    { id: "review", title: "Review Acceptances", desc: "Navigates to the Acceptances Overview screen", path: "/AOverviewAcceptances" },
 ];
 
 export default function NavigationDropdownMenu({ navigateFn }) {

@@ -11,6 +11,7 @@ export default function SupplierDashboard() {
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [userData, setUserData] = useState({ userName: 'Guest', userRole: 'Supplier' });
     const [error, setError] = useState(null);
+    const [auctionLots, setAuctionLots] = useState([]);
 
     const navigate = useNavigate();
 
@@ -147,12 +148,30 @@ export default function SupplierDashboard() {
         fetchPlants();
     }, []);
 
+    useEffect(() => {
+        fetch("/api/AuctionLots")
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch auction lots");
+                return res.json();
+            })
+            .then((data) => setAuctionLots(data))
+            .catch((err) => {
+                console.error("Error loading auction lots:", err);
+                setAuctionLots([]);
+            });
+    }, []);
+
+    const getRemainingQuantity = (plantId) => {
+        const lot = auctionLots.find(l => Number(l.plant_id) === Number(plantId));
+        return lot ? lot.remaining_quantity : null;
+    };
+
     const toggleExpand = (index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     };
 
     const handleAddProducts = () => {
-        navigate('/supplier/s_addProduct');
+        navigate('/sAddProduct');
     };
 
     return (
@@ -235,6 +254,7 @@ export default function SupplierDashboard() {
                                             <th>Category</th>
                                             <th>Form</th>
                                             <th>Quality</th>
+                                            <th>Remaining Quantity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -258,11 +278,12 @@ export default function SupplierDashboard() {
                                                     <td>{plant.category}</td>
                                                     <td>{plant.form}</td>
                                                     <td>{plant.quality}</td>
+                                                    <td>{getRemainingQuantity(plant.plantId) ?? "—"}</td>
                                                 </tr>
 
                                                 {expandedIndex === index && (
                                                     <tr className="sd-details-row" id={`plant-details-${index}`}>
-                                                        <td colSpan="4" className="sd-details-cell">
+                                                        <td colSpan="5" className="sd-details-cell">
                                                             <div className="sd-details-container">
                                                                 {/* Image on the left */}
                                                                 <div className="sd-details-image">

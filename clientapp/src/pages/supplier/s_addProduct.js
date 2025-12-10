@@ -179,7 +179,7 @@ export default function SAddProduct() {
       resetForm();
 
       setTimeout(() => {
-        navigate("/supplier/supplierdashboard");
+        navigate("/supplierDashboard");
       }, 900);
     } catch (err) {
       setError(err.message || "Failed to add product.");
@@ -452,7 +452,7 @@ export default function SAddProduct() {
                 {loading ? "Saving..." : "Save product"}
               </button>
 
-              <button type="button" onClick={() => navigate("/supplier/supplierdashboard")} className="btn btn-secondary">
+              <button type="button" onClick={() => navigate("/supplierDashboard")} className="btn btn-secondary">
                 Cancel
               </button>
 
