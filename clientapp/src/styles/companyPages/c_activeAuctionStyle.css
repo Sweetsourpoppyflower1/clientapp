@@ -1,0 +1,331 @@
+.c-aa-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fff;
+    min-height: 100vh;
+    padding-bottom: 40px;
+}
+
+/* Header */
+.c-aa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.c-aa-logo img {
+    height: 80px;
+}
+.c-aa-logo span {
+    font-size: 48px;
+    color: #e91e63;
+    font-weight: bold;
+}
+
+/* Main Grid */
+.c-aa-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 40px;
+    align-items: start;
+}
+
+/* Common Card Styles */
+.c-aa-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Left Panel */
+.c-aa-left-panel {
+    border: 3px solid #5a8e68;
+}
+
+.c-aa-img-container {
+    background: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.c-aa-product-img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.c-aa-buy-controls {
+    background-color: #5a8e68;
+    padding: 20px;
+    color: #000;
+}
+
+.c-aa-label-bold {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.c-aa-slider-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.c-aa-range {
+    width: 100%;
+}
+
+.c-aa-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.c-aa-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.c-aa-input-group label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.c-aa-input-box {
+    background: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+/* Clock Panel */
+.c-aa-clock-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.c-aa-clock-wrapper {
+    position: relative;
+    width: 350px;
+    height: 350px;
+    margin-bottom: 30px;
+}
+
+.c-aa-clock-face {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Clock Labels */
+.c-aa-clock-label {
+    position: absolute;
+    font-size: 12px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Positioning labels roughly around the clock */
+.c100 { top: 10px; left: 50%; transform: translateX(-50%); }
+.c10 { top: 15%; left: 30%; }
+.c20 { top: 35%; left: 10%; }
+.c30 { top: 60%; left: 10%; }
+.c40 { bottom: 15%; left: 30%; }
+.c50 { bottom: 10%; left: 50%; transform: translateX(-50%); }
+.c60 { bottom: 15%; right: 30%; }
+.c70 { top: 60%; right: 10%; }
+.c80 { top: 35%; right: 10%; }
+.c90 { top: 15%; right: 30%; }
+
+.c-aa-clock-center {
+    width: 60%;
+    height: 60%;
+    background: #2e7d32;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.c-aa-price-display {
+    background: #455a64;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.c-aa-info-box {
+    background: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-align: center;
+    width: 80px;
+}
+
+.c-aa-box-label {
+    display: block;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.c-aa-box-val {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.c-aa-buy-btn {
+    background: #b71c1c;
+    color: #fff;
+    border: none;
+    padding: 15px 80px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.c-aa-buy-btn:hover {
+    background: #c62828;
+}
+
+/* Right Panel (Details) */
+.c-aa-details-panel {
+    background: #e6c5c5; /* Pinkish */
+    padding: 20px;
+    border: 3px solid #000;
+}
+
+.c-aa-detail-group {
+    margin-bottom: 12px;
+}
+
+.c-aa-detail-group label {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.c-aa-detail-val.box-white {
+    background: #fff;
+    padding: 8px 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    min-height: 20px;
+}
+
+.highlight-border {
+    border: 2px solid #7b1fa2 !important; /* Purple border for Form field as in screenshot */
+}
+
+.c-aa-row {
+    display: flex;
+    gap: 10px;
+}
+
+.half {
+    flex: 1;
+}
+
+/* Upcoming Auctions */
+.c-aa-upcoming {
+    margin-top: 50px;
+    padding: 0 40px;
+}
+
+.c-aa-section-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.c-aa-carousel {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.c-aa-nav-btn {
+    background: transparent;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    color: #666;
+}
+
+.c-aa-cards-row {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 10px 0;
+    flex: 1;
+}
+
+.c-aa-upcoming-card {
+    border: 3px solid #5a8e68;
+    border-radius: 15px;
+    min-width: 250px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.c-aa-uc-img {
+    height: 180px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.c-aa-uc-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.c-aa-uc-details {
+    background: #5a8e68;
+    padding: 15px;
+}
+
+.c-aa-uc-details label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.c-aa-uc-details .c-aa-detail-val {
+    font-size: 14px;
+    padding: 5px 8px;
+}
+
+/* Loading */
+.c-aa-loading {
+    padding: 50px;
+    text-align: center;
+    font-size: 20px;
+}
