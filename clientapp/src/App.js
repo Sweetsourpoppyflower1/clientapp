@@ -29,7 +29,7 @@ function App() {
                 <Route path="/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/aStockOverview" element={<AStockOverview />} />
                 <Route path="/aCreateAuction" element={<ACreateAuction />} />
-                <Route path="/cAuctions" element={Auctions />} />
+                <Route path="/cAuctions" element={<Auctions />} />
                 <Route path="/auctionCalender" element={<AuctionCalender />} />
                 <Route path="/supplierDashboard" element={<SupplierDashboard />} />
                 <Route path="/sAddProduct" element={<SAddProduct />} />
