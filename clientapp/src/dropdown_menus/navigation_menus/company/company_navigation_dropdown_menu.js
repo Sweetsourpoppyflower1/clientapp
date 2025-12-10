@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import "./company_navigation_dropdown_menu.css";
 
 const MENU_ITEMS = [
-  { id: "home", title: "Company Dashboard", desc: "Navigates to Company Dashboard", path: "/company/companyDashboard" },
-  { id: "auctions", title: "Auctions", desc: "Navigates to the Auctions screen", path: "/company/c_auctions" },
-  { id: "orders", title: "My Orders", desc: "Navigates to My Orders screen", path: "/company/c_myOrders" },
+  { id: "home", title: "Company Dashboard", desc: "Navigates to Company Dashboard", path: "/companyDashboard" },
+  { id: "auctions", title: "Auctions", desc: "Navigates to the Auctions screen", path: "/cAuctions" },
+  { id: "orders", title: "My Orders", desc: "Navigates to My Orders screen", path: "/cMyOrders" },
 ];
 
 export default function CompanyNavigationDropdownMenu({ navigateFn }) {

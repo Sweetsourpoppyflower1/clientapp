@@ -1,0 +1,323 @@
+/* Overview Acceptances Page Styles - Based on Auction Calendar */
+
+.acceptances-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Dropdown Menu Icons - Make them white */
+.acceptances-page .nav-icon,
+.acceptances-page .nav-icon svg,
+.acceptances-page .acc-avatar-icon,
+.acceptances-page .acc-avatar-icon svg,
+.acceptances-page .nav-menu-btn,
+.acceptances-page .nav-menu-btn svg,
+.acceptances-page .acc-avatar-btn,
+.acceptances-page .acc-avatar-btn svg {
+    color: #fff !important;
+    fill: #fff !important;
+    stroke: #fff !important;
+}
+
+/* Welcome Section */
+.acceptances-welcome-section {
+    padding: 40px 40px;
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.3) 0%, rgba(100, 0, 0, 0.2) 100%);
+    border-bottom: 2px solid rgba(139, 0, 0, 0.5);
+}
+
+.acceptances-welcome-header {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.acceptances-welcome-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: #fff;
+}
+
+.acceptances-welcome-subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Main Content */
+.acceptances-main {
+    padding: 40px;
+}
+
+.acceptances-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.acceptances-section-header {
+    margin-bottom: 30px;
+}
+
+.acceptances-section-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #fff;
+}
+
+.acceptances-section-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+/* Loading & Empty States */
+.acceptances-loading {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.acceptances-empty {
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-message {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.empty-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+/* Acceptances Grid */
+.acceptances-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+/* Acceptance Card */
+.acceptance-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.acceptance-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: rgba(139, 0, 0, 0.5);
+}
+
+.acceptance-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.acceptance-info {
+    flex: 1;
+}
+
+.acceptance-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.acceptance-company {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.acceptance-price {
+    text-align: right;
+}
+
+.price-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+}
+
+.price-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #4caf50;
+}
+
+/* Acceptance Details */
+.acceptance-details {
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Acceptance Actions */
+.acceptance-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.accept-btn,
+.refuse-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.accept-btn {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: #fff;
+}
+
+.accept-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.refuse-btn {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: #fff;
+}
+
+.refuse-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+.accept-btn:disabled,
+.refuse-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Footer Actions */
+.acceptances-footer-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 40px;
+}
+
+.acceptances-back-btn {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.acceptances-back-btn:hover {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.3) 0%, rgba(100, 0, 0, 0.2) 100%);
+    border-color: rgba(139, 0, 0, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .acceptances-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .acceptances-header {
+        padding: 15px 20px;
+    }
+
+    .acceptances-welcome-section {
+        padding: 30px 20px;
+    }
+
+    .acceptances-welcome-title {
+        font-size: 28px;
+    }
+
+    .acceptances-main {
+        padding: 20px;
+    }
+
+    .acceptances-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .acceptance-card {
+        padding: 20px;
+    }
+
+    .acceptance-card-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .acceptance-price {
+        text-align: left;
+    }
+
+    .acceptance-actions {
+        flex-direction: column;
+    }
+}

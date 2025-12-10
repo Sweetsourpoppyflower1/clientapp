@@ -436,7 +436,7 @@ export default function AAuctions() {
                     </div>
 
                     <div className="c-auctions-back-section">
-                        <button className="c-auctions-back-btn" onClick={() => navigate("/master/auctionmasterDashboard")}>
+                        <button className="c-auctions-back-btn" onClick={() => navigate("/auctionmasterDashboard")}>
                             Back to Dashboard
                         </button>
                     </div>

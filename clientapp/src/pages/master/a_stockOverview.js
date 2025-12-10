@@ -12,6 +12,7 @@ export default function AStockOverview() {
     const [logo, setLogo] = useState(null);
     const [deleting, setDeleting] = useState({});
     const [error, setError] = useState(null);
+    const [auctionLots, setAuctionLots] = useState([]);
 
     const toggleExpand = (index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
@@ -84,6 +85,24 @@ export default function AStockOverview() {
             });
     }, []);
 
+    useEffect(() => {
+        fetch("/api/AuctionLots")
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch auction lots");
+                return res.json();
+            })
+            .then((data) => setAuctionLots(data))
+            .catch((err) => {
+                console.error("Error loading auction lots:", err);
+                setAuctionLots([]);
+            });
+    }, []);
+
+    const getRemainingQuantity = (plantId) => {
+        const lot = auctionLots.find(l => Number(l.plant_id) === Number(plantId));
+        return lot ? lot.remaining_quantity : null;
+    };
+
     return (
         <div className="stock-page">
             {/* Header with logo */}
@@ -92,7 +111,7 @@ export default function AStockOverview() {
                     {logo ? (
                         <img src={logo.url} alt={logo.alt} className="stock-logo" />
                     ) : (
-                        <span className="loading-label">Loading…</span>
+                        <span className="loading-label">Loadingâ€¦</span>
                     )}
                 </div>
             </header>
@@ -125,12 +144,13 @@ export default function AStockOverview() {
                                     <tr>
                                         <th className="stock-th">Stock name</th>
                                         <th className="stock-th">Supplier name</th>
+                                        <th className="stock-th">Remaining quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {plants.length === 0 ? (
                                         <tr>
-                                            <td colSpan={2} className="stock-td no-stock">No stock loaded</td>
+                                            <td colSpan={3} className="stock-td no-stock">No stock loaded</td>
                                         </tr>
                                     ) : (
                                         plants.map((p, i) => (
@@ -150,11 +170,12 @@ export default function AStockOverview() {
                                                 >
                                                     <td className="stock-td stock-plant-name">{p.plantName}</td>
                                                     <td className="stock-td stock-supplier">{p.supplier}</td>
+                                                    <td className="stock-td">{getRemainingQuantity(p.plantId) ?? "â€”"}</td>
                                                 </tr>
 
                                                 {expandedIndex === i && (
                                                     <tr className="stock-details-row">
-                                                        <td colSpan={2} className="stock-details-cell">
+                                                        <td colSpan={3} className="stock-details-cell">
                                                             <div className="stock-details-container">
                                                                 <div className="stock-details-image">
                                                                     {p.imageUrl ? (
@@ -183,7 +204,7 @@ export default function AStockOverview() {
                                                                         <div>
                                                                             <div><span className="stock-label">Stems/Bunch</span>{p.stemsBunch}</div>
                                                                             <div><span className="stock-label">Maturity</span>{p.maturity}</div>
-                                                                            <div><span className="stock-label">Min Price</span>{p.minPrice ?? p.min_price ?? "—"}</div>
+                                                                            <div><span className="stock-label">Min Price</span>{p.minPrice ?? p.min_price ?? "â€”"}</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -220,7 +241,7 @@ export default function AStockOverview() {
                         <div className="stock-footer-actions">
                             <button
                                 className="stock-back-btn"
-                                onClick={() => navigate("/master/auctionmasterDashboard")}
+                                onClick={() => navigate("/auctionmasterDashboard")}
                             >
                                 Back to Dashboard
                             </button>

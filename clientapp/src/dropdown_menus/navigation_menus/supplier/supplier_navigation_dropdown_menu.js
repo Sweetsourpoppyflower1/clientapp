@@ -3,8 +3,8 @@ import "../master/navigation_dropdown_menu.css";
 import "./supplier_navigation_dropdown_menu.css";
 
 const MENU_ITEMS = [
-    { id: "home", title: "Home", desc: "Back to Supplier Dashboard", path: "/supplier/supplierDashboard" },
-    { id: "add", title: "Add Product", desc: "Create a new product listing", path: "/supplier/s_addProduct" },
+    { id: "home", title: "Home", desc: "Back to Supplier Dashboard", path: "/supplierDashboard" },
+    { id: "add", title: "Add Product", desc: "Create a new product listing", path: "/sAddProduct" },
 ];
 
 export default function SupplierNavigationDropdownMenu({ navigateFn }) {
