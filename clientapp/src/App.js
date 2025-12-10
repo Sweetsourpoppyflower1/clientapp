@@ -9,16 +9,19 @@ import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
 import AStockOverview from "./pages/master/a_stockOverview.js";
 import ACreateAuction from "./pages/master/a_createAuction.js";
 import Auctions from "./pages/company/c_auctions.js"
+import ActiveAuction from "./pages/company/c_activeAuction.js";
 import AuctionCalender from "./pages/master/a_overviewAuctionCalendar.js";
 import SupplierDashboard from "./pages/supplier/supplierDashboard.js";
 import SAddProduct from "./pages/supplier/s_addProduct.js";
 import CMyOrders from "./pages/company/c_myOrders.js";
 import CompanyDashboard from "./pages/company/companyDashboard.js";
+import AOverviewAcceptances from "./pages/master/a_overviewAcceptances.js";
 
 function App() {
     return (
         <Router>
             <Routes>
+                {/* Authentication Routes */}
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/registerOptions" element={<RegisterOptions />} />
                 <Route path="/registerCompany" element={<RegisterCompany />} />

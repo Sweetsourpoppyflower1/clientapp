@@ -1,5 +1,7 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import "../../styles/companyPages/c_auctionsStyle.css";
+import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
 
 const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 
@@ -84,6 +86,7 @@ function AuctionCard({ a }) {
 }
 
 export default function CAuctions() {
+    const navigate = useNavigate();
     const [active, setActive] = useState([]);
     const [upcoming, setUpcoming] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -367,6 +370,7 @@ export default function CAuctions() {
                     </div>
                 </main>
             </div>
+            <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
         </div>
     );
 }
