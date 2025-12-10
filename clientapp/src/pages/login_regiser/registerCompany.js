@@ -124,7 +124,7 @@ export default function RegisterCompany() {
                 });
                 // Redirect after 2 seconds
                 setTimeout(() => {
-                    window.location.href = "/login_register/login";
+                    window.location.href = "/login";
                 }, 2000);
             } else {
                 // Try to parse JSON response
@@ -257,7 +257,7 @@ export default function RegisterCompany() {
                         <button
                             type="button"
                             className="r-login-btn"
-                            onClick={() => (window.location.href = "/login_register/login")}
+                            onClick={() => (window.location.href = "/login")}
                         >
                             Login
                         </button>

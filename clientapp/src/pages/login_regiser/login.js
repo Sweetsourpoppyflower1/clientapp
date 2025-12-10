@@ -53,7 +53,7 @@ export default function Login() {
       window.location.href = "/auctionmasterDashboard";
     } else {
       console.warn(`Unknown role: ${r}`);
-      window.location.href = "/login_register/login";
+      window.location.href = "/login";
     }
   }
 
@@ -247,7 +247,7 @@ export default function Login() {
               <button
                 className="register-btn"
                 type="button"
-                onClick={() => (window.location.href = "/login_register/registerOptions")}
+                onClick={() => (window.location.href = "/registerOptions")}
                 style={{ width: "70%", padding: 8 }}
               >
                 Register
