@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../../styles/companyPages/c_myOrdersStyle.css';
+import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
 
 export default function CMyOrders() {
   const navigate = useNavigate();
@@ -157,6 +158,7 @@ export default function CMyOrders() {
           </div>
         </section>
       </main>
+      <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
     </div>
   );
 }

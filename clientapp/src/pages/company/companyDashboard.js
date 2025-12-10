@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../../styles/companyPages/companyDashboardStyle.css';
 import { useNavigate } from 'react-router-dom';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
+import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
 
 export default function CompanyDashboard() {
     const [logo, setLogo] = useState(null);
@@ -59,7 +60,7 @@ export default function CompanyDashboard() {
                     {logo ? (
                         <img src={logo.url} alt={logo.alt} className="top-logo" />
                     ) : (
-                        <span className="loading-label">Loading…</span>
+                        <span className="loading-label">Loadingâ€¦</span>
                     )}
                 </div>
             </header>
@@ -70,7 +71,7 @@ export default function CompanyDashboard() {
 
                     <div className="cd-card">
                         {loading ? (
-                            <p className="cd-loading">Loading active auctions…</p>
+                            <p className="cd-loading">Loading active auctionsâ€¦</p>
                         ) : !firstAuction ? (
                             <div className="cd-no-active">
                                 <img
@@ -126,6 +127,7 @@ export default function CompanyDashboard() {
             </main>
 
             <AccountDropdownMenu />
+            <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
         </div>
     );
 }
