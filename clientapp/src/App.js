@@ -19,14 +19,22 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Navigate to="/login_register/login" replace />} />
-                <Route path="/login_register/registerOptions" element={<RegisterOptions />} />
-                <Route path="/login_register/registerCompany" element={<RegisterCompany />} />
-                <Route path="/login_register/registerSupplier" element={<RegisterSupplier />} />
-                <Route path="/login_register/login" element={<LoginUser /> } />
-                <Route path="/master/a_overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
-                <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
-                <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/registerOptions" element={<RegisterOptions />} />
+                <Route path="/registerCompany" element={<RegisterCompany />} />
+                <Route path="/registerSupplier" element={<RegisterSupplier />} />
+                <Route path="/login" element={<LoginUser /> } />
+                <Route path="/overviewUpcomingAuctions" element={<AOverviewUpcomingAuctions /> } />
+                <Route path="/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
+                <Route path="/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
+                <Route path="/aStockOverview" element={<AStockOverview />} />
+                <Route path="/aCreateAuction" element={<ACreateAuction />} />
+                <Route path="/cAuctions" element={Auctions />} />
+                <Route path="/auctionCalender" element={<AuctionCalender />} />
+                <Route path="/supplierDashboard" element={<SupplierDashboard />} />
+                <Route path="/sAddProduct" element={<SAddProduct />} />
+                <Route path="/cMyOrders" element={<CMyOrders />} />
+                <Route path="/companyDashboard" element={<CompanyDashboard />} />
             </Routes>
         </Router>
     );
