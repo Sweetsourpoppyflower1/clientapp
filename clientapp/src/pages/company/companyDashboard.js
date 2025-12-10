@@ -24,36 +24,27 @@ export default function CompanyDashboard() {
     }, []);
 
     useEffect(() => {
-        const tryActive = async () => {
+        const fetchActiveAuctions = async () => {
             try {
-                const r = await fetch('/api/Auction/active');
-                if (r.ok) {
-                    const data = await r.json();
-                    setAuctions(Array.isArray(data) ? data : []);
-                    setLoading(false);
-                    return;
-                }
-            } catch { /* fallback */ }
-
-            try {
-                const r2 = await fetch('/api/Auction');
-                if (r2.ok) {
-                    const all = await r2.json();
-                    const active = Array.isArray(all)
-                        ? all.filter(a => (a.status || '').toLowerCase() === 'active')
+                const response = await fetch('/api/Auctions');
+                if (response.ok) {
+                    const allAuctions = await response.json();
+                    const activeAuctions = Array.isArray(allAuctions)
+                        ? allAuctions.filter(a => (a.status || '').toLowerCase() === 'active')
                         : [];
-                    setAuctions(active);
+                    setAuctions(activeAuctions);
                 } else {
                     setAuctions([]);
                 }
-            } catch {
+            } catch (error) {
+                console.error('Error fetching auctions:', error);
                 setAuctions([]);
             } finally {
                 setLoading(false);
             }
         };
 
-        tryActive();
+        fetchActiveAuctions();
     }, []);
 
     const handleVisitAuction = (id) => navigate(`/company/auction/${id}`);
