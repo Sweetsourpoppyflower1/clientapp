@@ -1,0 +1,281 @@
+:root {
+    --maroon: #9b2630;
+    --pink: #f6d7da;
+    --dark-green: #174f3c;
+    --mint: #7fc7ab;
+    --muted: #f5f5f6;
+    --shadow: 0 4px 10px rgba(0,0,0,0.08);
+    --radius: 10px;
+}
+
+.sd-page {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    color: #222;
+    padding: 0;
+}
+
+
+.sd-topbar {
+    display: flex;
+    align-items: center;
+    min-height: 100px;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid #e6e6e6;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    /* allow absolute-centering the logo */
+    position: relative;
+}
+
+.sd-left, .sd-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sd-icon-btn {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 6px;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sd-hamburger {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    line-height: 1;
+    border-radius: 6px;
+}
+
+.sd-hamburger:hover,
+.sd-hamburger:focus-visible {
+    background: rgba(0,0,0,0.03);
+}
+
+/* center the logo using absolute positioning so it stays visually centered regardless of left/right content width */
+.sd-logo {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1px;
+
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 20; /* keep above left/right controls */
+    width: max-content;
+    white-space: nowrap;
+}
+
+.sd-dropdown {
+    position: relative;
+}
+
+.sd-dropdown-panel {
+    display: block; 
+    position: absolute;
+    top: calc(100% - 2px); 
+    left: 0;
+    min-width: 220px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 12px;
+    border: 1px solid #eee;
+    z-index: 30;
+    transition: opacity 150ms ease, transform 120ms ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+.sd-dropdown:hover .sd-dropdown-panel,
+.sd-dropdown:focus-within .sd-dropdown-panel,
+.sd-dropdown-panel:hover,
+.sd-user-dropdown:hover .sd-dropdown-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.sd-right-panel {
+    right: 0;
+    left: auto;
+}
+
+.sd-panel-title {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.sd-panel-links .sd-link {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    padding: 8px 6px;
+    color: #222;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.sd-panel-links .sd-link:focus,
+.sd-panel-links .sd-link:hover {
+    background: rgba(0,0,0,0.03);
+    outline: none;
+}
+
+.sd-logged {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.sd-panel-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.sd-logout {
+    background: var(--maroon);
+    color: white;
+    border: 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.sd-settings {
+    background: transparent;
+    border: 0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.sd-welcome {
+    background: var(--pink);
+    padding: 5px 16px;
+    height: 100px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+    .sd-welcome h1 {
+        margin: 0 0 6px 0;
+        font-weight: 700;
+        font-size: 28px;
+    }
+
+    .sd-welcome p {
+        font-size: 18px;
+        color: #111;
+        line-height: 1.2;
+    }
+
+.sd-main {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 28px;
+    padding: 28px;
+    align-items: start;
+}
+
+.sd-add-card {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    box-shadow: var(--shadow);
+}
+
+.sd-add-graphic {
+    background: rgba(0,0,0,0.06);
+    padding: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.sd-add-footer {
+    background: var(--maroon);
+    padding: 12px;
+    text-align: center;
+}
+
+.sd-add-btn {
+    background: transparent;
+    border: 0;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sd-stock {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sd-stock-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--dark-green);
+    color: white;
+    padding: 12px 16px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.sd-stock-icon {
+    font-size: 20px;
+    opacity: 0.95;
+}
+
+.sd-stock-title {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.sd-stock-body {
+    background: var(--mint);
+    min-height: 360px;
+    padding: 24px;
+}
+
+@media (max-width:920px) {
+    .sd-main {
+        grid-template-columns: 1fr;
+    }
+
+    /* revert to normal flow on smaller screens so logo stacks correctly */
+    .sd-logo {
+        position: static;
+        transform: none;
+        width: auto;
+        order: 0;
+    }
+}
