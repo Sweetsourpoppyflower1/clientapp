@@ -16,11 +16,13 @@ export default function RegisterCompany() {
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [logo, setLogo] = useState(null);
+    
     const isValidPostalCode = (code) => /^[0-9]{4}[A-Za-z]{2}$/.test(code);
     const isValidVAT = (vat) => /^NL\d{9}B\d{2}$/i.test(vat);
     const isValidBIC = (bic) => /^[A-Za-z]{4}[A-Za-z]{2}[A-Za-z0-9]{2}([A-Za-z0-9]{3})?$/.test(bic);
-    const countries = ["Netherlands", "Belgium", "Luxemburg"];
+    const countries = ["Netherlands", "Belgium", "Luxembourg"];
 
     const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -35,36 +37,51 @@ export default function RegisterCompany() {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: normalizedUrl, alt: m.alt_text });
             })
-            .catch(() => { });
+            .catch((err) => {
+                console.warn("Logo fetch failed:", err);
+            });
     }, []);
 
     const onSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
+        setLoading(true);
+
+        // Client-side validation
+        if (!form.email || !form.password || !form.companyName || !form.address || !form.postalCode || !form.country || !form.vat || !form.iban || !form.bic) {
+            setError("All fields are required.");
+            setLoading(false);
+            return;
+        }
 
         if (!IBAN.isValid(form.iban)) {
             setError("Invalid IBAN number.");
+            setLoading(false);
             return;
         }
 
         if (!isValidPostalCode(form.postalCode)) {
-            setError("Invalid postal code. Format must be 4 digits followed by 2 letters.");
+            setError("Invalid postal code. Format must be 4 digits followed by 2 letters (e.g., 1234AB).");
+            setLoading(false);
             return;
         }
 
         if (!isValidVAT(form.vat)) {
             setError("Invalid VAT number. Format: NL123456789B01");
+            setLoading(false);
             return;
         }
 
         if (!isValidBIC(form.bic)) {
             setError("Invalid BIC / SWIFT code. Example: ABNANL2A");
+            setLoading(false);
             return;
         }
 
         if (!countries.includes(form.country)) {
             setError("Invalid country selected.");
+            setLoading(false);
             return;
         }
 
@@ -81,13 +98,18 @@ export default function RegisterCompany() {
         };
 
         try {
+            console.log("📡 Sending registration request...", payload);
+
             const res = await fetch("/api/companies/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
+            console.log(`📊 Response status: ${res.status}`);
+
             if (res.ok) {
+                console.log("✅ Registration successful!");
                 setSuccess(true);
                 setForm({
                     email: "",
@@ -95,19 +117,40 @@ export default function RegisterCompany() {
                     companyName: "",
                     address: "",
                     postalCode: "",
-                    country: "",
+                    country: "Netherlands",
                     vat: "",
                     iban: "",
                     bic: ""
                 });
-                window.location.href = "/login_register/login";
-
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "/login_register/login";
+                }, 2000);
             } else {
-                const body = await res.json();
-                setError(body?.error || JSON.stringify(body));
+                // Try to parse JSON response
+                let errorMessage = `Registration failed (${res.status})`;
+                
+                try {
+                    const contentType = res.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        const body = await res.json();
+                        errorMessage = body?.message || body?.error || JSON.stringify(body);
+                    } else {
+                        const text = await res.text();
+                        errorMessage = text || errorMessage;
+                    }
+                } catch (parseError) {
+                    console.error("❌ Could not parse response:", parseError);
+                }
+
+                console.error("❌ Registration error:", errorMessage);
+                setError(errorMessage);
             }
         } catch (ex) {
-            setError(ex.message);
+            console.error("❌ Network error:", ex);
+            setError(`Network error: ${ex.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
