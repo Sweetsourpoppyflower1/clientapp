@@ -10,6 +10,7 @@ export default function AStockOverview() {
 
     const [plants, setPlants] = useState([]);
     const [logo, setLogo] = useState(null);
+    const [auctionLots, setAuctionLots] = useState([]);
 
     const toggleExpand = (index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
@@ -28,7 +29,14 @@ export default function AStockOverview() {
                 if (!res.ok) throw new Error("Failed to fetch plants");
                 return res.json();
             })
-            .then((data) => setPlants(data))
+            .then((data) => {
+                console.log("API Response:", data);
+                if (data.length > 0) {
+                    console.log("First plant:", data[0]);
+                    console.log("Keys:", Object.keys(data[0]));
+                }
+                setPlants(data);
+            })
             .catch((err) => {
                 console.error("Error loading plants:", err);
                 setPlants([]);
@@ -50,6 +58,24 @@ export default function AStockOverview() {
             });
     }, []);
 
+    useEffect(() => {
+        fetch("/api/AuctionLots")
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch auction lots");
+                return res.json();
+            })
+            .then((data) => setAuctionLots(data))
+            .catch((err) => {
+                console.error("Error loading auction lots:", err);
+                setAuctionLots([]);
+            });
+    }, []);
+
+    const getRemainingQuantity = (plantId) => {
+        const lot = auctionLots.find(l => Number(l.plant_id) === Number(plantId));
+        return lot ? lot.remaining_quantity : null;
+    };
+
     return (
         <div className="stock-page">
             <div className="stock-header">
@@ -67,12 +93,13 @@ export default function AStockOverview() {
                         <tr>
                             <th className="stock-th">Stock name</th>
                             <th className="stock-th">supplier name</th>
+                            <th className="stock-th">remaining quantity</th>
                         </tr>
                     </thead>
                     <tbody>
                         {plants.length === 0 ? (
                             <tr>
-                                <td colSpan={2} className="stock-td no-stock">No stock loaded</td>
+                                <td colSpan={3} className="stock-td no-stock">No stock loaded</td>
                             </tr>
                         ) : (
                             plants.map((p, i) => (
@@ -91,11 +118,12 @@ export default function AStockOverview() {
                                             {p.plantName}
                                         </td>
                                         <td className="stock-td stock-supplier">{p.supplier}</td>
+                                        <td className="stock-td">{getRemainingQuantity(p.plantId) ?? "-"}</td>
                                     </tr>
 
                                     {expandedIndex === i && (
                                         <tr>
-                                            <td colSpan={2} className="stock-details-row">
+                                            <td colSpan={3} className="stock-details-row">
                                                 <div className="stock-details-container">
                                                     <div className="stock-picture-box">
                                                         {p.imageUrl ? (

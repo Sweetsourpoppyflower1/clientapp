@@ -8,10 +8,22 @@ import { useNavigate } from "react-router-dom";
 export default function SupplierDashboard() {
     // Replace these with real data / hooks
     const [logo, setLogo] = useState(null);
-  const userName = 'user';
-  const userRole = 'Supplier';
+    const [plants, setPlants] = useState([]);
+    const [expandedIndex, setExpandedIndex] = useState(null);
+    const [auctionLots, setAuctionLots] = useState([]);
+    const userName = 'user';
+    const userRole = 'Supplier';
 
     const navigate = useNavigate();
+
+    const toggleExpand = (index) => {
+        setExpandedIndex(expandedIndex === index ? null : index);
+    };
+
+    const getRemainingQuantity = (plantId) => {
+        const lot = auctionLots.find(l => Number(l.plant_id) === Number(plantId));
+        return lot ? lot.remaining_quantity : null;
+    };
 
     useEffect(() => {
         // Top logo (media id 1)
@@ -26,6 +38,32 @@ export default function SupplierDashboard() {
                 setLogo({ url: normalizedUrl, alt: m.alt_text });
             })
             .catch(() => { /* silent fallback */ });
+    }, []);
+
+    useEffect(() => {
+        fetch("/api/plant/overview")
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch plants");
+                return res.json();
+            })
+            .then((data) => setPlants(data))
+            .catch((err) => {
+                console.error("Error loading plants:", err);
+                setPlants([]);
+            });
+    }, []);
+
+    useEffect(() => {
+        fetch("/api/AuctionLots")
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch auction lots");
+                return res.json();
+            })
+            .then((data) => setAuctionLots(data))
+            .catch((err) => {
+                console.error("Error loading auction lots:", err);
+                setAuctionLots([]);
+            });
     }, []);
 
   const handleAddProducts = () => navigate('/supplier/s_addProduct');
@@ -74,7 +112,88 @@ export default function SupplierDashboard() {
           </div>
 
           <div className="sd-stock-body" role="region" aria-label="Stock view content">
-            {/* Stock table / list goes here */}
+            <table className="stock-table" aria-label="stock-table">
+              <thead>
+                <tr>
+                  <th className="stock-th">Stock name</th>
+                  <th className="stock-th">supplier name</th>
+                  <th className="stock-th">remaining quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plants.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="stock-td no-stock">No stock loaded</td>
+                  </tr>
+                ) : (
+                  plants.map((p, i) => (
+                    <React.Fragment key={p.plantId ?? i}>
+                      <tr>
+                        <td
+                          className="stock-td stock-plant-name"
+                          onClick={() => toggleExpand(i)}
+                          aria-expanded={expandedIndex === i}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") toggleExpand(i);
+                          }}
+                        >
+                          {p.plantName}
+                        </td>
+                        <td className="stock-td stock-supplier">{p.supplier}</td>
+                        <td className="stock-td">{getRemainingQuantity(p.plantId) ?? "-"}</td>
+                      </tr>
+
+                      {expandedIndex === i && (
+                        <tr>
+                          <td colSpan={3} className="stock-details-row">
+                            <div className="stock-details-container">
+                              <div className="stock-picture-box">
+                                {p.imageUrl ? (
+                                  <img
+                                    src={
+                                      p.imageUrl && !p.imageUrl.startsWith("/")
+                                        ? "/" + p.imageUrl
+                                        : p.imageUrl
+                                    }
+                                    alt={p.imageAlt ?? p.productName}
+                                    className="stock-picture"
+                                  />
+                                ) : (
+                                  <div className="stock-picture-placeholder">No image</div>
+                                )}
+                              </div>
+
+                              <div className="stock-details-content">
+                                <div className="stock-details-grid">
+                                  <div>
+                                    <div><span className="stock-label">product name</span>{p.productName}</div>
+                                    <div><span className="stock-label">category</span>{p.category}</div>
+                                    <div><span className="stock-label">form</span>{p.form}</div>
+                                  </div>
+
+                                  <div>
+                                    <div><span className="stock-label">stems_bunch</span>{p.stemsBunch}</div>
+                                    <div><span className="stock-label">maturity</span>{p.maturity}</div>
+                                    <div><span className="stock-label">min price</span>{p.minPrice ?? p.min_price ?? "-"}</div>
+                                    <div><span className="stock-label">max price</span>{p.maxPrice ?? p.start_price ?? "-"}</div>
+                                  </div>
+
+                                  <div>
+                                    <div><span className="stock-label">desc</span>{p.desc}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
       </main>
