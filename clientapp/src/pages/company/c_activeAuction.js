@@ -140,6 +140,14 @@ export default function ActiveAuction() {
     const handleBuy = async () => {
         if (!auction || !activeLot) return;
         
+        const currentTime = new Date();
+        const auctionStartTime = new Date(auction.startTime);
+        
+        if (currentTime < auctionStartTime) {
+            alert("De veiling is nog niet begonnen. U kunt geen aankoop doen voordat de veiling is gestart.");
+            return;
+        }
+        
         let userData = {};
         try {
             userData = JSON.parse(localStorage.getItem("user_data") || "{}");
@@ -197,7 +205,6 @@ export default function ActiveAuction() {
             setActiveLot(updatedLot);
             setAuction(prev => ({ ...prev, contInLot: updatedLot.remaining_quantity }));
             
-            // Reset the auction clock on purchase
             setResetTrigger(prev => prev + 1);
             
             alert(`Successfully bought ${userAmount} containers!`);
