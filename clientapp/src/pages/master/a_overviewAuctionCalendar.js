@@ -15,8 +15,6 @@ const inlinePlaceholder =
       font-family='Arial' font-size='12'>No image</text></svg>`
     );
 
-
-
 const resolveUrl = (url = "") =>
     !url ? "" : url.startsWith("http") ? url : `${API_BASE}${url.startsWith("/") ? url : `/${url}`}`;
 
@@ -48,12 +46,78 @@ const parseUtcDate = (s) => {
     return new Date(`${s}Z`);
 };
 
-function AuctionCard({ a }) {
+function AuctionCard({ a, onDelete }) {
+    const [imageIndex, setImageIndex] = useState(0);
+    const [deleting, setDeleting] = useState(false);
+
+    const images = Array.isArray(a.images) && a.images.length > 0 ? a.images : [a.imageUrl || inlinePlaceholder];
+
+    const handlePrevImage = (e) => {
+        e.stopPropagation();
+        setImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const handleNextImage = (e) => {
+        e.stopPropagation();
+        setImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const handleDeleteAuction = async () => {
+        if (!window.confirm(`Are you sure you want to delete "${a.plantName ?? a.title}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            const token = localStorage.getItem("auth_token");
+            const res = await fetch(`/api/Auctions/${a.auction_id || a.id}`, {
+                method: "DELETE",
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+
+            if (!res.ok) {
+                const errMsg = await res.text().catch(() => `Failed to delete (${res.status})`);
+                throw new Error(errMsg);
+            }
+
+            onDelete(a.auction_id || a.id);
+            alert(`"${a.plantName ?? a.title}" has been deleted successfully.`);
+        } catch (err) {
+            console.error("Delete error:", err);
+            alert(`Failed to delete auction: ${err.message}`);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
     return (
-        <div className="c-auctions-auction-card" style={{ alignItems: "start" }}>
-            <img className="c-auctions-thumb" src={a.images?.[0] ? resolveUrl(a.images[0]) : a.imageUrl ? resolveUrl(a.imageUrl) : inlinePlaceholder} alt={a.plantName ?? a.title ?? "image"} />
+        <div className="c-auctions-auction-card">
+            <div className="c-auctions-image-wrapper">
+                <img className="c-auctions-thumb" src={images[imageIndex]} alt={a.plantName ?? a.title ?? "image"} />
+                {images.length > 1 && (
+                    <>
+                        <button 
+                            className="c-auctions-img-nav-btn left" 
+                            onClick={handlePrevImage}
+                            aria-label="Previous image"
+                        >
+                            ‹
+                        </button>
+                        <button 
+                            className="c-auctions-img-nav-btn right" 
+                            onClick={handleNextImage}
+                            aria-label="Next image"
+                        >
+                            ›
+                        </button>
+                        <div className="c-auctions-img-counter">
+                            {imageIndex + 1} / {images.length}
+                        </div>
+                    </>
+                )}
+            </div>
             <div className="c-auctions-meta-column">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div className="c-auctions-title-row">
                     <div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "#fff" }}>{a.plantName ?? a.title}</div>
                         <div className="c-auctions-small-muted" style={{ marginTop: 6 }}>{a.supplierName}</div>
@@ -61,17 +125,13 @@ function AuctionCard({ a }) {
                     <div style={{ textAlign: "right" }}>
                         <div style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>€ {priceOf(a).toFixed(2)}</div>
                         <div className="c-auctions-small-muted">
-                            <div>
-                                Starts: {dateOf(a) ? parseUtcDate(dateOf(a)).toLocaleString() : "—"}
-                            </div>
-                            <div>
-                                Ends: {dateEnd(a) ? parseUtcDate(dateEnd(a)).toLocaleString() : "-"}
-                            </div>
+                            <div>Starts: {dateOf(a) ? parseUtcDate(dateOf(a)).toLocaleString() : "—"}</div>
+                            <div>Ends: {dateEnd(a) ? parseUtcDate(dateEnd(a)).toLocaleString() : "—"}</div>
                         </div>
                     </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12, color: "#fff" }}>
+                <div className="c-auctions-specs-grid">
                     <div>Category: <strong>{a.category ?? "—"}</strong></div>
                     <div>Form: <strong>{a.form ?? "—"}</strong></div>
                     <div>Quality: <strong>{a.quality ?? "—"}</strong></div>
@@ -80,11 +140,24 @@ function AuctionCard({ a }) {
                     <div>Maturity: <strong>{a.maturity ?? "—"}</strong></div>
                 </div>
 
-                <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ color: "#fff", fontSize: 14 }}>
+                <div className="c-auctions-description-box">
+                    <div className="c-auctions-description-text">
                         {(a.description ?? a.desc ?? "").slice(0, 200)}
                     </div>
-                    <button className="c-auctions-btn">View</button>
+                </div>
+
+                <div style={{ display: "flex", gap: 12 }}>
+                    <button className="c-auctions-cta-wide" style={{ flex: 1 }}>
+                        Go to auction
+                    </button>
+                    <button 
+                        className="c-auctions-cta-wide" 
+                        style={{ flex: 1, background: "#d32f2f" }}
+                        onClick={handleDeleteAuction}
+                        disabled={deleting}
+                    >
+                        {deleting ? "Deleting..." : "Delete auction"}
+                    </button>
                 </div>
             </div>
         </div>
@@ -268,6 +341,7 @@ export default function AAuctions() {
             if (sort === "price-asc") return priceOf(a) - priceOf(b);
             if (sort === "price-desc") return priceOf(b) - priceOf(a);
             if (sort === "newest") return (parseUtcDate(dateOf(b))?.getTime() || 0) - (parseUtcDate(dateOf(a))?.getTime() || 0);
+            if (sort === "oldest") return (parseUtcDate(dateOf(a))?.getTime() || 0) - (parseUtcDate(dateOf(b))?.getTime() || 0);
             return 0;
         });
 
@@ -277,6 +351,11 @@ export default function AAuctions() {
     const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
     if (page > totalPages) setPage(1);
     const pageItems = filtered.slice((page - 1) * perPage, page * perPage);
+
+    const handleDeleteAuction = (auctionId) => {
+        setActive(prev => prev.filter(a => (a.auction_id || a.id) !== auctionId));
+        setUpcoming(prev => prev.filter(a => (a.auction_id || a.id) !== auctionId));
+    };
 
     return (
         <div className="c-auctions-page">
@@ -288,9 +367,19 @@ export default function AAuctions() {
                 )}
             </div></div>
 
+            <section className="c-auctions-welcome-section" role="region" aria-label="auction-calendar-banner">
+                <div className="c-auctions-welcome-header">
+                    <div className="c-auctions-welcome-text">
+                        <p className="c-auctions-welcome-subtitle">
+                            Manage all your auctions in one place. View active and upcoming auctions with full control over your auction schedule.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             <div>
                 <div className="c-auctions-section-title"><strong>Active Auctions</strong></div>
-                {loading ? <div>Loading...</div> : active.length ? <div className="c-auctions-carousel">{active.map(a => <AuctionCard key={getId(a)} a={a} />)}</div> : <div className="c-auctions-carousel-card c-auctions-carousel-card--empty">No active auctions</div>}
+                {loading ? <div>Loading...</div> : active.length ? <div className="c-auctions-carousel">{active.map(a => <AuctionCard key={getId(a)} a={a} onDelete={handleDeleteAuction} />)}</div> : <div className="c-auctions-carousel-card c-auctions-carousel-card--empty">No active auctions</div>}
             </div>
 
             <div style={{ height: 18 }} />
@@ -342,18 +431,23 @@ export default function AAuctions() {
                         <select className="c-auctions-input" value={maturity} onChange={(e) => setMaturity(e.target.value)}><option value="">Any</option>{options.maturities.map(m => <option key={m} value={m}>{m}</option>)}</select>
                     </div>
 
-                    <div className="c-auctions-filter-box" style={{ display: "flex", gap: 8, justifyContent: "space-between" }}>
-                        <button className="c-auctions-btn" onClick={() => { setQuery(""); setPriceMin(0); setPriceMax(100); setSelectedCategories(new Set()); setSelectedForms(new Set()); setQuality(""); setMinStems(0); setStemsPerBunch(0); setMaturity(""); }}>Reset</button>
-                        <div className="c-auctions-pill">{filtered.length} matches</div>
+                    <div className="c-auctions-filter-box" style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                        <button className="c-auctions-btn" onClick={() => { setQuery(""); setPriceMin(0); setPriceMax(100); setSelectedCategories(new Set()); setSelectedForms(new Set()); setQuality(""); setMinStems(0); setStemsPerBunch(0); setMaturity(""); }}>↻ Reset Filters</button>
+                    </div>
+
+                    <div className="c-auctions-back-section">
+                        <button className="c-auctions-back-btn" onClick={() => navigate("/auctionmasterDashboard")}>
+                            Back to Dashboard
+                        </button>
                     </div>
                 </aside>
 
                 <main className="c-auctions-main">
-                    <div className="c-auctions-controls-row" style={{ marginBottom: 8 }}>
+                    <div className="c-auctions-controls-row">
                         <div style={{ flex: 1 }} />
-                        <div>
-                            <label style={{ marginRight: 8 }}>Sort</label>
-                            <select value={sort} onChange={(e) => setSort(e.target.value)} className="c-auctions-input" style={{ width: 220 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <label style={{ marginRight: 8, fontWeight: 600 }}>Sort</label>
+                            <select value={sort} onChange={(e) => setSort(e.target.value)} className="c-auctions-input" style={{ width: 180 }}>
                                 <option value="price-asc">Price: Low → High</option>
                                 <option value="price-desc">Price: High → Low</option>
                                 <option value="newest">Newest</option>
@@ -363,23 +457,21 @@ export default function AAuctions() {
                     </div>
 
                     <div className="c-auctions-upcoming-list">
-                        {loading ? <div>Loading upcoming auctions...</div> : pageItems.length ? pageItems.map(a => <AuctionCard key={getId(a)} a={a} />) : <div>No upcoming auctions matching your filters.</div>}
+                        {loading ? <div>Loading upcoming auctions...</div> : pageItems.length ? pageItems.map(a => <AuctionCard key={getId(a)} a={a} onDelete={handleDeleteAuction} />) : <div>No upcoming auctions matching your filters.</div>}
 
-                        <div className="c-auctions-pager" style={{ marginTop: 10 }}>
-                            <button onClick={() => setPage(1)} disabled={page === 1} className="c-auctions-btn">&lt;&lt;</button>
-                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="c-auctions-btn">Previous</button>
-                            <div style={{ margin: "0 8px" }}>{page} / {totalPages}</div>
-                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="c-auctions-btn">Next</button>
-                            <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="c-auctions-btn">&gt;&gt;</button>
+                        <div className="c-auctions-pager">
+                            <button onClick={() => setPage(1)} disabled={page === 1} className="c-auctions-btn c-auctions-pager-btn" title="First page">⟨⟨</button>
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="c-auctions-btn c-auctions-pager-btn" title="Previous page">‹</button>
+                            <div style={{ margin: "0 12px", fontWeight: 600 }}>{page} / {totalPages}</div>
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="c-auctions-btn c-auctions-pager-btn" title="Next page">›</button>
+                            <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="c-auctions-btn c-auctions-pager-btn" title="Last page">⟩⟩</button>
                         </div>
                     </div>
                 </main>
             </div>
 
             <NavigationDropdownMenu navigateFn={(p) => navigate(p)} />
-
             <AccountDropdownMenu />
-
         </div>
     );
 }

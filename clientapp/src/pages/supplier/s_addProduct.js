@@ -123,8 +123,8 @@ export default function SAddProduct() {
         min_stem: String(minStem),
         stems_bunch: String(stemsBunch),
         maturity: maturity,
-        start_price: Number(startPrice),
-        min_price: Number(minPrice)
+        start_price: Math.floor(Number(startPrice) || 0),
+        min_price: Math.floor(Number(minPrice) || 0)
       };
 
       const plantRes = await fetch("/api/Plants", {
@@ -179,7 +179,7 @@ export default function SAddProduct() {
       resetForm();
 
       setTimeout(() => {
-        navigate("/supplier/supplierdashboard");
+        navigate("/supplierDashboard");
       }, 900);
     } catch (err) {
       setError(err.message || "Failed to add product.");
@@ -209,11 +209,7 @@ export default function SAddProduct() {
     <div className="sd-page">
       <header className="sd-topbar">
         <div className="sd-left" aria-hidden>
-          <button aria-label="menu" className="sd-icon-btn sd-hamburger">
-            <span />
-            <span />
-            <span />
-          </button>
+      
         </div>
 
         <div className="sd-logo">
@@ -238,7 +234,7 @@ export default function SAddProduct() {
             <div className="sd-stock-body" role="region" aria-label="Add product form">
               <form onSubmit={handleSubmit} className="add-product-form">
                 
-                {/* Column 1: Basic Info */}
+                {/* Column 1: Basic Product Info */}
                 <div className="form-column">
                   <div className="form-group">
                     <label className="form-label form-required">Product name</label>
@@ -292,7 +288,7 @@ export default function SAddProduct() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Min stems</label>
+                    <label className="form-label">Minimal stems lenght in centimeters</label>
                     <input
                       type="number"
                       min="1"
@@ -303,7 +299,7 @@ export default function SAddProduct() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Stems per bunch</label>
+                    <label className="form-label">Amount of stems per bunch</label>
                     <input
                       type="number"
                       min="1"
@@ -328,14 +324,13 @@ export default function SAddProduct() {
                   </div>
                 </div>
 
-                {/* Column 2: Pricing & Auction */}
+                {/* Column 2: Pricing, Auction, Description & Media */}
                 <div className="form-column">
                   <div className="form-group">
-                    <label className="form-label">Start Price</label>
+                    <label className="form-label">Start Price (whole numbers only)</label>
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
                       value={startPrice}
                       onChange={(e) => setStartPrice(Math.max(0, Number(e.target.value) || 0))}
                       className="form-input"
@@ -343,11 +338,10 @@ export default function SAddProduct() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Min Price</label>
+                    <label className="form-label">Min Price (whole numbers only)</label>
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
                       value={minPrice}
                       onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value) || 0))}
                       className="form-input"
@@ -386,16 +380,14 @@ export default function SAddProduct() {
                       className="form-input"
                     />
                   </div>
-                </div>
 
-                {/* Column 3: Description & Media */}
-                <div className="form-column">
                   <div className="form-group">
                     <label className="form-label">Description</label>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       className="form-textarea"
+                      placeholder="Describe your product..."
                     />
                   </div>
 
@@ -452,7 +444,7 @@ export default function SAddProduct() {
                 {loading ? "Saving..." : "Save product"}
               </button>
 
-              <button type="button" onClick={() => navigate("/supplier/supplierdashboard")} className="btn btn-secondary">
+              <button type="button" onClick={() => navigate("/supplierDashboard")} className="btn btn-secondary">
                 Cancel
               </button>
 

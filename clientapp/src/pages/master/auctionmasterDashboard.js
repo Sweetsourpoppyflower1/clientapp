@@ -46,19 +46,19 @@ export default function AuctionmasterDashboard() {
     }, []);
 
     const handleCreateAuction = () => {
-        window.location.href = '/master/a_createAuction';
+        window.location.href = '/aCreateAuction';
     };
 
     const handleUpcomingAuctions = () => {
-        window.location.href = '/master/a_overviewAuctionCalendar';
+        window.location.href = '/auctionCalender';
     };
 
     const handleOverviewStock = () => {
-        window.location.href = '/master/a_overviewStock';
+        window.location.href = '/aStockOverview';
     };
 
     const handleOverviewAcceptances = () => {
-        window.location.href = '/master/a_overviewAcceptances';
+        window.location.href = '/AOverviewAcceptances';
     };
 
     const renderTileContent = (index, placeholderSvg) => {
@@ -89,7 +89,7 @@ export default function AuctionmasterDashboard() {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">Loadingâ€¦</span>
                 )}
             </div>
 

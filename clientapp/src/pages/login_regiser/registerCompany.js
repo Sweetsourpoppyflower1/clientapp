@@ -16,11 +16,13 @@ export default function RegisterCompany() {
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [logo, setLogo] = useState(null);
+    
     const isValidPostalCode = (code) => /^[0-9]{4}[A-Za-z]{2}$/.test(code);
     const isValidVAT = (vat) => /^NL\d{9}B\d{2}$/i.test(vat);
     const isValidBIC = (bic) => /^[A-Za-z]{4}[A-Za-z]{2}[A-Za-z0-9]{2}([A-Za-z0-9]{3})?$/.test(bic);
-    const countries = ["Netherlands", "Belgium", "Luxemburg"];
+    const countries = ["Netherlands", "Belgium", "Luxembourg"];
 
     const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -35,36 +37,51 @@ export default function RegisterCompany() {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: normalizedUrl, alt: m.alt_text });
             })
-            .catch(() => { });
+            .catch((err) => {
+                console.warn("Logo fetch failed:", err);
+            });
     }, []);
 
     const onSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
+        setLoading(true);
+
+        // Client-side validation
+        if (!form.email || !form.password || !form.companyName || !form.address || !form.postalCode || !form.country || !form.vat || !form.iban || !form.bic) {
+            setError("All fields are required.");
+            setLoading(false);
+            return;
+        }
 
         if (!IBAN.isValid(form.iban)) {
             setError("Invalid IBAN number.");
+            setLoading(false);
             return;
         }
 
         if (!isValidPostalCode(form.postalCode)) {
-            setError("Invalid postal code. Format must be 4 digits followed by 2 letters.");
+            setError("Invalid postal code. Format must be 4 digits followed by 2 letters (e.g., 1234AB).");
+            setLoading(false);
             return;
         }
 
         if (!isValidVAT(form.vat)) {
             setError("Invalid VAT number. Format: NL123456789B01");
+            setLoading(false);
             return;
         }
 
         if (!isValidBIC(form.bic)) {
             setError("Invalid BIC / SWIFT code. Example: ABNANL2A");
+            setLoading(false);
             return;
         }
 
         if (!countries.includes(form.country)) {
             setError("Invalid country selected.");
+            setLoading(false);
             return;
         }
 
@@ -81,13 +98,18 @@ export default function RegisterCompany() {
         };
 
         try {
+            console.log("📡 Sending registration request...", payload);
+
             const res = await fetch("/api/companies/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
+            console.log(`📊 Response status: ${res.status}`);
+
             if (res.ok) {
+                console.log("✅ Registration successful!");
                 setSuccess(true);
                 setForm({
                     email: "",
@@ -95,141 +117,161 @@ export default function RegisterCompany() {
                     companyName: "",
                     address: "",
                     postalCode: "",
-                    country: "",
+                    country: "Netherlands",
                     vat: "",
                     iban: "",
                     bic: ""
                 });
-                window.location.href = "/login_register/login";
-
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 2000);
             } else {
-                const body = await res.json();
-                setError(body?.error || JSON.stringify(body));
+                // Try to parse JSON response
+                let errorMessage = `Registration failed (${res.status})`;
+                
+                try {
+                    const contentType = res.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        const body = await res.json();
+                        errorMessage = body?.message || body?.error || JSON.stringify(body);
+                    } else {
+                        const text = await res.text();
+                        errorMessage = text || errorMessage;
+                    }
+                } catch (parseError) {
+                    console.error("❌ Could not parse response:", parseError);
+                }
+
+                console.error("❌ Registration error:", errorMessage);
+                setError(errorMessage);
             }
         } catch (ex) {
-            setError(ex.message);
+            console.error("❌ Network error:", ex);
+            setError(`Network error: ${ex.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
-
     return (
         <div className="r-parent">
+            {/* Header */}
+            <header className="r-header">
+                <div className="r-logo" role="region" aria-label="logo-section">
+                    {logo ? (
+                        <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                    ) : (
+                        <span className="loading-label">Loading…</span>
+                    )}
+                </div>
+            </header>
 
-            <div className="r-header">
-                {logo ? (
-                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
-                ) : (
-                    <span className="loading-label">Loading…</span>
+            {/* Welcome Banner */}
+            <section className="r-welcome-section" role="region" aria-label="welcome-banner">
+                <div className="r-welcome-header">
+                    <div className="r-welcome-text">
+                        <p className="r-welcome-greeting">Create Your Account</p>
+                        <p className="r-welcome-title">Company Registration</p>
+                        <p className="r-welcome-subtitle">
+                            Register your company to start participating in auctions and managing your orders
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Main Content */}
+            <div className="r-content-section">
+                {/* Error Message */}
+                {error && (
+                    <div className="r-error-banner" role="alert">
+                        <span>⚠️ {error}</span>
+                    </div>
                 )}
-            </div>
 
-            {error && <div style={{ color: "red" }}>{error}</div>}
-            {success && <div style={{ color: "green" }}>Registration successful</div>}
+                {/* Success Message */}
+                {success && (
+                    <div className="r-success-banner" role="status">
+                        <span>✅ Registration successful! Redirecting to login...</span>
+                    </div>
+                )}
 
-            <div className="r-register">
-
-                {/*<div className="r-register-infocard">*/}
-
-                {/*    <div class="r-infocard">*/}
-                {/*        <h2>Register</h2>*/}
-                {/*        <p>Register your account at Flauction</p>*/}
-                {/*    </div>*/}
-
-                {/*</div>  */}
-
-                <div className="r-register-form">
+                {/* Form Card */}
+                <div className="r-form-card">
+                    <div className="r-form-header">
+                        <h2>Sign Up</h2>
+                        <p>Enter your company details</p>
+                    </div>
 
                     <form className="form" onSubmit={onSubmit}>
-
                         <div>
                             <label>Email Address</label>
-                            <input name="email" type="email" value={form.email} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="email" type="email" value={form.email} onChange={onChange} required placeholder="your@company.com" />
                         </div>
 
                         <div>
                             <label>Password</label>
-                            <input name="password" type="password" value={form.password} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="password" type="password" value={form.password} onChange={onChange} required placeholder="Enter a strong password" />
                         </div>
 
                         <div>
                             <label>Company Name</label>
-                            <input name="companyName" value={form.companyName} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="companyName" value={form.companyName} onChange={onChange} required placeholder="Your Company" />
                         </div>
 
                         <div>
                             <label>Company Address</label>
-                            <input name="address" value={form.address} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="address" value={form.address} onChange={onChange} required placeholder="Street and number" />
                         </div>
 
                         <div>
                             <label>Postal Code</label>
-                            <input name="postalCode" value={form.postalCode} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="postalCode" value={form.postalCode} onChange={onChange} required placeholder="1234AB" />
                         </div>
 
                         <div>
                             <label>Country</label>
-                            <select
-                                name="country"
-                                value={form.country}
-                                onChange={onChange}
-                                required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
-                            >
+                            <select name="country" value={form.country} onChange={onChange} required>
                                 {countries.map((c) => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
                             </select>
                         </div>
 
-
                         <div>
                             <label>VAT Number</label>
-                            <input name="vat" value={form.vat} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="vat" value={form.vat} onChange={onChange} required placeholder="NL123456789B01" />
                         </div>
 
                         <div>
                             <label>IBAN</label>
-                            <input name="iban" value={form.iban} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="iban" value={form.iban} onChange={onChange} required placeholder="NL91ABNA0417164300" />
                         </div>
 
                         <div>
                             <label>BIC / SWIFT</label>
-                            <input name="bic" value={form.bic} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="bic" value={form.bic} onChange={onChange} required placeholder="ABNANL2A" />
                         </div>
 
-                        <button className="r-register-btn" type="submit">Register</button>
-
-                        <div className="r-login-placeholder">
-                            Already a member? Log in here:
-                        </div>
-
-                        <button
-                            type="button"
-                            className="r-login-btn"
-                            onClick={() => (window.location.href = "/login_register/login")}
-                        >
-                            Login
+                        <button className="r-register-btn" type="submit" disabled={loading}>
+                            {loading ? "Creating Account..." : "Register"}
                         </button>
 
+                        <div className="r-login-placeholder">or</div>
+
+                        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                            <p style={{ fontSize: "12px", color: "#666", margin: "0 0 10px 0" }}>Already have an account?</p>
+                            <button
+                                type="button"
+                                className="r-login-btn"
+                                onClick={() => (window.location.href = "/login")}
+                            >
+                                Sign In
+                            </button>
+                        </div>
                     </form>
-
                 </div>
-
             </div>
-
-            <div className="r-empty">
-
-            </div>
-
         </div>
     );
-
 }

@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./navigation_dropdown_menu.css";
+import "./company_navigation_dropdown_menu.css";
 
 const MENU_ITEMS = [
-  { id: "home", title: "Auctionmaster Dashboard", desc: "Navigates to Auctionmaster Dashboard", path: "/auctionmasterDashboard" },
-  { id: "create", title: "Create Auction", desc: "Navigates to the Create Auction screen", path: "/aCreateAuction" },
-    { id: "auction", title: "Auction Calender", desc: "Navigates to the Auction Calendar screen", path: "/auctionCalender" },
-    { id: "overview", title: "Overview Stock", desc: "Navigates to the Stock Overview screen", path: "/aStockOverview" },
-    { id: "review", title: "Review Acceptances", desc: "Navigates to the Acceptances Overview screen", path: "/AOverviewAcceptances" },
-    { id: "manage", title: "Manage Users", desc: "Manage companies and suppliers", path: "/aManageUsers" },
+  { id: "home", title: "Company Dashboard", desc: "Navigates to Company Dashboard", path: "/companyDashboard" },
+  { id: "auctions", title: "Auctions", desc: "Navigates to the Auctions screen", path: "/cAuctions" },
+  { id: "orders", title: "My Orders", desc: "Navigates to My Orders screen", path: "/cMyOrders" },
 ];
 
-export default function NavigationDropdownMenu({ navigateFn }) {
+export default function CompanyNavigationDropdownMenu({ navigateFn }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import '../../styles/companyPages/companyDashboardStyle.css';
 import { useNavigate } from 'react-router-dom';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
+import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
 
 export default function CompanyDashboard() {
     const [logo, setLogo] = useState(null);
-    const [auctions, setAuctions] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [buttonLogos, setButtonLogos] = useState([null, null]);
+    const [companyName, setCompanyName] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,42 +25,61 @@ export default function CompanyDashboard() {
     }, []);
 
     useEffect(() => {
-        const tryActive = async () => {
-            try {
-                const r = await fetch('/api/Auction/active');
-                if (r.ok) {
-                    const data = await r.json();
-                    setAuctions(Array.isArray(data) ? data : []);
-                    setLoading(false);
-                    return;
-                }
-            } catch { /* fallback */ }
-
-            try {
-                const r2 = await fetch('/api/Auction');
-                if (r2.ok) {
-                    const all = await r2.json();
-                    const active = Array.isArray(all)
-                        ? all.filter(a => (a.status || '').toLowerCase() === 'active')
-                        : [];
-                    setAuctions(active);
-                } else {
-                    setAuctions([]);
-                }
-            } catch {
-                setAuctions([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        tryActive();
+        const ids = [2, 4];
+        Promise.all(
+            ids.map(id =>
+                fetch(`/api/Media/${id}`)
+                    .then(res => (res.ok ? res.json() : null))
+                    .catch(() => null)
+            )
+        ).then(results => {
+            const normalized = results.map(r => {
+                if (!r || !r.url) return null;
+                return {
+                    url: r.url.startsWith('/') ? r.url : `/${r.url}`,
+                    alt: r.alt_text ?? ''
+                };
+            });
+            setButtonLogos(normalized);
+        });
     }, []);
 
-    const handleVisitAuction = (id) => navigate(`/company/auction/${id}`);
-    const handleAllAuctions = () => navigate('/company/auctions');
+    useEffect(() => {
+        // Try to get company name from local storage or localStorage
+        const storedCompanyName = localStorage.getItem('companyName');
+        if (storedCompanyName) {
+            setCompanyName(storedCompanyName);
+        }
+    }, []);
 
-    const firstAuction = auctions.length ? auctions[0] : null;
+    const handleButton1 = () => {
+        window.location.href = '/CAuctions';
+    };
+
+    const handleButton2 = () => {
+        window.location.href = '/CMyOrders';
+    };
+
+    const renderTileContent = (index, placeholderSvg) => {
+        const media = buttonLogos[index];
+        if (media) {
+            return (
+                <img
+                    src={media.url}
+                    alt={media.alt}
+                    className="tile-img"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+            );
+        }
+        return placeholderSvg;
+    };
+
+    const placeholderSvg = (
+        <svg viewBox="0 0 24 24" className="iconPlaceholder" aria-hidden="true" style={{ width: 96, height: 96 }}>
+            <circle cx="12" cy="12" r="8" fill="none" stroke="#fff" strokeWidth="10" />
+        </svg>
+    );
 
     return (
         <div className="company-dashboard" aria-label="company-dashboard">
@@ -68,73 +88,37 @@ export default function CompanyDashboard() {
                     {logo ? (
                         <img src={logo.url} alt={logo.alt} className="top-logo" />
                     ) : (
-                        <span className="loading-label">Loading…</span>
+                        <span className="loading-label">Loadingâ€¦</span>
                     )}
                 </div>
             </header>
 
-            <main className="cd-panel" role="region" aria-label="active-now-panel">
-                <div className="cd-left">
-                    <h2 className="cd-section-title">Active Now</h2>
-
-                    <div className="cd-card">
-                        {loading ? (
-                            <p className="cd-loading">Loading active auctions…</p>
-                        ) : !firstAuction ? (
-                            <div className="cd-no-active">
-                                <img
-                                    className="cd-auction-img"
-                                    alt="no-active"
-                                    src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&q=60&auto=format&fit=crop"
-                                />
-                                <h3>No active auctions</h3>
-                                <p className="cd-muted">
-                                    There are no auctions running right now for your company. Use the button
-                                    to see all auctions or check back later.
-                                </p>
-                                <div className="cd-cta-wrap">
-                                    <button className="cd-cta cd-cta-secondary" onClick={handleAllAuctions}>
-                                        Visit this auction
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="cd-auction">
-                                <img
-                                    className="cd-auction-img"
-                                    alt={`auction-${firstAuction.auction_id}`}
-                                    src={firstAuction.imageUrl || 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&q=60&auto=format&fit=crop'}
-                                />
-                                <h3 className="cd-auction-title">Auction #{firstAuction.auction_id}</h3>
-                                <p className="cd-muted">
-                                    {firstAuction.short_description || 'Live auction running now. Click below to visit the auction, view lots and place bids.'}
-                                </p>
-                                <div className="cd-cta-wrap">
-                                    <button className="cd-cta" onClick={() => handleVisitAuction(firstAuction.auction_id)}>
-                                        Visit This Auction
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+            <section className="cd-welcome-section" role="region" aria-label="welcome-banner">
+                <div className="cd-welcome-header">
+                    <div className="cd-welcome-text">
+                        <p className="cd-welcome-greeting">Welcome back</p>
+                        <p className="cd-welcome-subtitle">
+                            Browse available auctions and manage your orders all in one place. Start exploring to find new opportunities.
+                        </p>
                     </div>
                 </div>
+            </section>
 
-                <aside className="cd-right">
-                    <div className="cd-card cd-summary">
-                        <h3>Company Dashboard</h3>
-                        <p className="cd-summary-text">
-                            Monitor your active auctions here. Select an auction to enter the live view, review lot
-                            details and follow bids. Use the Auctions button to browse all auctions.
-                        </p>
+            <div className="cd-buttons-section" role="region" aria-label="company-actions">
+                <p className="cd-buttons-label">What would you like to do?</p>
+                <div className="cd-tiles-row" role="navigation" aria-label="dashboard-actions">
+                    <button className="cd-tile cd-tile1" aria-label="View Auctions" onClick={handleButton1}>
+                        {renderTileContent(0, placeholderSvg)}
+                    </button>
 
-                        <div className="cd-cta-wrap">
-                            <button className="cd-cta cd-cta-light" onClick={handleAllAuctions}>Auctions</button>
-                        </div>
-                    </div>
-                </aside>
-            </main>
+                    <button className="cd-tile cd-tile2" aria-label="View My Orders" onClick={handleButton2}>
+                        {renderTileContent(1, placeholderSvg)}
+                    </button>
+                </div>
+            </div>
 
             <AccountDropdownMenu />
+            <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
         </div>
     );
 }
