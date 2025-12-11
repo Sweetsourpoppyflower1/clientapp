@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../../styles/companyPages/c_myOrdersStyle.css';
+import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
 
 export default function CMyOrders() {
@@ -10,12 +11,51 @@ export default function CMyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [companyId, setCompanyId] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [plantDetails, setPlantDetails] = useState({});
+  const [plantMediaMap, setPlantMediaMap] = useState({});
+  const [loadingPlants, setLoadingPlants] = useState({});
 
-  // Adjust this endpoint to match your backend
   const API_ENDPOINT = "/api/acceptances";
 
+  const normalizeUrl = (url) => {
+    if (!url) return null;
+    const trimmed = url.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  };
+
+  // Fetch all MediaPlant data once on mount
   useEffect(() => {
-    // Top logo (media id 1) - same approach as supplier dashboard
+    async function loadMediaPlants() {
+      try {
+        const res = await fetch("/api/MediaPlant");
+        if (res.ok) {
+          const mediaList = await res.json();
+          const mediaMap = {};
+          
+          if (Array.isArray(mediaList)) {
+            mediaList.forEach(media => {
+              const plantId = media.plant_id;
+              if (!mediaMap[plantId]) {
+                mediaMap[plantId] = [];
+              }
+              mediaMap[plantId].push(media);
+            });
+          }
+          
+          setPlantMediaMap(mediaMap);
+        }
+      } catch (err) {
+        console.error("Failed to fetch MediaPlant data:", err);
+      }
+    }
+
+    loadMediaPlants();
+  }, []);
+
+  useEffect(() => {
     const mediaId = 1;
     fetch(`/api/Media/${mediaId}`)
       .then(res => {
@@ -27,6 +67,20 @@ export default function CMyOrders() {
         setLogo({ url: normalizedUrl, alt: m.alt_text || m.altText || "Flauction" });
       })
       .catch(() => { /* silent fallback */ });
+  }, []);
+
+  useEffect(() => {
+    const userDataStr = localStorage.getItem("user_data");
+    if (userDataStr) {
+      try {
+        const userData = JSON.parse(userDataStr);
+        if (userData.companyID) {
+          setCompanyId(userData.companyID);
+        }
+      } catch (err) {
+        console.error("Failed to parse user_data:", err);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -47,7 +101,12 @@ export default function CMyOrders() {
         }
 
         const data = await res.json();
-        if (mounted) setOrders(Array.isArray(data) ? data : []);
+        if (mounted && Array.isArray(data)) {
+          const filteredOrders = companyId 
+            ? data.filter(order => order.company_id === companyId)
+            : data;
+          setOrders(filteredOrders);
+        }
       } catch (err) {
         if (mounted) setError(err.message || "Failed to load orders.");
       } finally {
@@ -55,11 +114,76 @@ export default function CMyOrders() {
       }
     }
 
-    loadOrders();
+    if (companyId) {
+      loadOrders();
+    }
     return () => {
       mounted = false;
     };
-  }, [API_ENDPOINT]);
+  }, [API_ENDPOINT, companyId]);
+
+  const toggleExpand = async (index, auctionId) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+
+    if (expandedIndex !== index && !plantDetails[auctionId]) {
+      setLoadingPlants(prev => ({ ...prev, [auctionId]: true }));
+      try {
+        const token = localStorage.getItem("auth_token");
+        const res = await fetch(`/api/Auctions/${auctionId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+
+        if (res.ok) {
+          const auctionData = await res.json();
+          const plantId = auctionData.plant_id;
+
+          if (plantId) {
+            // Fetch plant details
+            const plantRes = await fetch(`/api/Plants/${plantId}`, {
+              headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+
+            if (plantRes.ok) {
+              const plant = await plantRes.json();
+              
+              // Get media for this plant from the already-loaded mediaMap
+              let imageUrl = null;
+              let imageAlt = null;
+              
+              const mediaForPlant = plantMediaMap[plantId];
+              if (mediaForPlant && mediaForPlant.length > 0) {
+                // Sort to get primary image first
+                const sortedMedia = [...mediaForPlant].sort((a, b) => {
+                  const ai = a.is_primary ? 0 : 1;
+                  const bi = b.is_primary ? 0 : 1;
+                  return ai - bi;
+                });
+                
+                const primaryImage = sortedMedia[0];
+                if (primaryImage) {
+                  imageUrl = normalizeUrl(primaryImage.url);
+                  imageAlt = primaryImage.alt_text || plant.productname;
+                }
+              }
+              
+              setPlantDetails(prev => ({ 
+                ...prev, 
+                [auctionId]: {
+                  ...plant,
+                  imageUrl,
+                  imageAlt
+                }
+              }));
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load plant details:", err);
+      } finally {
+        setLoadingPlants(prev => ({ ...prev, [auctionId]: false }));
+      }
+    }
+  };
 
   function formatDate(iso) {
     try {
@@ -70,94 +194,147 @@ export default function CMyOrders() {
   }
 
   return (
-    <div className="sd-page">
-      <header className="sd-topbar" style={{ position: "relative" }}>
-        <div className="sd-left" aria-hidden>
-          <button aria-label="menu" className="sd-icon-btn sd-hamburger">
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-
-        <div className="sd-logo" role="region" aria-label="brand-logo">
+    <div className="cmo-page">
+      <header className="cmo-topbar">
+        <div className="cmo-logo" role="region" aria-label="brand-logo">
           {logo ? (
             <img src={logo.url} alt={logo.alt} className="top-logo" />
           ) : (
             <span className="loading-label">Loading…</span>
           )}
         </div>
-
-        <div className="sd-right" aria-hidden />
       </header>
 
-      <main className="sd-main" style={{ gridTemplateColumns: "1fr", paddingTop: 20 }}>
-        <section style={{ width: "100%" }}>
-          <div className="sd-stock">
-            <div className="sd-stock-header">
-              <div className="sd-stock-icon">📦</div>
-              <div className="sd-stock-title">My Orders</div>
-            </div>
+      <section className="cmo-welcome-section" role="region" aria-label="my-orders-banner">
+        <div className="cmo-welcome-header">
+          <div className="cmo-welcome-text">
+            <p className="cmo-welcome-subtitle">
+              Track and manage all your auction orders in one place. Review your accepted bids and order details.
+            </p>
+          </div>
+        </div>
+      </section>
 
-            <div className="sd-stock-body" role="region" aria-label="Company my orders">
-              {loading && <div className="status-text">Loading orders...</div>}
-              {error && <div className="status-text error">{error}</div>}
+      <main className="cmo-main">
+        <section className="cmo-orders-container">
+          <div className="cmo-orders-header">
+            <h1 className="cmo-orders-title">My Orders</h1>
+            <p className="cmo-orders-subtitle">{orders.length} order{orders.length !== 1 ? 's' : ''}</p>
+          </div>
 
-              {!loading && !error && orders.length === 0 && (
-                <div className="status-text">No orders found for this company.</div>
-              )}
+          <div className="cmo-orders-body" role="region" aria-label="company-orders">
+            {loading && <div className="cmo-status-text">Loading orders...</div>}
+            {error && <div className="cmo-status-text cmo-error">{error}</div>}
 
-              {!loading && !error && orders.length > 0 && (
-                <div className="orders-grid">
-                  {orders.map((o) => (
-                    <div
-                      key={o.acceptance_id ?? `${o.auction_id}-${o.auction_lot_id}-${o.tick_number}`}
-                      className="order-card"
-                    >
-                      <div className="order-content">
-                        <div className="order-title">
-                          Auction #{o.auction_id} — Lot #{o.auction_lot_id}
-                        </div>
+            {!loading && !error && orders.length === 0 && (
+              <div className="cmo-status-text">No orders found. Start by browsing available auctions.</div>
+            )}
 
-                        <div className="order-meta">
-                          Tick: {o.tick_number ?? "—"} • Accepted qty: {o.accepted_quantity ?? "—"} • Price: {o.accepted_price ?? "—"}
-                        </div>
-
-                        <div className="order-time">
-                          Order time: {o.time ? formatDate(o.time) : "—"}
-                        </div>
-
-                        {o.company_id && (
-                          <div className="order-company">Company: {o.company_id}</div>
-                        )}
-                      </div>
-
-                      <div className="order-actions">
-                        <button
-                          className="sd-logout"
-                          onClick={() => navigate(`/company/auctions/${o.auction_id}`)}
+            {!loading && !error && orders.length > 0 && (
+              <div className="cmo-orders-list">
+                <table className="cmo-orders-table" aria-label="Company auction orders">
+                  <thead>
+                    <tr>
+                      <th>Auction</th>
+                      <th>Lot</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                      <th>Order Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((o, index) => (
+                      <React.Fragment key={o.acceptance_id ?? `${o.auction_id}-${o.auction_lot_id}-${o.tick_number}`}>
+                        <tr
+                          className={`cmo-orders-row ${expandedIndex === index ? 'cmo-expanded' : ''}`}
+                          onClick={() => toggleExpand(index, o.auction_id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              toggleExpand(index, o.auction_id);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          aria-expanded={expandedIndex === index}
+                          aria-controls={`order-details-${index}`}
                         >
-                          View auction
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                          <td>#{o.auction_id}</td>
+                          <td>#{o.auction_lot_id}</td>
+                          <td>{o.accepted_quantity ?? "—"}</td>
+                          <td>€{o.accepted_price ?? "—"}</td>
+                          <td>{o.time ? formatDate(o.time) : "—"}</td>
+                        </tr>
 
-              <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-                <button
-                  className="sd-settings"
-                  onClick={() => navigate("/company/dashboard")}
-                  style={{ padding: "8px 14px" }}
-                >
-                  Back
-                </button>
+                        {expandedIndex === index && (
+                          <tr className="cmo-details-row" id={`order-details-${index}`}>
+                            <td colSpan="5" className="cmo-details-cell">
+                              {loadingPlants[o.auction_id] ? (
+                                <div className="cmo-loading-details">Loading plant information...</div>
+                              ) : plantDetails[o.auction_id] ? (
+                                <div className="cmo-details-container">
+                                  {/* Plant Image */}
+                                  <div className="cmo-details-image">
+                                    {plantDetails[o.auction_id].imageUrl ? (
+                                      <img
+                                        src={plantDetails[o.auction_id].imageUrl}
+                                        alt={plantDetails[o.auction_id].imageAlt || plantDetails[o.auction_id].productname}
+                                        className="cmo-details-img"
+                                      />
+                                    ) : (
+                                      <div className="cmo-image-placeholder">No image available</div>
+                                    )}
+                                  </div>
+
+                                  {/* Plant Details Grid */}
+                                  <div className="cmo-details-grid">
+                                    <div>
+                                      <div><span className="cmo-label">Product</span>{plantDetails[o.auction_id].productname || "—"}</div>
+                                      <div><span className="cmo-label">Category</span>{plantDetails[o.auction_id].category || "—"}</div>
+                                      <div><span className="cmo-label">Form</span>{plantDetails[o.auction_id].form || "—"}</div>
+                                      <div><span className="cmo-label">Quality</span>{plantDetails[o.auction_id].quality || "—"}</div>
+                                    </div>
+                                    <div>
+                                      <div><span className="cmo-label">Min Stems</span>{plantDetails[o.auction_id].min_stem || "—"}</div>
+                                      <div><span className="cmo-label">Stems/Bunch</span>{plantDetails[o.auction_id].stems_bunch || "—"}</div>
+                                      <div><span className="cmo-label">Maturity</span>{plantDetails[o.auction_id].maturity || "—"}</div>
+                                      <div><span className="cmo-label">Accepted Qty</span>{o.accepted_quantity || "—"}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="cmo-no-details">Plant information not available</div>
+                              )}
+
+                              {plantDetails[o.auction_id]?.desc && (
+                                <div className="cmo-description-box">
+                                  <span className="cmo-label">Description</span>
+                                  <p>{plantDetails[o.auction_id].desc}</p>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+            )}
+
+            <div className="cmo-footer-actions">
+              <button
+                className="cmo-back-btn"
+                onClick={() => navigate("/companyDashboard")}
+              >
+                Back to Dashboard
+              </button>
             </div>
           </div>
         </section>
       </main>
+
+      <AccountDropdownMenu />
       <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
     </div>
   );

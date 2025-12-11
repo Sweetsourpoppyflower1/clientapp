@@ -46,14 +46,14 @@ export default function Login() {
     console.log(`🔀 Redirecting for role: ${r}`);
 
     if (r === "client") {
-      window.location.href = "/company/companyDashboard";
+      window.location.href = "/companyDashboard";
     } else if (r === "supplier") {
-      window.location.href = "/supplier/supplierDashboard";
+      window.location.href = "/supplierDashboard";
     } else if (r === "admin") {
-      window.location.href = "/master/auctionmasterDashboard";
+      window.location.href = "/auctionmasterDashboard";
     } else {
       console.warn(`Unknown role: ${r}`);
-      window.location.href = "/login_register/login";
+      window.location.href = "/login";
     }
   }
 
@@ -247,7 +247,7 @@ export default function Login() {
               <button
                 className="register-btn"
                 type="button"
-                onClick={() => (window.location.href = "/login_register/registerOptions")}
+                onClick={() => (window.location.href = "/registerOptions")}
                 style={{ width: "70%", padding: 8 }}
               >
                 Register

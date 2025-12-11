@@ -45,7 +45,7 @@ export default function RegisterOptions() {
                         <button
                             type="button"
                             className="company-btn"
-                            onClick={() => navigate("/login_register/registerCompany")}
+                            onClick={() => navigate("/registerCompany")}
                             aria-label="Register as company"
                             title="Register as company"
                         >
@@ -57,7 +57,7 @@ export default function RegisterOptions() {
                         <button
                             type="button"
                             className="supplier-btn"
-                            onClick={() => navigate("/login_register/registerSupplier")}
+                            onClick={() => navigate("/registerSupplier")}
                             aria-label="Register as supplier"
                             title="Register as supplier"
                         >

@@ -6,9 +6,354 @@
     --muted: #f5f5f6;
     --shadow: 0 4px 10px rgba(0,0,0,0.08);
     --radius: 10px;
+    --primary-teal: #5A786B;
+    --primary-pink: #B35678;
+    --gradient: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
 }
 
-/* Basic layout and topbar styles (kept small to avoid duplicating entire supplier stylesheet) */
+/* enforce white background at the root level */
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.cmo-page {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.cmo-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cmo-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.loading-label {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Welcome section */
+.cmo-welcome-section {
+    background: var(--gradient);
+    color: white;
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.cmo-welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+.cmo-welcome-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmo-welcome-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 700px;
+    line-height: 1.4;
+}
+
+/* Main content */
+.cmo-main {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+}
+
+.cmo-orders-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cmo-orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cmo-orders-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.cmo-orders-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.cmo-orders-body {
+    background: white;
+}
+
+/* Status text */
+.cmo-status-text {
+    color: #666;
+    font-size: 15px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.cmo-status-text.cmo-error {
+    color: #d32f2f;
+}
+
+/* Orders table */
+.cmo-orders-list {
+    overflow-x: auto;
+}
+
+.cmo-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.cmo-orders-table thead {
+    background: var(--primary-teal);
+    color: white;
+}
+
+.cmo-orders-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cmo-orders-row {
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.cmo-orders-row:hover {
+    background-color: #f8f9fa;
+}
+
+.cmo-orders-row.cmo-expanded {
+    background-color: #f5f5f5;
+}
+
+.cmo-orders-row td {
+    padding: 16px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Details row */
+.cmo-details-row {
+    background-color: #f8f9fa;
+}
+
+.cmo-details-cell {
+    padding: 24px !important;
+}
+
+.cmo-details-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
+}
+
+.cmo-details-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cmo-details-img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.cmo-image-placeholder {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+    border-radius: 8px;
+    color: #999;
+    font-size: 13px;
+}
+
+.cmo-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+}
+
+.cmo-details-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cmo-details-grid > div > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cmo-label {
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.cmo-description-box {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.cmo-description-box p {
+    margin: 12px 0 0 0;
+    color: #555;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.cmo-loading-details {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+}
+
+.cmo-no-details {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+}
+
+/* Footer actions */
+.cmo-footer-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.cmo-back-btn {
+    background-color: var(--primary-teal);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.cmo-back-btn:hover {
+    background-color: #4a6459;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .cmo-main {
+        padding: 24px 16px;
+    }
+
+    .cmo-orders-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .cmo-orders-title {
+        font-size: 24px;
+    }
+
+    .cmo-details-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .cmo-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cmo-welcome-section {
+        padding: 24px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cmo-orders-title {
+        font-size: 20px;
+    }
+
+    .cmo-order-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .cmo-meta-item::after {
+        content: "" !important;
+        margin: 0 !important;
+    }
+}
+
+/* Keep old styles for backward compatibility if needed */
 .sd-page {
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
     color: #222;
@@ -29,182 +374,27 @@
     z-index: 10;
 }
 
-.sd-left, .sd-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.sd-icon-btn {
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    padding: 6px;
-    color: #333;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sd-hamburger {
-    width: 36px;
-    height: 36px;
-    padding: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    line-height: 1;
-    border-radius: 6px;
-}
-
-.sd-logo {
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 1px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 20;
-    width: max-content;
-    white-space: nowrap;
-}
-
-/* small helpers for logo */
-.top-logo {
-    max-height: 56px;
-    display: block;
-    object-fit: contain;
-}
-
-.loading-label {
-    color: #666;
-    font-size: 14px;
-}
-
-/* Stock block / header */
-.sd-stock {
-    display: flex;
-    flex-direction: column;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
 .sd-stock-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--dark-green);
+    background: var(--primary-teal);
     color: white;
     padding: 12px 16px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
 
-.sd-stock-icon {
-    font-size: 20px;
-    opacity: 0.95;
-}
-
-.sd-stock-title {
-    font-weight: 700;
-    font-size: 16px;
-}
-
-/* Body background */
-.sd-stock-body {
-    background: var(--mint);
-    min-height: 360px;
-    padding: 24px;
-}
-
-/* Status text */
-.status-text {
-    color: #222;
-    font-size: 14px;
-}
-
-.status-text.error {
-    color: crimson;
-}
-
-/* Orders grid and cards */
-.orders-grid {
-    display: grid;
-    gap: 12px;
-}
-
-.order-card {
-    border-radius: 8px;
-    padding: 12px;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 8px;
-    align-items: center;
-}
-
-.order-content {
-    display: grid;
-    gap: 6px;
-}
-
-.order-title {
-    font-weight: 600;
-    color: #222;
-}
-
-.order-meta {
-    color: #555;
-    font-size: 13px;
-}
-
-.order-time {
-    color: #666;
-    font-size: 13px;
-}
-
-.order-company {
-    color: #444;
-    font-size: 12px;
-    margin-top: 6px;
-}
-
-/* Action area */
-.order-actions {
-    text-align: right;
-}
-
-/* Reuse existing button look-and-feel */
 .sd-logout {
-    background: var(--maroon);
+    background: var(--primary-pink);
     color: white;
     border: 0;
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
+    transition: background-color 120ms ease;
 }
 
-.sd-settings {
-    background: transparent;
-    border: 0;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-/* Responsive fallback */
-@media (max-width:920px) {
-    .sd-main { grid-template-columns: 1fr; }
-
-    .sd-logo {
-        position: static;
-        transform: none;
-        width: auto;
-        order: 0;
-    }
-
-    .order-card { grid-template-columns: 1fr; text-align: left; }
+.sd-logout:hover {
+    background: #a0456a;
 }

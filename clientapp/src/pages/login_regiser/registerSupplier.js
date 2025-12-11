@@ -85,7 +85,7 @@ export default function RegisterSupplier() {
                     iban: "",
                     desc: ""
                 });
-                window.location.href = "/login_register/login";
+                window.location.href = "/login";
 
             } else {
                 const body = await res.json().catch(() => null);
@@ -180,7 +180,7 @@ export default function RegisterSupplier() {
                         <button
                             type="button"
                             className="r-login-btn"
-                            onClick={() => (window.location.href = "/login_register/login")}
+                            onClick={() => (window.location.href = "/login")}
                         >
                             Login
                         </button>

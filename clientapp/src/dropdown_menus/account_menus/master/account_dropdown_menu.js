@@ -4,7 +4,7 @@ import "./account_dropdown_menu.css";
 export default function AccountDropdownMenu({
   userName,
   logoutFn,
-  logoutUrl = "/login_register/login",
+  logoutUrl = "/login",
 }) {
   const [open, setOpen] = useState(false);
   const [userEmail, setUserEmail] = useState(userName ?? "<user>");
