@@ -737,25 +737,25 @@
 
 /* Welcome Section */
 .sd-welcome {
-    background: #ffe1e3;
-    color: #b62b49;
+    background: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
     padding: 20px;
     text-align: center;
     border-bottom: 1px solid rgba(0,0,0,0.03);
+    margin-bottom: 2vw;
 }
 
     .sd-welcome h1 {
         margin: 0 0 8px 0;
         font-weight: 700;
         font-size: 28px;
-        color: #b62b49;
+        color: white;
     }
 
     .sd-welcome p {
         margin: 0;
         font-size: 16px;
         line-height: 1.4;
-        color: #b62b49;
+        color: white;
     }
 
     .sd-welcome strong {
@@ -812,7 +812,7 @@
 }
 
 .sd-add-footer {
-    background: #4caf50;
+    background: #B35678;
     padding: 12px;
     text-align: center;
 }
