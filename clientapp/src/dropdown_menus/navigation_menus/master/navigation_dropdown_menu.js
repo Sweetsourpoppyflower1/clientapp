@@ -7,6 +7,7 @@ const MENU_ITEMS = [
     { id: "auction", title: "Auction Calender", desc: "Navigates to the Auction Calendar screen", path: "/auctionCalender" },
     { id: "overview", title: "Overview Stock", desc: "Navigates to the Stock Overview screen", path: "/aStockOverview" },
     { id: "review", title: "Review Acceptances", desc: "Navigates to the Acceptances Overview screen", path: "/AOverviewAcceptances" },
+    { id: "manage", title: "Manage Users", desc: "Manage companies and suppliers", path: "/aManageUsers" },
 ];
 
 export default function NavigationDropdownMenu({ navigateFn }) {

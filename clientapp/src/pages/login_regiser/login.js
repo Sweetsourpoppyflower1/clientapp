@@ -69,8 +69,8 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          email: email,    // Changed from Email to email (lowercase)
-          password: password  // Changed from Password to password (lowercase)
+          email: email,
+          password: password
         }),
       });
 
@@ -175,88 +175,96 @@ export default function Login() {
   }
 
   return (
-    <div className="parent">
-      <div className="header">
-        {logo ? (
-          <img src={logo.url} alt={logo.alt} className="u-top-logo" />
-        ) : (
-          <span className="loading-label">Loading…</span>
-        )}
-      </div>
-
-      {error && (
-        <div style={{ 
-          color: "#d32f2f", 
-          padding: "12px 16px", 
-          margin: "16px", 
-          backgroundColor: "#ffebee",
-          borderRadius: "4px",
-          border: "1px solid #ef5350"
-        }}>
-          ⚠️ {error}
+    <div className="login-container">
+      {/* Header */}
+      <header className="login-topbar">
+        <div className="login-logo" role="region" aria-label="logo-section">
+          {logo ? (
+            <img src={logo.url} alt={logo.alt} className="login-top-logo" />
+          ) : (
+            <span className="loading-label">Loading…</span>
+          )}
         </div>
-      )}
+      </header>
 
-      <div className="login">
-        <div className="login-infocard">
-          <div className="infocard">
-            <h2>Log in</h2>
-            <p>Log in to your account at Flauction</p>
+      {/* Welcome Banner */}
+      <section className="login-welcome-section" role="region" aria-label="welcome-banner">
+        <div className="login-welcome-header">
+          <div className="login-welcome-text">
+            <p className="login-welcome-greeting">Welcome to Flauction</p>
+            <p className="login-welcome-title">Auction Platform</p>
+            <p className="login-welcome-subtitle">
+              Access your account to manage auctions, orders, and inventory in one integrated platform
+            </p>
           </div>
         </div>
+      </section>
 
-        <div className="login-form">
-          <form className="form" onSubmit={handleSubmit}>
-            <div className="email">
-              <label className="email-title">Email</label>
+      {/* Main Content */}
+      <div className="login-content-section">
+        {/* Error Message */}
+        {error && (
+          <div className="login-error-banner" role="alert">
+            <span>⚠️ {error}</span>
+          </div>
+        )}
+
+        {/* Form Card */}
+        <div className="login-form-card">
+          <div className="login-form-header">
+            <h2>Sign In</h2>
+            <p>Enter your credentials to continue</p>
+          </div>
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="login-form-group">
+              <label htmlFor="email" className="login-label">Email Address</label>
               <input
+                id="email"
                 type="email"
                 required
-                placeholder="Email"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
+                className="login-input"
               />
             </div>
 
-            <div className="password">
-              <label className="password-title">Password</label>
+            <div className="login-form-group">
+              <label htmlFor="password" className="login-label">Password</label>
               <input
+                id="password"
                 type="password"
                 required
-                placeholder="Password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
+                className="login-input"
               />
             </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <button
-                className="login-btn"
-                type="submit"
-                disabled={loading}
-                style={{ width: "100%", padding: 10 }}
-              >
-                {loading ? "Signing in..." : "Login"}
-              </button>
-            </div>
-
-            <div className="register-placeholder" style={{ textAlign: "center" }}>
-              <div style={{ marginBottom: 8 }}>No Account? Register here:</div>
-              <button
-                className="register-btn"
-                type="button"
-                onClick={() => (window.location.href = "/registerOptions")}
-                style={{ width: "70%", padding: 8 }}
-              >
-                Register
-              </button>
-            </div>
+            <button
+              className="login-submit-btn"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
           </form>
-        </div>
 
-        <div className="empty"></div>
+          <div className="login-divider">or</div>
+
+          <div className="login-register-section">
+            <p className="login-register-text">Don't have an account?</p>
+            <button
+              className="login-register-btn"
+              type="button"
+              onClick={() => (window.location.href = "/registerOptions")}
+            >
+              Create Account
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

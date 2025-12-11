@@ -16,6 +16,7 @@ import SAddProduct from "./pages/supplier/s_addProduct.js";
 import CMyOrders from "./pages/company/c_myOrders.js";
 import CompanyDashboard from "./pages/company/companyDashboard.js";
 import AOverviewAcceptances from "./pages/master/a_overviewAcceptances.js";
+import AManageUsers from "./pages/master/a_manageUsers.js";
 
 function App() {
     return (
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/cMyOrders" element={<CMyOrders />} />
                 <Route path="/companyDashboard" element={<CompanyDashboard />} />
                 <Route path="/AOverviewAcceptances" element={<AOverviewAcceptances />} />
+                <Route path="/aManageUsers" element={<AManageUsers />} />
                 <Route path="/ActiveAuction/:id" element={<ActiveAuction /> } />
             </Routes>
         </Router>
