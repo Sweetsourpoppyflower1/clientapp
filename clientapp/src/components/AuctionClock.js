@@ -10,20 +10,20 @@ const AuctionClock = ({
     resetTrigger = 0
 }) => {
     const [currentPrice, setCurrentPrice] = useState(startPrice);
-    const [progress, setProgress] = useState(0); // 0 to 100
+    const [progress, setProgress] = useState(0);
     const [timeRemaining, setTimeRemaining] = useState('');
+    const [auctionStarted, setAuctionStarted] = useState(true);
+    const [timeUntilStart, setTimeUntilStart] = useState('');
     const intervalRef = useRef(null);
     const startTimeRef = useRef(Date.now());
 
-    // Calculate total duration in milliseconds
     const getTotalDuration = () => {
-        if (!startTime || !endTime) return 60000; // Default 60 seconds
+        if (!startTime || !endTime) return 60000;
         const start = new Date(startTime).getTime();
         const end = new Date(endTime).getTime();
         return Math.max(end - start, 1000);
     };
 
-    // Calculate price based on elapsed time
     const calculatePrice = (elapsedTime, totalDuration) => {
         const ratio = Math.min(elapsedTime / totalDuration, 1);
         const priceRange = startPrice - minPrice;
@@ -31,7 +31,6 @@ const AuctionClock = ({
         return Math.max(price, minPrice);
     };
 
-    // Format time remaining
     const formatTimeRemaining = (ms) => {
         if (ms <= 0) return '00:00:00';
         const hours = Math.floor(ms / 3600000);
@@ -40,7 +39,6 @@ const AuctionClock = ({
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
-    // Reset clock when purchase happens
     useEffect(() => {
         if (resetTrigger > 0) {
             startTimeRef.current = Date.now();
@@ -49,32 +47,44 @@ const AuctionClock = ({
         }
     }, [resetTrigger, startPrice]);
 
-    // Main timer effect
     useEffect(() => {
         const totalDuration = getTotalDuration();
         
         const updateClock = () => {
             const now = Date.now();
-            const elapsedTime = now - startTimeRef.current;
             
-            // Calculate progress percentage
+            if (startTime) {
+                const auctionStartTimeMs = new Date(startTime).getTime();
+                if (now < auctionStartTimeMs) {
+                    setAuctionStarted(false);
+                    const timeUntil = auctionStartTimeMs - now;
+                    setTimeUntilStart(formatTimeRemaining(timeUntil));
+                    setCurrentPrice(startPrice);
+                    setProgress(0);
+                    if (onPriceUpdate) {
+                        onPriceUpdate(startPrice);
+                    }
+                    return;
+                } else if (!auctionStarted) {
+                    setAuctionStarted(true);
+                    startTimeRef.current = now;
+                }
+            }
+            
+            const elapsedTime = now - startTimeRef.current;
             const progressPercent = Math.min((elapsedTime / totalDuration) * 100, 100);
             setProgress(progressPercent);
             
-            // Calculate current price
             const price = calculatePrice(elapsedTime, totalDuration);
             setCurrentPrice(price);
             
-            // Calculate time remaining
             const remaining = Math.max(totalDuration - elapsedTime, 0);
             setTimeRemaining(formatTimeRemaining(remaining));
             
-            // Notify parent of price update
             if (onPriceUpdate) {
                 onPriceUpdate(price);
             }
             
-            // Stop if we've reached the end
             if (elapsedTime >= totalDuration) {
                 setCurrentPrice(minPrice);
                 setProgress(100);
@@ -85,10 +95,7 @@ const AuctionClock = ({
             }
         };
         
-        // Initial update
         updateClock();
-        
-        // Update every 100ms for smooth animation
         intervalRef.current = setInterval(updateClock, 100);
         
         return () => {
@@ -96,15 +103,14 @@ const AuctionClock = ({
                 clearInterval(intervalRef.current);
             }
         };
-    }, [startPrice, minPrice, startTime, endTime, onPriceUpdate]);
+    }, [startPrice, minPrice, startTime, endTime, onPriceUpdate, auctionStarted]);
 
-    // Generate price steps (10 steps)
     const priceSteps = [];
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i < 10; i++) {
         const stepPrice = startPrice - ((startPrice - minPrice) * (i / 10));
         const angle = (i / 10) * 360;
         priceSteps.push({
-            price: stepPrice.toFixed(2),
+            price: Math.round(stepPrice),
             angle: angle,
             position: i
         });
@@ -113,42 +119,38 @@ const AuctionClock = ({
     return (
         <div className="auction-clock-container">
             <div className="auction-clock-wrapper">
-                <svg className="auction-clock-svg" viewBox="0 0 200 200">
-                    {/* Background circle */}
+                <svg className="auction-clock-svg" viewBox="0 0 280 280">
                     <circle
-                        cx="100"
-                        cy="100"
+                        cx="140"
+                        cy="140"
                         r="85"
                         fill="none"
                         stroke="#e0e0e0"
                         strokeWidth="8"
                     />
                     
-                    {/* Progress circle */}
                     <circle
-                        cx="100"
-                        cy="100"
+                        cx="140"
+                        cy="140"
                         r="85"
                         fill="none"
                         stroke="#2e7d32"
                         strokeWidth="8"
                         strokeDasharray={`${2 * Math.PI * 85}`}
                         strokeDashoffset={`${2 * Math.PI * 85 * (1 - progress / 100)}`}
-                        transform="rotate(-90 100 100)"
+                        transform="rotate(-90 140 140)"
                         className="progress-circle"
                     />
                     
-                    {/* Price markers */}
                     {priceSteps.map((step, index) => {
                         const radian = (step.angle - 90) * (Math.PI / 180);
-                        const markerX = 100 + 85 * Math.cos(radian);
-                        const markerY = 100 + 85 * Math.sin(radian);
-                        const labelX = 100 + 100 * Math.cos(radian);
-                        const labelY = 100 + 100 * Math.sin(radian);
+                        const markerX = 140 + 85 * Math.cos(radian);
+                        const markerY = 140 + 85 * Math.sin(radian);
+                        const labelX = 140 + 110 * Math.cos(radian);
+                        const labelY = 140 + 110 * Math.sin(radian);
                         
                         return (
                             <g key={index}>
-                                {/* Marker dot */}
                                 <circle
                                     cx={markerX}
                                     cy={markerY}
@@ -156,11 +158,10 @@ const AuctionClock = ({
                                     fill="#2e7d32"
                                     className="price-marker"
                                 />
-                                {/* Price label */}
                                 <text
                                     x={labelX}
                                     y={labelY}
-                                    fontSize="8"
+                                    fontSize="10"
                                     fontWeight="bold"
                                     fill="#2e7d32"
                                     textAnchor="middle"
@@ -173,23 +174,33 @@ const AuctionClock = ({
                         );
                     })}
                     
-                    {/* Center circle */}
                     <circle
-                        cx="100"
-                        cy="100"
+                        cx="140"
+                        cy="140"
                         r="50"
                         fill="#2e7d32"
                         className="center-circle"
                     />
                 </svg>
                 
-                {/* Center content */}
                 <div className="auction-clock-center">
-                    <div className="time-remaining">{timeRemaining}</div>
-                    <div className="current-price">
-                        €{currentPrice.toFixed(2).replace('.', ',')}
-                    </div>
-                    <div className="price-label-text">Current Price</div>
+                    {!auctionStarted ? (
+                        <>
+                            <div className="time-remaining">{timeUntilStart}</div>
+                            <div className="current-price" style={{ fontSize: '14px', lineHeight: '1.2' }}>
+                                Veiling nog niet<br/>begonnen
+                            </div>
+                            <div className="price-label-text">Begint over</div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="time-remaining">{timeRemaining}</div>
+                            <div className="current-price">
+                                €{currentPrice.toFixed(2).replace('.', ',')}
+                            </div>
+                            <div className="price-label-text">Current Price</div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

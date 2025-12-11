@@ -157,6 +157,14 @@ export default function ActiveAuction() {
     const handleBuy = async () => {
         if (!auction || !activeLot) return;
         
+        const currentTime = new Date();
+        const auctionStartTime = new Date(auction.startTime);
+        
+        if (currentTime < auctionStartTime) {
+            alert("De veiling is nog niet begonnen. U kunt geen aankoop doen voordat de veiling is gestart.");
+            return;
+        }
+        
         let userData = {};
         try {
             userData = JSON.parse(localStorage.getItem("user_data") || "{}");
@@ -229,7 +237,7 @@ export default function ActiveAuction() {
         <div className="c-aa-page">
             <header className="c-aa-topbar">
                 <div className="c-aa-logo-section">
-                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">Loading…</span>}
+                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">LoadingÂ…</span>}
                 </div>
             </header>
 
@@ -288,7 +296,7 @@ export default function ActiveAuction() {
                     {/* Static Price Display */}
                     <div className="c-aa-static-price-display">
                         <div className="c-aa-static-price-value">
-                            €{currentPrice.toFixed(2).replace('.', ',')}
+                            Â€{currentPrice.toFixed(2).replace('.', ',')}
                         </div>
                         <div className="c-aa-static-price-label">Current Price</div>
                     </div>
