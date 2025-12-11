@@ -209,11 +209,7 @@ export default function SAddProduct() {
     <div className="sd-page">
       <header className="sd-topbar">
         <div className="sd-left" aria-hidden>
-          <button aria-label="menu" className="sd-icon-btn sd-hamburger">
-            <span />
-            <span />
-            <span />
-          </button>
+      
         </div>
 
         <div className="sd-logo">
