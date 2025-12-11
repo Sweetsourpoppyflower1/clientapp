@@ -237,7 +237,8 @@ export default function ActiveAuction() {
         <div className="c-aa-page">
             <header className="c-aa-topbar">
                 <div className="c-aa-logo-section">
-                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">Loading</span>}
+                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">Loading
+</span>}
                 </div>
             </header>
 
