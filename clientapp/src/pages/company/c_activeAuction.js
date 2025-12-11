@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../../styles/companyPages/c_activeAuctionStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
-import AuctionClock from "../../components/AuctionClock";
 
 const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 const resolveUrl = (url = "") =>
@@ -29,8 +28,6 @@ export default function ActiveAuction() {
     const [currentPrice, setCurrentPrice] = useState(0);
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [auctionData, setAuctionData] = useState(null);
-    const [resetTrigger, setResetTrigger] = useState(0);
 
     useEffect(() => {
         const mediaId = 1;
@@ -95,14 +92,10 @@ export default function ActiveAuction() {
                     unitPerCont: lot?.unit_per_container || 0,
                     contInLot: lot?.remaining_quantity || 0,
                     minPickup: lot?.min_pickup || 1,
-                    startPrice: plant?.start_price || 0,
-                    minPrice: plant?.min_price || plant?.start_price * 0.3 || 10,
-                    startTime: a.start_time,
-                    endTime: a.end_time
+                    startPrice: plant?.start_price || 0
                 };
                 
                 setAuction(enriched);
-                setAuctionData(a);
                 setMinBuy(enriched.minPickup);
                 setUserAmount(enriched.minPickup);
                 setCurrentPrice(enriched.startPrice);
@@ -196,10 +189,6 @@ export default function ActiveAuction() {
 
             setActiveLot(updatedLot);
             setAuction(prev => ({ ...prev, contInLot: updatedLot.remaining_quantity }));
-            
-            // Reset the auction clock on purchase
-            setResetTrigger(prev => prev + 1);
-            
             alert(`Successfully bought ${userAmount} containers!`);
 
         } catch (err) {
@@ -278,24 +267,26 @@ export default function ActiveAuction() {
                 </div>
 
                 <div className="c-aa-clock-panel">
-                    <AuctionClock 
-                        startPrice={auction.startPrice}
-                        minPrice={auction.minPrice}
-                        startTime={auction.startTime}
-                        endTime={auction.endTime}
-                        onPriceUpdate={(price) => setCurrentPrice(price)}
-                        resetTrigger={resetTrigger}
-                    />
-                    
-                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                        <div className="c-aa-info-box" style={{ display: 'inline-block', margin: '10px' }}>
-                            <span className="c-aa-box-label">Unit / cont.</span>
-                            <span className="c-aa-box-val">{auction.unitPerCont}</span>
-                        </div>
-                        <div className="c-aa-info-box" style={{ display: 'inline-block', margin: '10px' }}>
-                            <span className="c-aa-box-label">a/cont. in lot</span>
-                            <span className="c-aa-box-val">{auction.contInLot}</span>
-                        </div>
+                    <div className="c-aa-clock-wrapper">
+                         <div className="c-aa-clock-face">
+                             
+                             
+                             <div className="c-aa-clock-center">
+                                 <div className="c-aa-info-box top-box">
+                                     <span className="c-aa-box-label">Unit / cont.</span>
+                                     <span className="c-aa-box-val">{auction.unitPerCont}</span>
+                                 </div>
+                                 
+                                 <div className="c-aa-price-display">
+                                     €{Number(currentPrice).toFixed(2).replace('.', ',')}
+                                 </div>
+                                 
+                                 <div className="c-aa-info-box bottom-box">
+                                     <span className="c-aa-box-label">a/cont. in lot</span>
+                                     <span className="c-aa-box-val">{auction.contInLot}</span>
+                                 </div>
+                             </div>
+                         </div>
                     </div>
                     
                     <button className="c-aa-buy-btn" onClick={handleBuy}>BUY</button>
