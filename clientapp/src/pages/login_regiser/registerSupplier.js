@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/registerStyle.css";
 import * as IBAN from "iban";
 
@@ -15,9 +15,10 @@ export default function RegisterSupplier() {
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [logo, setLogo] = useState(null);
     const isValidPostalCode = (code) => /^[0-9]{4}[A-Za-z]{2}$/.test(code);
-    const countries = ["Netherlands", "Belgium", "Luxemburg"];
+    const countries = ["Netherlands", "Belgium", "Luxembourg"];
 
     const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -39,19 +40,29 @@ export default function RegisterSupplier() {
         e.preventDefault();
         setError(null);
         setSuccess(false);
+        setLoading(true);
+
+        if (!form.email || !form.password || !form.supplierName || !form.address || !form.postalCode || !form.country || !form.iban || !form.desc) {
+            setError("All fields are required.");
+            setLoading(false);
+            return;
+        }
 
         if (!IBAN.isValid(form.iban)) {
             setError("Invalid IBAN number.");
+            setLoading(false);
             return;
         }
 
         if (!isValidPostalCode(form.postalCode)) {
-            setError("Invalid postal code. Format must be 4 digits followed by 2 letters.");
+            setError("Invalid postal code. Format must be 4 digits followed by 2 letters (e.g., 1234AB).");
+            setLoading(false);
             return;
         }
 
         if (!countries.includes(form.country)) {
             setError("Invalid country selected.");
+            setLoading(false);
             return;
         }
 
@@ -85,82 +96,112 @@ export default function RegisterSupplier() {
                     iban: "",
                     desc: ""
                 });
-                window.location.href = "/login_register/login";
-
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 2000);
             } else {
                 const body = await res.json().catch(() => null);
-                setError(body || JSON.stringify(body) || `Status ${res.status}`);
+                setError(body?.message || body?.error || JSON.stringify(body) || `Status ${res.status}`);
             }
         } catch (ex) {
             setError(ex.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="r-parent">
+            {/* Header */}
+            <header className="r-header">
+                <div className="r-logo" role="region" aria-label="logo-section">
+                    {logo ? (
+                        <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                    ) : (
+                        <span className="loading-label">Loading…</span>
+                    )}
+                </div>
+            </header>
 
-            <div className="r-header">
-                {logo ? (
-                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
-                ) : (
-                    <span className="loading-label">Loading�</span>
+            {/* Welcome Banner */}
+            <section className="r-welcome-section" role="region" aria-label="welcome-banner">
+                <div className="r-welcome-header">
+                    <div className="r-welcome-text">
+                        <p className="r-welcome-greeting">Create Your Account</p>
+                        <p className="r-welcome-title">Supplier Registration</p>
+                        <p className="r-welcome-subtitle">
+                            Register as a supplier to list your products and participate in auctions
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Main Content */}
+            <div className="r-content-section">
+                {/* Error Message */}
+                {error && (
+                    <div className="r-error-banner" role="alert">
+                        <span>⚠️ {error}</span>
+                    </div>
                 )}
-            </div>
 
-            {error && <div style={{ color: "red" }}>{typeof error === "string" ? error : JSON.stringify(error)}</div>}
-            {success && <div style={{ color: "green" }}>Registration successful</div>}
+                {/* Success Message */}
+                {success && (
+                    <div className="r-success-banner" role="status">
+                        <span>✅ Registration successful! Redirecting to login...</span>
+                    </div>
+                )}
 
-            <div className="r-register">
-
-                <div className="r-register-form">
+                {/* Form Card */}
+                <div className="r-form-card">
+                    <div className="r-form-header">
+                        <h2>Sign Up</h2>
+                        <p>Enter your supplier details</p>
+                    </div>
 
                     <form className="form" onSubmit={onSubmit}>
                         <div>
-                            <label>Email</label>
-                            <input name="email" type="email" value={form.email} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <label>Email Address</label>
+                            <input name="email" type="email" value={form.email} onChange={onChange} required placeholder="your@email.com" />
                         </div>
+
                         <div>
                             <label>Password</label>
-                            <input name="password" type="password" value={form.password} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="password" type="password" value={form.password} onChange={onChange} required placeholder="Enter a strong password" />
                         </div>
+
                         <div>
-                            <label>Supplier name</label>
-                            <input name="supplierName" value={form.supplierName} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <label>Supplier Name</label>
+                            <input name="supplierName" value={form.supplierName} onChange={onChange} required placeholder="Your Supplier Name" />
                         </div>
+
                         <div>
                             <label>Address</label>
-                            <input name="address" value={form.address} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="address" value={form.address} onChange={onChange} required placeholder="Street and number" />
                         </div>
+
                         <div>
-                            <label>Postal code</label>
-                            <input name="postalCode" value={form.postalCode} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <label>Postal Code</label>
+                            <input name="postalCode" value={form.postalCode} onChange={onChange} required placeholder="1234AB" />
                         </div>
+
                         <div>
                             <label>Country</label>
-                            <select
-                                name="country"
-                                value={form.country}
-                                onChange={onChange}
-                                required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
-                            >
+                            <select name="country" value={form.country} onChange={onChange} required>
+                                <option value="">Select a country</option>
                                 {countries.map((c) => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
                             </select>
                         </div>
+
                         <div>
                             <label>IBAN</label>
-                            <input name="iban" value={form.iban} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="iban" value={form.iban} onChange={onChange} required placeholder="NL91ABNA0417164300" />
                         </div>
+
                         <div>
-                            <label>Description (max 500 chars)</label>
+                            <label>Description</label>
                             <textarea
                                 name="desc"
                                 value={form.desc}
@@ -168,33 +209,29 @@ export default function RegisterSupplier() {
                                 required
                                 maxLength={500}
                                 rows={4}
+                                placeholder="Describe your business (max 500 characters)"
                             />
                         </div>
 
-                        <button className="r-register-btn" type="submit">Register</button>
-
-                        <div className="r-login-placeholder">
-                            Already a member? Log in here:
-                        </div>
-
-                        <button
-                            type="button"
-                            className="r-login-btn"
-                            onClick={() => (window.location.href = "/login_register/login")}
-                        >
-                            Login
+                        <button className="r-register-btn" type="submit" disabled={loading}>
+                            {loading ? "Creating Account..." : "Register"}
                         </button>
 
+                        <div className="r-login-placeholder">or</div>
+
+                        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                            <p style={{ fontSize: "12px", color: "#666", margin: "0 0 10px 0" }}>Already have an account?</p>
+                            <button
+                                type="button"
+                                className="r-login-btn"
+                                onClick={() => (window.location.href = "/login")}
+                            >
+                                Sign In
+                            </button>
+                        </div>
                     </form>
-
                 </div>
-
             </div>
-
-            <div className="r-empty">
-
-            </div>
-
         </div>
     );
 }

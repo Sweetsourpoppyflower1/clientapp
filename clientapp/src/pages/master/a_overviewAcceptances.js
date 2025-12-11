@@ -208,6 +208,15 @@ export default function AOverviewAcceptances() {
 
     return (
         <div className="acceptances-page">
+            {/* Header with logo */}
+            <header className="acceptances-header">
+                {logo ? (
+                    <img src={logo.url} alt={logo.alt} className="acceptances-logo" />
+                ) : (
+                    <span className="loading-label">Loading…</span>
+                )}
+            </header>
+
             {/* Welcome section */}
             <section className="acceptances-welcome-section" role="region" aria-label="acceptances-banner">
                 <div className="acceptances-welcome-header">

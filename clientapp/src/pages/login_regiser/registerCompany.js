@@ -124,7 +124,7 @@ export default function RegisterCompany() {
                 });
                 // Redirect after 2 seconds
                 setTimeout(() => {
-                    window.location.href = "/login_register/login";
+                    window.location.href = "/login";
                 }, 2000);
             } else {
                 // Try to parse JSON response
@@ -154,125 +154,124 @@ export default function RegisterCompany() {
         }
     };
 
-
     return (
         <div className="r-parent">
+            {/* Header */}
+            <header className="r-header">
+                <div className="r-logo" role="region" aria-label="logo-section">
+                    {logo ? (
+                        <img src={logo.url} alt={logo.alt} className="u-top-logo" />
+                    ) : (
+                        <span className="loading-label">Loading…</span>
+                    )}
+                </div>
+            </header>
 
-            <div className="r-header">
-                {logo ? (
-                    <img src={logo.url} alt={logo.alt} className="u-top-logo" />
-                ) : (
-                    <span className="loading-label">Loading…</span>
+            {/* Welcome Banner */}
+            <section className="r-welcome-section" role="region" aria-label="welcome-banner">
+                <div className="r-welcome-header">
+                    <div className="r-welcome-text">
+                        <p className="r-welcome-greeting">Create Your Account</p>
+                        <p className="r-welcome-title">Company Registration</p>
+                        <p className="r-welcome-subtitle">
+                            Register your company to start participating in auctions and managing your orders
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Main Content */}
+            <div className="r-content-section">
+                {/* Error Message */}
+                {error && (
+                    <div className="r-error-banner" role="alert">
+                        <span>⚠️ {error}</span>
+                    </div>
                 )}
-            </div>
 
-            {error && <div style={{ color: "red" }}>{error}</div>}
-            {success && <div style={{ color: "green" }}>Registration successful</div>}
+                {/* Success Message */}
+                {success && (
+                    <div className="r-success-banner" role="status">
+                        <span>✅ Registration successful! Redirecting to login...</span>
+                    </div>
+                )}
 
-            <div className="r-register">
-
-                {/*<div className="r-register-infocard">*/}
-
-                {/*    <div class="r-infocard">*/}
-                {/*        <h2>Register</h2>*/}
-                {/*        <p>Register your account at Flauction</p>*/}
-                {/*    </div>*/}
-
-                {/*</div>  */}
-
-                <div className="r-register-form">
+                {/* Form Card */}
+                <div className="r-form-card">
+                    <div className="r-form-header">
+                        <h2>Sign Up</h2>
+                        <p>Enter your company details</p>
+                    </div>
 
                     <form className="form" onSubmit={onSubmit}>
-
                         <div>
                             <label>Email Address</label>
-                            <input name="email" type="email" value={form.email} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="email" type="email" value={form.email} onChange={onChange} required placeholder="your@company.com" />
                         </div>
 
                         <div>
                             <label>Password</label>
-                            <input name="password" type="password" value={form.password} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="password" type="password" value={form.password} onChange={onChange} required placeholder="Enter a strong password" />
                         </div>
 
                         <div>
                             <label>Company Name</label>
-                            <input name="companyName" value={form.companyName} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="companyName" value={form.companyName} onChange={onChange} required placeholder="Your Company" />
                         </div>
 
                         <div>
                             <label>Company Address</label>
-                            <input name="address" value={form.address} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="address" value={form.address} onChange={onChange} required placeholder="Street and number" />
                         </div>
 
                         <div>
                             <label>Postal Code</label>
-                            <input name="postalCode" value={form.postalCode} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="postalCode" value={form.postalCode} onChange={onChange} required placeholder="1234AB" />
                         </div>
 
                         <div>
                             <label>Country</label>
-                            <select
-                                name="country"
-                                value={form.country}
-                                onChange={onChange}
-                                required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}
-                            >
+                            <select name="country" value={form.country} onChange={onChange} required>
                                 {countries.map((c) => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
                             </select>
                         </div>
 
-
                         <div>
                             <label>VAT Number</label>
-                            <input name="vat" value={form.vat} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="vat" value={form.vat} onChange={onChange} required placeholder="NL123456789B01" />
                         </div>
 
                         <div>
                             <label>IBAN</label>
-                            <input name="iban" value={form.iban} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="iban" value={form.iban} onChange={onChange} required placeholder="NL91ABNA0417164300" />
                         </div>
 
                         <div>
                             <label>BIC / SWIFT</label>
-                            <input name="bic" value={form.bic} onChange={onChange} required
-                                style={{ width: "100%", padding: 8, boxSizing: "border-box" }}/>
+                            <input name="bic" value={form.bic} onChange={onChange} required placeholder="ABNANL2A" />
                         </div>
 
-                        <button className="r-register-btn" type="submit">Register</button>
-
-                        <div className="r-login-placeholder">
-                            Already a member? Log in here:
-                        </div>
-
-                        <button
-                            type="button"
-                            className="r-login-btn"
-                            onClick={() => (window.location.href = "/login_register/login")}
-                        >
-                            Login
+                        <button className="r-register-btn" type="submit" disabled={loading}>
+                            {loading ? "Creating Account..." : "Register"}
                         </button>
 
+                        <div className="r-login-placeholder">or</div>
+
+                        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                            <p style={{ fontSize: "12px", color: "#666", margin: "0 0 10px 0" }}>Already have an account?</p>
+                            <button
+                                type="button"
+                                className="r-login-btn"
+                                onClick={() => (window.location.href = "/login")}
+                            >
+                                Sign In
+                            </button>
+                        </div>
                     </form>
-
                 </div>
-
             </div>
-
-            <div className="r-empty">
-
-            </div>
-
         </div>
     );
-
 }

@@ -1,11 +1,326 @@
-/* left */
+/* Root styling */
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.r-parent {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header/Topbar */
+.r-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.r-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.u-top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.loading-label {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Welcome Banner Section - Compact */
+.r-welcome-section {
+    background: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
+    color: white;
+    padding: 24px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.r-welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.r-welcome-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.r-welcome-greeting {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin: 0;
+    text-transform: uppercase;
+    opacity: 0.95;
+}
+
+.r-welcome-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.r-welcome-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 550px;
+    line-height: 1.4;
+}
+
+/* Content Section */
+.r-content-section {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 24px 20px;
+}
+
+/* Error Banner */
+.r-error-banner {
+    background-color: #ffebee;
+    border-left: 4px solid #d32f2f;
+    color: #d32f2f;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    width: 100%;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Success Banner */
+.r-success-banner {
+    background-color: #f1f8f4;
+    border-left: 4px solid #2e7d32;
+    color: #2e7d32;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    width: 100%;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Form Card */
+.r-form-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 28px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 380px;
+}
+
+.r-form-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.r-form-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #222;
+}
+
+.r-form-header p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
+
+/* Form */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: none;
+    padding: 0;
+}
+
+.form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #222;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.form input,
+.form select,
+.form textarea {
+    padding: 8px 10px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-family: inherit !important;
+    transition: all 120ms ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    background: #fff !important;
+    color: #222 !important;
+}
+
+.form input:hover,
+.form select:hover,
+.form textarea:hover {
+    border-color: #bbb !important;
+    background: #fafafa !important;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+    outline: none !important;
+    border-color: #5A786B !important;
+    box-shadow: 0 0 0 2px rgba(90, 120, 107, 0.1) !important;
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+    color: #999 !important;
+}
+
+.form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Submit Button - Matches create-btn style */
+.r-register-btn {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    background: #B35678 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    margin-bottom: 8px !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    transition: all 120ms ease !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+}
+
+.r-register-btn:hover:not(:disabled) {
+    background: #a0456a !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18) !important;
+}
+
+.r-register-btn:focus:not(:disabled) {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(179, 86, 120, 0.2) !important;
+}
+
+.r-register-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+/* Divider */
+.r-login-placeholder {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    margin: 12px 0;
+    position: relative;
+}
+
+.r-login-placeholder::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #ddd;
+}
+
+.r-login-placeholder {
+    position: relative;
+    text-align: center;
+    background: white;
+    z-index: 1;
+    padding: 0 8px;
+}
+
+/* Secondary Button - Matches cancel-btn style */
+.r-login-btn {
+    display: inline-block !important;
+    width: 100% !important;
+    padding: 8px 14px !important;
+    background: #f0f0f0 !important;
+    color: #666 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    margin-top: 0 !important;
+    transition: all 120ms ease !important;
+}
+
+.r-login-btn:hover {
+    background: #e8e8e8 !important;
+    border-color: #bbb !important;
+    transform: translateY(-1px) !important;
+}
+
+.r-login-btn:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Old layout classes - deprecated but kept for compatibility */
 .r-register-infocard {
     width: 33vw;
     display: flex;
     justify-content: flex-start;
 }
 
-/* middle */
 .r-register-form {
     display: flex;
     justify-content: center;
@@ -14,55 +329,8 @@
     box-sizing: border-box;
 }
 
-/* right */
 .r-empty {
     width: 33vw;
-}
-
-.r-register-btn {
-    background-color: #B62B49;
-    border: none;
-    color: #fff;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.r-login-btn {
-    background-color: #FFE1E3;
-    border: 1px solid rgba(0,0,0,0.12);
-    color: #B62B49;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-}
-
-.r-login-placeholder {
-    margin-top: 14px;
-}
-
-.r-parent {
-    width: 100vw;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    grid-template-columns: 1fr minmax(320px, 600px) 1fr;
-    gap: 24px;
-    align-items: start;
-    justify-items: center;
-    min-height: calc(100vh - 120px);
-}
-
-.r-header {
-    margin-top: 20px;
-    margin-bottom: 8px;
-    text-align: center;
-    justify-content: center;
-    display: flex;
-    width: 100vw;
 }
 
 .r-register {
@@ -76,15 +344,75 @@
     background: #fff;
     border-radius: 8px;
     padding: 18px;
-    border: 2px solid rgba(0,0,0,0.08);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
     margin: 0;
     width: 300px;
     height: 100px;
 }
 
-.form {
-    padding: 20px;
-    border: 1px solid black;
-    border-radius: 5px;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .r-welcome-title {
+        font-size: 28px;
+    }
+
+    .r-welcome-greeting {
+        font-size: 13px;
+        letter-spacing: 0.8px;
+    }
+
+    .r-welcome-subtitle {
+        font-size: 12px;
+    }
+
+    .r-welcome-section {
+        padding: 20px 20px;
+    }
+
+    .r-content-section {
+        padding: 20px 16px;
+    }
+
+    .r-form-card {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .r-form-header h2 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .r-welcome-title {
+        font-size: 24px;
+    }
+
+    .r-welcome-greeting {
+        font-size: 12px;
+    }
+
+    .r-welcome-subtitle {
+        font-size: 11px;
+    }
+
+    .r-form-card {
+        padding: 16px;
+    }
+
+    .r-form-header h2 {
+        font-size: 18px;
+    }
+
+    .form label {
+        font-size: 11px;
+    }
+
+    .form input,
+    .form select,
+    .form textarea {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+    }
 }

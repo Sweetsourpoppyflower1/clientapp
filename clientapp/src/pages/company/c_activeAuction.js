@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../../styles/companyPages/c_activeAuctionStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
-import AuctionClock from "../../components/AuctionClock";
 
 const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 const resolveUrl = (url = "") =>
@@ -29,8 +28,6 @@ export default function ActiveAuction() {
     const [currentPrice, setCurrentPrice] = useState(0);
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [auctionData, setAuctionData] = useState(null);
-    const [resetTrigger, setResetTrigger] = useState(0);
 
     useEffect(() => {
         const mediaId = 1;
@@ -102,7 +99,6 @@ export default function ActiveAuction() {
                 };
                 
                 setAuction(enriched);
-                setAuctionData(a);
                 setMinBuy(enriched.minPickup);
                 setUserAmount(enriched.minPickup);
                 setCurrentPrice(enriched.startPrice);
@@ -113,15 +109,36 @@ export default function ActiveAuction() {
                      const plantsMap = new Map();
                      if(Array.isArray(allPlants)) allPlants.forEach(p => plantsMap.set(p.plant_id, p));
                      
+                     // Fetch media for upcoming auctions
+                     const allMedia = await fetchMaybe("/api/MediaPlant");
+                     const mediaMap = new Map();
+                     if(Array.isArray(allMedia)) {
+                         allMedia.forEach(m => {
+                             if (!mediaMap.has(m.plant_id)) {
+                                 mediaMap.set(m.plant_id, []);
+                             }
+                             mediaMap.get(m.plant_id).push(m);
+                         });
+                     }
+                     
                      const upcomingList = allAuctions
                         .filter(x => x.status === 'upcoming' && String(x.auction_id) !== String(id))
                         .slice(0, 10)
                         .map(x => {
                             const p = plantsMap.get(x.plant_id);
+                            const plantMediaList = mediaMap.get(x.plant_id) || [];
+                            
+                            // Get primary image or first image
+                            let imageUrl = null;
+                            if (plantMediaList.length > 0) {
+                                plantMediaList.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
+                                imageUrl = resolveUrl(plantMediaList[0].url);
+                            }
+                            
                             return {
                                 ...x,
                                 plantName: p?.productname || "Auction Product",
-                                imageUrl: null
+                                imageUrl: imageUrl || "https://via.placeholder.com/400x300?text=No+Image"
                             };
                         });
                      setUpcoming(upcomingList);
@@ -205,8 +222,6 @@ export default function ActiveAuction() {
             setActiveLot(updatedLot);
             setAuction(prev => ({ ...prev, contInLot: updatedLot.remaining_quantity }));
             
-            setResetTrigger(prev => prev + 1);
-            
             alert(`Successfully bought ${userAmount} containers!`);
 
         } catch (err) {
@@ -220,17 +235,10 @@ export default function ActiveAuction() {
 
     return (
         <div className="c-aa-page">
-            <header className="c-aa-header">
-                 <div className="c-aa-header-left">
-                     <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
-                 </div>
-                 
-                 <div className="c-aa-logo">
-                    {logo ? <img src={logo.url} alt={logo.alt} /> : <span>Flora</span>}
-                 </div>
-                 
-                 <div className="c-aa-header-right">
-                 </div>
+            <header className="c-aa-topbar">
+                <div className="c-aa-logo-section">
+                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">Loading</span>}
+                </div>
             </header>
 
             <main className="c-aa-main">
@@ -285,14 +293,13 @@ export default function ActiveAuction() {
                 </div>
 
                 <div className="c-aa-clock-panel">
-                    <AuctionClock 
-                        startPrice={auction.startPrice}
-                        minPrice={auction.minPrice}
-                        startTime={auction.startTime}
-                        endTime={auction.endTime}
-                        onPriceUpdate={(price) => setCurrentPrice(price)}
-                        resetTrigger={resetTrigger}
-                    />
+                    {/* Static Price Display */}
+                    <div className="c-aa-static-price-display">
+                        <div className="c-aa-static-price-value">
+                            {currentPrice.toFixed(2).replace('.', ',')}
+                        </div>
+                        <div className="c-aa-static-price-label">Current Price</div>
+                    </div>
                     
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
                         <div className="c-aa-info-box" style={{ display: 'inline-block', margin: '10px' }}>
@@ -351,7 +358,7 @@ export default function ActiveAuction() {
                         {upcoming.length > 0 ? upcoming.map((mk, i) => (
                              <div className="c-aa-upcoming-card" key={i}>
                                  <div className="c-aa-uc-img">
-                                     <img src={resolveUrl(mk.imageUrl) || "https://via.placeholder.com/400x300?text=No+Image"} alt={mk.plantName} />
+                                     <img src={mk.imageUrl} alt={mk.plantName} />
                                  </div>
                                  <div className="c-aa-uc-details">
                                      <div className="c-aa-detail-group">
@@ -375,6 +382,7 @@ export default function ActiveAuction() {
                 </div>
             </section>
             
+            <CompanyNavigationDropdownMenu navigateFn={(path) => navigate(path)} />
             <AccountDropdownMenu />
         </div>
     );
