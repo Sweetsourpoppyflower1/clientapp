@@ -1,80 +1,112 @@
-.c-aa-page {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fff;
-    min-height: 100vh;
-    padding-bottom: 40px;
+:root {
+    --primary-teal: #5A786B;
+    --primary-pink: #B35678;
+    --gradient: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
 }
 
-/* Header */
-.c-aa-header {
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.c-aa-page {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background-color: #fff;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header/Topbar */
+.c-aa-topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-    border-bottom: 1px solid #eee;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.c-aa-logo img {
-    height: 80px;
+.c-aa-logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.c-aa-logo span {
-    font-size: 48px;
-    color: #e91e63;
-    font-weight: bold;
+
+.c-aa-top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.c-aa-loading-label {
+    color: #999;
+    font-size: 14px;
 }
 
 /* Main Grid */
 .c-aa-main {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 40px;
+    gap: 20px;
     max-width: 1400px;
-    margin: 40px auto;
-    padding: 0 40px;
+    margin: 20px auto;
+    padding: 0 20px;
     align-items: start;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Common Card Styles */
 .c-aa-card {
-    border-radius: 20px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
 }
 
 /* Left Panel */
 .c-aa-left-panel {
-    border: 3px solid #5a8e68;
+    background: #fff;
 }
 
 .c-aa-img-container {
     background: #fff;
-    padding: 20px;
+    padding: 16px;
     text-align: center;
 }
 
 .c-aa-product-img {
     width: 100%;
-    max-width: 250px;
+    max-width: 100%;
     height: auto;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
 .c-aa-buy-controls {
-    background-color: #5a8e68;
-    padding: 20px;
-    color: #000;
+    background-color: var(--primary-teal);
+    padding: 16px;
+    color: #fff;
 }
 
 .c-aa-label-bold {
     display: block;
-    font-weight: bold;
-    margin-bottom: 15px;
-    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #fff;
 }
 
 .c-aa-slider-container {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: center;
 }
@@ -85,28 +117,34 @@
 
 .c-aa-input-row {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .c-aa-input-group {
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
 .c-aa-input-group label {
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #fff;
 }
 
 .c-aa-input-box {
     background: #fff;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 4px;
+    padding: 8px;
     text-align: center;
-    font-weight: bold;
-    font-size: 24px;
+    font-weight: 700;
+    font-size: 18px;
+    border: none;
+    color: #222;
 }
 
 /* Clock Panel */
@@ -114,108 +152,85 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 16px;
 }
 
-.c-aa-clock-wrapper {
-    position: relative;
-    width: 350px;
-    height: 350px;
-    margin-bottom: 30px;
-}
-
-.c-aa-clock-face {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Clock Labels */
-.c-aa-clock-label {
-    position: absolute;
-    font-size: 12px;
-    color: #fff;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-/* Positioning labels roughly around the clock */
-.c100 { top: 10px; left: 50%; transform: translateX(-50%); }
-.c10 { top: 15%; left: 30%; }
-.c20 { top: 35%; left: 10%; }
-.c30 { top: 60%; left: 10%; }
-.c40 { bottom: 15%; left: 30%; }
-.c50 { bottom: 10%; left: 50%; transform: translateX(-50%); }
-.c60 { bottom: 15%; right: 30%; }
-.c70 { top: 60%; right: 10%; }
-.c80 { top: 35%; right: 10%; }
-.c90 { top: 15%; right: 30%; }
-
-.c-aa-clock-center {
-    width: 60%;
-    height: 60%;
-    background: #2e7d32;
-    border-radius: 50%;
+/* Static Price Display */
+.c-aa-static-price-display {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
+    padding: 32px 16px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    width: 100%;
+    min-height: 160px;
 }
 
-.c-aa-price-display {
-    background: #455a64;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 32px;
-    font-weight: bold;
-    margin: 10px 0;
+.c-aa-static-price-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--primary-teal);
+    margin-bottom: 8px;
+}
+
+.c-aa-static-price-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .c-aa-info-box {
     background: #fff;
-    padding: 5px 10px;
+    padding: 8px 12px;
     border-radius: 4px;
     text-align: center;
-    width: 80px;
+    border: 1px solid #e0e0e0;
 }
 
 .c-aa-box-label {
     display: block;
     font-size: 10px;
-    font-weight: bold;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #666;
 }
 
 .c-aa-box-val {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 700;
+    display: block;
+    color: #222;
 }
 
 .c-aa-buy-btn {
-    background: #b71c1c;
+    width: 100%;
+    background: var(--primary-pink);
     color: #fff;
     border: none;
-    padding: 15px 80px;
-    font-size: 18px;
-    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    transition: all 120ms ease;
 }
 
 .c-aa-buy-btn:hover {
-    background: #c62828;
+    background: #a0456a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
 /* Right Panel (Details) */
 .c-aa-details-panel {
-    background: #e6c5c5; /* Pinkish */
-    padding: 20px;
-    border: 3px solid #000;
+    background: #fff;
+    padding: 16px;
 }
 
 .c-aa-detail-group {
@@ -223,28 +238,32 @@
 }
 
 .c-aa-detail-group label {
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: 600;
+    font-size: 11px;
     display: block;
     margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #666;
 }
 
 .c-aa-detail-val.box-white {
-    background: #fff;
+    background: #f5f5f5;
     padding: 8px 10px;
-    border-radius: 5px;
-    font-size: 16px;
-    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    border: 1px solid #ddd;
     min-height: 20px;
+    color: #222;
 }
 
 .highlight-border {
-    border: 2px solid #7b1fa2 !important; /* Purple border for Form field as in screenshot */
+    border: 1px solid #ddd !important;
 }
 
 .c-aa-row {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .half {
@@ -253,52 +272,91 @@
 
 /* Upcoming Auctions */
 .c-aa-upcoming {
-    margin-top: 50px;
-    padding: 0 40px;
+    margin-top: 40px;
+    padding: 0 20px 40px 20px;
 }
 
 .c-aa-section-title {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #222;
 }
 
 .c-aa-carousel {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
 }
 
 .c-aa-nav-btn {
     background: transparent;
     border: none;
-    font-size: 40px;
+    font-size: 24px;
     cursor: pointer;
     color: #666;
+    padding: 8px;
+    transition: all 120ms ease;
+    flex-shrink: 0;
+}
+
+.c-aa-nav-btn:hover {
+    color: var(--primary-teal);
+    transform: scale(1.1);
 }
 
 .c-aa-cards-row {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     overflow-x: auto;
-    padding: 10px 0;
+    padding: 8px 0;
     flex: 1;
+    scroll-behavior: smooth;
+}
+
+.c-aa-cards-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.c-aa-cards-row::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.c-aa-cards-row::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.c-aa-cards-row::-webkit-scrollbar-thumb:hover {
+    background: #999;
 }
 
 .c-aa-upcoming-card {
-    border: 3px solid #5a8e68;
-    border-radius: 15px;
-    min-width: 250px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    min-width: 280px;
     overflow: hidden;
     background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 120ms ease;
+    flex-shrink: 0;
+}
+
+.c-aa-upcoming-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
 
 .c-aa-uc-img {
-    height: 180px;
+    height: 160px;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #f5f5f5;
 }
 
 .c-aa-uc-img img {
@@ -308,24 +366,92 @@
 }
 
 .c-aa-uc-details {
-    background: #5a8e68;
-    padding: 15px;
+    background: #fff;
+    padding: 12px;
 }
 
 .c-aa-uc-details label {
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: block;
+    color: #666;
 }
 
 .c-aa-uc-details .c-aa-detail-val {
+    font-size: 12px;
+    padding: 4px 6px;
+    margin: 0;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    color: #222;
+}
+
+.c-aa-upcoming-card.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: #999;
     font-size: 14px;
-    padding: 5px 8px;
 }
 
 /* Loading */
 .c-aa-loading {
-    padding: 50px;
+    padding: 40px 20px;
     text-align: center;
-    font-size: 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .c-aa-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .c-aa-details-panel {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .c-aa-main {
+        grid-template-columns: 1fr;
+        padding: 0 12px;
+    }
+
+    .c-aa-upcoming {
+        padding: 0 12px 40px 12px;
+    }
+
+    .c-aa-static-price-value {
+        font-size: 36px;
+    }
+
+    .c-aa-upcoming-card {
+        min-width: 240px;
+    }
+
+    .c-aa-uc-img {
+        height: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .c-aa-static-price-value {
+        font-size: 28px;
+    }
+
+    .c-aa-upcoming-card {
+        min-width: 200px;
+    }
+
+    .c-aa-section-title {
+        font-size: 16px;
+    }
 }
