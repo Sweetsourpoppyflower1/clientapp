@@ -182,153 +182,158 @@ export default function SupplierDashboard() {
                     {logo?.url ? (
                         <img src={logo.url} alt={logo.alt} className="sd-top-logo" />
                     ) : (
-                        <span className="loading-label">Loading…</span>
+                        <span className="sd-loading-label">Loading…</span>
                     )}
                 </div>
             </header>
 
             {/* Welcome Section */}
-            <section className="sd-welcome">
-                <h1>Welcome, {userData.userName}!</h1>
-                <p>You can add products to the stock by clicking on the 'Add Products' button.<br/>You can also look at your stock.</p>
+            <section className="sd-welcome-section">
+                <div className="sd-welcome-header">
+                    <div className="sd-welcome-text">
+                        <p className="sd-welcome-greeting">Welcome back</p>
+                        <p className="sd-welcome-title">Supplier Dashboard</p>
+                        <p className="sd-welcome-subtitle">
+                            Manage your products and view auction opportunities in one place
+                        </p>
+                    </div>
+                </div>
             </section>
 
             {/* Main Content */}
             <main className="sd-main">
-                {/* Add Products Card - Left Side */}
-                <aside className="sd-left-card">
-                    <div className="sd-add-card">
-                        <div className="sd-add-graphic" aria-hidden="true">
-                            <svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true" className="sd-plus-icon">
-                                <rect x="8" y="8" width="48" height="48" rx="6" fill="rgba(0,0,0,0.08)"/>
-                                <rect x="22" y="22" width="20" height="20" rx="2" stroke="rgba(0,0,0,0.2)" strokeWidth="2" fill="none"/>
+                {/* Content Grid - Button and Stock Side by Side */}
+                <div className="sd-content-grid">
+                    {/* Add Products Button Tile */}
+                    <div className="sd-buttons-section">
+                        <button className="sd-action-btn sd-add-products-btn" onClick={handleAddProducts}>
+                            <svg className="sd-btn-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                                <rect x="8" y="8" width="48" height="48" rx="6" fill="rgba(255,255,255,0.1)"/>
                                 <path d="M32 20v24M20 32h24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                        </div>
-                        <div className="sd-add-footer">
-                            <button className="sd-add-btn" onClick={handleAddProducts}>Add Products</button>
-                        </div>
-                    </div>
-                </aside>
-
-                {/* Stock View Section - Right Side */}
-                <section className="sd-stock">
-                    <div className="sd-stock-header">
-                        <div className="sd-stock-icon">▦</div>
-                        <div className="sd-stock-title">Stock View</div>
+                            <span className="sd-btn-label">Add Products</span>
+                        </button>
                     </div>
 
-                    <div className="sd-stock-body" role="region" aria-label="Product inventory">
-                        {/* Error Message */}
-                        {error && (
-                            <div className="sd-error-message" role="alert">
-                                <span className="sd-error-icon">⚠</span>
-                                {error}
-                            </div>
-                        )}
+                    {/* Stock View Section */}
+                    <section className="sd-stock">
+                        <div className="sd-stock-header">
+                            <div className="sd-stock-icon">▦</div>
+                            <div className="sd-stock-title">Stock View</div>
+                        </div>
 
-                        {/* Loading State */}
-                        {loadingPlants && !error && (
-                            <div className="sd-loading-message">
-                                <span className="sd-spinner"></span>
-                                Loading your products…
-                            </div>
-                        )}
+                        <div className="sd-stock-body" role="region" aria-label="Product inventory">
+                            {/* Error Message */}
+                            {error && (
+                                <div className="sd-error-message" role="alert">
+                                    <span className="sd-error-icon">⚠</span>
+                                    {error}
+                                </div>
+                            )}
 
-                        {/* Empty State */}
-                        {!loadingPlants && plants.length === 0 && !error && (
-                            <div className="sd-empty-message">
-                                <span className="sd-empty-icon">📦</span>
-                                <p>No products in stock yet.</p>
-                                <p className="sd-empty-hint">Click 'Add Products' to get started.</p>
-                            </div>
-                        )}
+                            {/* Loading State */}
+                            {loadingPlants && !error && (
+                                <div className="sd-loading-message">
+                                    <span className="sd-spinner"></span>
+                                    Loading your products…
+                                </div>
+                            )}
 
-                        {/* Products Table */}
-                        {!loadingPlants && plants.length > 0 && (
-                            <div className="sd-table-wrapper">
-                                <table className="sd-stock-table" aria-label="Supplier product inventory">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Category</th>
-                                            <th>Form</th>
-                                            <th>Quality</th>
-                                            <th>Remaining Quantity</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {plants.map((plant, index) => (
-                                            <React.Fragment key={plant.plantId || index}>
-                                                <tr
-                                                    className={`sd-stock-row ${expandedIndex === index ? 'sd-expanded' : ''}`}
-                                                    onClick={() => toggleExpand(index)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Enter" || e.key === " ") {
-                                                            e.preventDefault();
-                                                            toggleExpand(index);
-                                                        }
-                                                    }}
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    aria-expanded={expandedIndex === index}
-                                                    aria-controls={`plant-details-${index}`}
-                                                >
-                                                    <td>{plant.productName}</td>
-                                                    <td>{plant.category}</td>
-                                                    <td>{plant.form}</td>
-                                                    <td>{plant.quality}</td>
-                                                    <td>{getRemainingQuantity(plant.plantId) ?? "—"}</td>
-                                                </tr>
+                            {/* Empty State */}
+                            {!loadingPlants && plants.length === 0 && !error && (
+                                <div className="sd-empty-message">
+                                    <span className="sd-empty-icon">📦</span>
+                                    <p>No products in stock yet.</p>
+                                    <p className="sd-empty-hint">Click 'Add Products' to get started.</p>
+                                </div>
+                            )}
 
-                                                {expandedIndex === index && (
-                                                    <tr className="sd-details-row" id={`plant-details-${index}`}>
-                                                        <td colSpan="5" className="sd-details-cell">
-                                                            <div className="sd-details-container">
-                                                                {/* Image on the left */}
-                                                                <div className="sd-details-image">
-                                                                    {plant.imageUrl ? (
-                                                                        <img
-                                                                            src={normalizeUrl(plant.imageUrl)}
-                                                                            alt={plant.imageAlt || plant.productName}
-                                                                            className="sd-details-img"
-                                                                        />
-                                                                    ) : (
-                                                                        <div className="sd-image-placeholder">No image</div>
-                                                                    )}
-                                                                </div>
-
-                                                                {/* Details grid on the right */}
-                                                                <div className="sd-details-grid">
-                                                                    <div>
-                                                                        <div><span className="sd-label">Min Stems</span>{plant.minStem}</div>
-                                                                        <div><span className="sd-label">Stems/Bunch</span>{plant.stemsBunch}</div>
-                                                                        <div><span className="sd-label">Maturity</span>{plant.maturity}</div>
-                                                                    </div>
-                                                                    <div>
-                                                                        <div><span className="sd-label">Quality</span>{plant.quality}</div>
-                                                                        <div><span className="sd-label">Min Price</span>€{plant.minPrice ?? '-'}</div>
-                                                                        <div><span className="sd-label">Start Price</span>€{plant.startPrice ?? '-'}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            {/* Description - Full Width */}
-                                                            <div className="sd-description-box">
-                                                                <span className="sd-label">Description</span>
-                                                                <p>{plant.description}</p>
-                                                            </div>
-                                                        </td>
+                            {/* Products Table */}
+                            {!loadingPlants && plants.length > 0 && (
+                                <div className="sd-table-wrapper">
+                                    <table className="sd-stock-table" aria-label="Supplier product inventory">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Category</th>
+                                                <th>Form</th>
+                                                <th>Quality</th>
+                                                <th>Remaining Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {plants.map((plant, index) => (
+                                                <React.Fragment key={plant.plantId || index}>
+                                                    <tr
+                                                        className={`sd-stock-row ${expandedIndex === index ? 'sd-expanded' : ''}`}
+                                                        onClick={() => toggleExpand(index)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === "Enter" || e.key === " ") {
+                                                                e.preventDefault();
+                                                                toggleExpand(index);
+                                                            }
+                                                        }}
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        aria-expanded={expandedIndex === index}
+                                                        aria-controls={`plant-details-${index}`}
+                                                    >
+                                                        <td>{plant.productName}</td>
+                                                        <td>{plant.category}</td>
+                                                        <td>{plant.form}</td>
+                                                        <td>{plant.quality}</td>
+                                                        <td>{getRemainingQuantity(plant.plantId) ?? "—"}</td>
                                                     </tr>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                </section>
+
+                                                    {expandedIndex === index && (
+                                                        <tr className="sd-details-row" id={`plant-details-${index}`}>
+                                                            <td colSpan="5" className="sd-details-cell">
+                                                                <div className="sd-details-container">
+                                                                    {/* Image on the left */}
+                                                                    <div className="sd-details-image">
+                                                                        {plant.imageUrl ? (
+                                                                            <img
+                                                                                src={normalizeUrl(plant.imageUrl)}
+                                                                                alt={plant.imageAlt || plant.productName}
+                                                                                className="sd-details-img"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="sd-image-placeholder">No image</div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Details grid on the right */}
+                                                                    <div className="sd-details-grid">
+                                                                        <div>
+                                                                            <div><span className="sd-label">Min Stems</span>{plant.minStem}</div>
+                                                                            <div><span className="sd-label">Stems/Bunch</span>{plant.stemsBunch}</div>
+                                                                            <div><span className="sd-label">Maturity</span>{plant.maturity}</div>
+                                                                        </div>
+                                                                        <div>
+                                                                            <div><span className="sd-label">Quality</span>{plant.quality}</div>
+                                                                            <div><span className="sd-label">Min Price</span>€{plant.minPrice ?? '-'}</div>
+                                                                            <div><span className="sd-label">Start Price</span>€{plant.startPrice ?? '-'}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                {/* Description - Full Width */}
+                                                                <div className="sd-description-box">
+                                                                    <span className="sd-label">Description</span>
+                                                                    <p>{plant.description}</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </React.Fragment>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                </div>
             </main>
 
             {/* Navigation and Account Menus */}
