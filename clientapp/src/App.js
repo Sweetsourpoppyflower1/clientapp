@@ -8,8 +8,10 @@ import AOverviewUpcomingAuctions from "./pages/master/a_overviewUpcomingAuctions
 import AuctionmasterDashboard from "./pages/master/auctionmasterDashboard.js";
 import AStockOverview from "./pages/master/a_stockOverview.js";
 import ACreateAuction from "./pages/master/a_createAuction.js";
-import RegisterOptions from "./pages/login_regiser/registerOptions.js"
 import Auctions from "./pages/company/c_auctions.js"
+import AuctionCalender from "./pages/master/a_overviewAuctionCalendar.js";
+import SupplierDashboard from "./pages/supplier/supplierDashboard.js";
+import SAddProduct from "./pages/supplier/s_addProduct.js";
 
 function App() {
     return (
@@ -24,8 +26,10 @@ function App() {
                 <Route path="/master/auctionmasterDashboard" element={<AuctionmasterDashboard />} />
                 <Route path="/master/a_overviewStock" element={<AStockOverview />} />
                 <Route path="/master/a_createAuction" element={<ACreateAuction />} />
-                <Route path="/login_register/registerOptions" element={<RegisterOptions />} />
                 <Route path="/company/auctions" element={<Auctions />} />
+                <Route path="/master/a_overviewAuctionCalendar" element={<AuctionCalender />} />
+                <Route path="/supplier/supplierDashboard" element={<SupplierDashboard />} />
+                <Route path="/supplier/s_addProduct" element={<SAddProduct /> } />
             </Routes>
         </Router>
     );
