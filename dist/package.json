@@ -1,10 +1,10 @@
 {
   "dependencies": {
+    "iban": "^0.0.14",
     "react-router-dom": "^7.9.4"
   },
-    "name": "clientapp",
-    "version": "0.1.0",
-    "private": true,
-    "proxy": "https://localhost:7036"
-
+  "name": "clientapp",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "https://localhost:7036"
 }
