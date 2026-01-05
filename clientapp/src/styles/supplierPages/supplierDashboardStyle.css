@@ -374,6 +374,15 @@ html, body, #root {
         line-height: 1.5;
     }
 
+
+.btn_editPlant {
+    display: flex;
+    width: 50px;
+    background-color: #5a786b;
+    font: bold;
+    margin-top: 10px;
+}
+
 /* Loading State */
 .sd-loading-message {
     display: flex;

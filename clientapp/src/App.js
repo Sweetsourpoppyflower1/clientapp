@@ -17,6 +17,7 @@ import CMyOrders from "./pages/company/c_myOrders.js";
 import CompanyDashboard from "./pages/company/companyDashboard.js";
 import AOverviewAcceptances from "./pages/master/a_overviewAcceptances.js";
 import AManageUsers from "./pages/master/a_manageUsers.js";
+import SEditPlant from "./pages/supplier/sEditPlant.js";
 
 function App() {
     return (
@@ -40,7 +41,8 @@ function App() {
                 <Route path="/companyDashboard" element={<CompanyDashboard />} />
                 <Route path="/AOverviewAcceptances" element={<AOverviewAcceptances />} />
                 <Route path="/aManageUsers" element={<AManageUsers />} />
-                <Route path="/ActiveAuction/:id" element={<ActiveAuction /> } />
+                <Route path="/ActiveAuction/:id" element={<ActiveAuction />} />
+                <Route path="/sEditPlant/:plantId" element={<SEditPlant />} />  {/* later nog aanpassen naar /naam ipv id */}
             </Routes>
         </Router>
     );
