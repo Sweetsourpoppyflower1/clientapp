@@ -55,6 +55,10 @@ function AuctionCard({ a }) {
         navigate(`/ActiveAuction/${a.auction_id || a.id}`);
     };
 
+    const handleSeeInfo = () => {
+        navigate(`/cSeeInfoAuction/${a.auction_id || a.id}`);
+    };
+
     const handlePrevImage = (e) => {
         e.stopPropagation();
         setImageIndex((prev) => (prev - 1 + images.length) % images.length);
@@ -120,11 +124,11 @@ function AuctionCard({ a }) {
                     </div>
                 </div>
                 <div className="c-auctions-button-box">
-                    <button className="c-auctions-cta-wide">
-                See info
-                </button>
-                <button className="c-auctions-cta-wide" onClick={handleViewAuction}>
-                    Go to auction
+                    <button className="c-auctions-cta-wide" onClick={handleSeeInfo}>
+                        See info
+                    </button>
+                    <button className="c-auctions-cta-wide" onClick={handleViewAuction}>
+                        Go to auction
                     </button>
                 </div>  
             </div>
