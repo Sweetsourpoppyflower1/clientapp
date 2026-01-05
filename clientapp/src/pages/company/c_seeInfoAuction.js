@@ -23,6 +23,8 @@ export default function SeeInfoAuction() {
     const [loading, setLoading] = useState(true);
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [priceHistory, setPriceHistory] = useState([]);
+    const [loadingHistory, setLoadingHistory] = useState(false);
 
     useEffect(() => {
         const mediaId = 1;
@@ -94,6 +96,10 @@ export default function SeeInfoAuction() {
                 };
                 
                 setAuction(enriched);
+
+                // Fetch price history
+                await fetchPriceHistory(plant.plant_id);
+
             } catch (e) {
                 console.error("Failed to load auction", e);
             } finally {
@@ -103,6 +109,20 @@ export default function SeeInfoAuction() {
 
         load();
     }, [id]);
+
+    const fetchPriceHistory = async (plantId) => {
+        setLoadingHistory(true);
+        try {
+            const history = await fetchMaybe(`/api/Plants/${plantId}/price-history`);
+            if (history) {
+                setPriceHistory(history);
+            }
+        } catch (e) {
+            console.error("Failed to load price history", e);
+        } finally {
+            setLoadingHistory(false);
+        }
+    };
 
     if (loading) return <div className="sia-loading">Loading...</div>;
     if (!auction) return <div className="sia-loading">Auction not found or invalid ID</div>;
@@ -116,115 +136,155 @@ export default function SeeInfoAuction() {
             </header>
 
             <main className="sia-main">
-                <div className="sia-info-card">
-                    {/* Header Section */}
-                    <div className="sia-header">
-                        <div className="sia-header-left">
-                            <h1 className="sia-title">{auction.productname}</h1>
-                            <div className="sia-supplier-info">
-                                <span className="sia-supplier-label">Supplier:</span>
-                                <span className="sia-supplier-name">{auction.supplierName}</span>
+                <div className="sia-wrapper">
+                    {/* Main Product Card - Left Side */}
+                    <div className="sia-info-card">
+                        {/* Header Section */}
+                        <div className="sia-header">
+                            <div className="sia-header-left">
+                                <h1 className="sia-title">{auction.productname}</h1>
+                                <div className="sia-supplier-info">
+                                    <span className="sia-supplier-label">Supplier:</span>
+                                    <span className="sia-supplier-name">{auction.supplierName}</span>
+                                </div>
+                            </div>
+                            <div className="sia-header-right">
+                                <div className="sia-price-display">
+                                    <div className="sia-time">Starts: {new Date(auction.startTime).toLocaleString()}</div>
+                                </div>
                             </div>
                         </div>
-                        <div className="sia-header-right">
-                            <div className="sia-price-display">
-                                <div className="sia-time">Starts: {new Date(auction.startTime).toLocaleString()}</div>
+
+                        {/* Content Section */}
+                        <div className="sia-content">
+                            {/* Image Gallery on the left */}
+                            <div className="sia-image-section">
+                                <div className="sia-img-container">
+                                    <img src={plantImages[currentImageIndex]} alt={auction.productname} className="sia-product-img" />
+                                    {plantImages.length > 1 && (
+                                        <>
+                                            <button 
+                                                className="sia-img-nav-btn left" 
+                                                onClick={() => setCurrentImageIndex((prev) => (prev - 1 + plantImages.length) % plantImages.length)}
+                                                aria-label="Previous image"
+                                            >
+                                                &lt;
+                                            </button>
+                                            <button 
+                                                className="sia-img-nav-btn right" 
+                                                onClick={() => setCurrentImageIndex((prev) => (prev + 1) % plantImages.length)}
+                                                aria-label="Next image"
+                                            >
+                                                &gt;
+                                            </button>
+                                            <div className="sia-img-counter">
+                                                {currentImageIndex + 1} / {plantImages.length}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Details Grid on the right */}
+                            <div className="sia-details-section">
+                                <div className="sia-details-grid">
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Category:</span>
+                                        <span className="sia-value">{auction.category}</span>
+                                    </div>
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Form:</span>
+                                        <span className="sia-value">{auction.form}</span>
+                                    </div>
+
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Quality:</span>
+                                        <span className="sia-value">{auction.quality}</span>
+                                    </div>
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Stems/Bunch:</span>
+                                        <span className="sia-value">{auction.quantityStems}</span>
+                                    </div>
+
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Min Stems:</span>
+                                        <span className="sia-value">{auction.minStemLength}</span>
+                                    </div>
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Maturity:</span>
+                                        <span className="sia-value">{auction.maturity}</span>
+                                    </div>
+
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Min Price:</span>
+                                        <span className="sia-value">{(auction.minPrice || 0).toFixed(2)}</span>
+                                    </div>
+                                    <div className="sia-detail-item">
+                                        <span className="sia-label">Start Price:</span>
+                                        <span className="sia-value">{(auction.startPrice || 0).toFixed(2)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Description Box */}
+                                <div className="sia-description-box">
+                                    <div className="sia-description">{auction.description}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="sia-actions">
+                            <button 
+                                className="sia-btn sia-btn-primary"
+                                onClick={() => navigate(`/cActiveAuction/${auction.auction_id}`)}
+                            >
+                                Go to auction
+                            </button>
+                            <button 
+                                className="sia-btn sia-btn-secondary"
+                                onClick={() => navigate(-1)}
+                            >
+                                Back
+                            </button>
                         </div>
                     </div>
 
-                    {/* Content Section */}
-                    <div className="sia-content">
-                        {/* Image Gallery on the left */}
-                        <div className="sia-image-section">
-                            <div className="sia-img-container">
-                                <img src={plantImages[currentImageIndex]} alt={auction.productname} className="sia-product-img" />
-                                {plantImages.length > 1 && (
-                                    <>
-                                        <button 
-                                            className="sia-img-nav-btn left" 
-                                            onClick={() => setCurrentImageIndex((prev) => (prev - 1 + plantImages.length) % plantImages.length)}
-                                            aria-label="Previous image"
-                                        >
-                                            &lt;
-                                        </button>
-                                        <button 
-                                            className="sia-img-nav-btn right" 
-                                            onClick={() => setCurrentImageIndex((prev) => (prev + 1) % plantImages.length)}
-                                            aria-label="Next image"
-                                        >
-                                            &gt;
-                                        </button>
-                                        <div className="sia-img-counter">
-                                            {currentImageIndex + 1} / {plantImages.length}
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                    {/* Price History Section - Right Side */}
+                    {priceHistory.length > 0 && (
+                        <div className="sia-price-history-card">
+                            <h2 className="sia-history-title">Price History</h2>
+                            {loadingHistory ? (
+                                <div className="sia-history-loading">Loading price history...</div>
+                            ) : (
+                                <div className="sia-history-table-wrapper">
+                                    <table className="sia-history-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Changed Date</th>
+                                                <th>Old Min Price</th>
+                                                <th>New Min Price</th>
+                                                <th>Old Start Price</th>
+                                                <th>New Start Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {priceHistory.map((entry, idx) => (
+                                                <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
+                                                    <td className="sia-history-date">
+                                                        {new Date(entry.changed_at).toLocaleString()}
+                                                    </td>
+                                                    <td className="sia-history-price">{(entry.old_min_price || 0).toFixed(2)}</td>
+                                                    <td className="sia-history-price">{(entry.new_min_price || 0).toFixed(2)}</td>
+                                                    <td className="sia-history-price">{(entry.old_start_price || 0).toFixed(2)}</td>
+                                                    <td className="sia-history-price">{(entry.new_start_price || 0).toFixed(2)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
-
-                        {/* Details Grid on the right */}
-                        <div className="sia-details-section">
-                            <div className="sia-details-grid">
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Category:</span>
-                                    <span className="sia-value">{auction.category}</span>
-                                </div>
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Form:</span>
-                                    <span className="sia-value">{auction.form}</span>
-                                </div>
-
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Quality:</span>
-                                    <span className="sia-value">{auction.quality}</span>
-                                </div>
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Stems/Bunch:</span>
-                                    <span className="sia-value">{auction.quantityStems}</span>
-                                </div>
-
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Min Stems:</span>
-                                    <span className="sia-value">{auction.minStemLength}</span>
-                                </div>
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Maturity:</span>
-                                    <span className="sia-value">{auction.maturity}</span>
-                                </div>
-
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Min Price:</span>
-                                    <span className="sia-value">€{(auction.minPrice || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="sia-detail-item">
-                                    <span className="sia-label">Start Price:</span>
-                                    <span className="sia-value">€{(auction.startPrice || 0).toFixed(2)}</span>
-                                </div>
-                            </div>
-
-                            {/* Description Box */}
-                            <div className="sia-description-box">
-                                <div className="sia-description">{auction.description}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="sia-actions">
-                        <button 
-                            className="sia-btn sia-btn-primary"
-                            onClick={() => navigate(`/cActiveAuction/${auction.auction_id}`)}
-                        >
-                            Go to auction
-                        </button>
-                        <button 
-                            className="sia-btn sia-btn-secondary"
-                            onClick={() => navigate(-1)}
-                        >
-                            Back
-                        </button>
-                    </div>
+                    )}
                 </div>
             </main>
 
