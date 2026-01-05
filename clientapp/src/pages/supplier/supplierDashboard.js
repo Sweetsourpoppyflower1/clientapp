@@ -174,6 +174,10 @@ export default function SupplierDashboard() {
         navigate('/sAddProduct');
     };
 
+    const handleEditPlant = (plant) => {
+        navigate(`/sEditPlant/${plant.plantId || plant.plant_id || plant.id}`);
+    };
+
     return (
         <div className="sd-page">
             {/* Header with Logo */}
@@ -321,6 +325,10 @@ export default function SupplierDashboard() {
                                                                 <div className="sd-description-box">
                                                                     <span className="sd-label">Description</span>
                                                                     <p>{plant.description}</p>
+
+                                                                    <button className="btn_editPlant" onClick={() => handleEditPlant(plant)}>
+                                                                        Edit
+                                                                    </button>
                                                                 </div>
                                                             </td>
                                                         </tr>
