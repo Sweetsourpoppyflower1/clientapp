@@ -119,10 +119,14 @@ function AuctionCard({ a }) {
                         {(a.description ?? a.desc ?? "").slice(0, 200)}
                     </div>
                 </div>
-
+                <div className="c-auctions-button-box">
+                    <button className="c-auctions-cta-wide">
+                See info
+                </button>
                 <button className="c-auctions-cta-wide" onClick={handleViewAuction}>
                     Go to auction
-                </button>
+                    </button>
+                </div>  
             </div>
         </div>
     );
