@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../../styles/companyPages/c_activeAuctionStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
+import AuctionClock from "../../components/AuctionClock";
 
 const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 const resolveUrl = (url = "") =>
@@ -32,6 +33,12 @@ export default function ActiveAuction() {
     const [priceHistory, setPriceHistory] = useState(null);
     const [loadingHistory, setLoadingHistory] = useState(false);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [notification, setNotification] = useState(null);
+
+    const showNotification = (message, type = 'success') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 4000);
+    };
 
     useEffect(() => {
         const mediaId = 1;
@@ -113,7 +120,6 @@ export default function ActiveAuction() {
                      const plantsMap = new Map();
                      if(Array.isArray(allPlants)) allPlants.forEach(p => plantsMap.set(p.plant_id, p));
                      
-                     // Fetch media for upcoming auctions
                      const allMedia = await fetchMaybe("/api/MediaPlant");
                      const mediaMap = new Map();
                      if(Array.isArray(allMedia)) {
@@ -132,7 +138,6 @@ export default function ActiveAuction() {
                             const p = plantsMap.get(x.plant_id);
                             const plantMediaList = mediaMap.get(x.plant_id) || [];
                             
-                            // Get primary image or first image
                             let imageUrl = null;
                             if (plantMediaList.length > 0) {
                                 plantMediaList.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
@@ -161,14 +166,6 @@ export default function ActiveAuction() {
     const handleBuy = async () => {
         if (!auction || !activeLot) return;
         
-        const currentTime = new Date();
-        const auctionStartTime = new Date(auction.startTime);
-        
-        if (currentTime < auctionStartTime) {
-            alert("De veiling is nog niet begonnen. U kunt geen aankoop doen voordat de veiling is gestart.");
-            return;
-        }
-        
         let userData = {};
         try {
             userData = JSON.parse(localStorage.getItem("user_data") || "{}");
@@ -177,12 +174,12 @@ export default function ActiveAuction() {
         const companyId = userData.companyID || userData.companyId || userData.id || userData.Id;
         
         if (!companyId) {
-            alert("You must be logged in as a company to buy.");
+            showNotification("U moet ingelogd zijn als bedrijf om te kopen", "error");
             return;
         }
 
         if (userAmount > activeLot.remaining_quantity) {
-            alert(`You cannot buy more than available quantity (${activeLot.remaining_quantity}).`);
+            showNotification(`Maximale beschikbare hoeveelheid: ${activeLot.remaining_quantity}`, "error");
             return;
         }
         
@@ -205,7 +202,7 @@ export default function ActiveAuction() {
             
             if (!resAcc.ok) {
                 const txt = await resAcc.text();
-                throw new Error(`Failed to create acceptance: ${txt}`);
+                throw new Error(`Aankoop mislukt: ${txt}`);
             }
 
             const updatedLot = {
@@ -220,17 +217,17 @@ export default function ActiveAuction() {
             });
 
             if (!resLot.ok) {
-                throw new Error("Failed to update lot quantity");
+                throw new Error("Kon hoeveelheid niet bijwerken");
             }
 
             setActiveLot(updatedLot);
             setAuction(prev => ({ ...prev, contInLot: updatedLot.remaining_quantity }));
             
-            alert(`Successfully bought ${userAmount} containers!`);
+            showNotification(`Gekocht: ${userAmount} containers voor €${currentPrice.toFixed(2).replace('.', ',')}`, "success");
 
         } catch (err) {
             console.error(err);
-            alert("Error processing purchase: " + err.message);
+            showNotification("Fout bij aankoop: " + err.message, "error");
         }
     };
 
@@ -257,10 +254,19 @@ export default function ActiveAuction() {
 
     return (
         <div className="c-aa-page">
+            {notification && (
+                <div className={`c-aa-notification ${notification.type}`}>
+                    <span className="notification-icon">
+                        {notification.type === 'success' ? '✓' : '✕'}
+                    </span>
+                    <span className="notification-message">{notification.message}</span>
+                    <button className="notification-close" onClick={() => setNotification(null)}>×</button>
+                </div>
+            )}
+
             <header className="c-aa-topbar">
                 <div className="c-aa-logo-section">
-                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">Loading
-</span>}
+                    {logo ? <img src={logo.url} alt={logo.alt} className="c-aa-top-logo" /> : <span className="c-aa-loading-label">Loading</span>}
                 </div>
             </header>
 
@@ -323,6 +329,13 @@ export default function ActiveAuction() {
                         </div>
                         <div className="c-aa-static-price-label">Current Price</div>
                     </div>
+                    <AuctionClock
+                        startPrice={auction.startPrice}
+                        minPrice={auction.minPrice}
+                        durationMs={60000}
+                        onPriceUpdate={(price) => setCurrentPrice(price)}
+                        resetTrigger={0}
+                    />
                     
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
                         <div className="c-aa-info-box" style={{ display: 'inline-block', margin: '10px' }}>

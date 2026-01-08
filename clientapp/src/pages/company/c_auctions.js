@@ -170,7 +170,7 @@ export default function CAuctions() {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: normalizedUrl, alt: m.alt_text });
             })
-            .catch(() => { /* silent fallback */ });
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -197,7 +197,7 @@ export default function CAuctions() {
 
                 const plantsById = new Map(plants.map((p) => [Number(p?.plant_id ?? p?.id), p]).filter(Boolean));
 
-                // media (single endpoint, local filter)
+                // media 
                 const mediaPayload = await fetchMaybe("/api/MediaPlant");
                 const mediaByPlant = new Map();
                 if (Array.isArray(mediaPayload)) {
