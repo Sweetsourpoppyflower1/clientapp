@@ -23,7 +23,7 @@ export default function SeeInfoAuction() {
     const [loading, setLoading] = useState(true);
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [priceHistory, setPriceHistory] = useState([]);
+    const [priceHistory, setPriceHistory] = useState(null);
     const [loadingHistory, setLoadingHistory] = useState(false);
 
     useEffect(() => {
@@ -96,9 +96,7 @@ export default function SeeInfoAuction() {
                 };
                 
                 setAuction(enriched);
-
-                // Fetch price history
-                await fetchPriceHistory(plant.plant_id);
+                await fetchPriceHistoryData(a.plant_id, enriched.supplierName);
 
             } catch (e) {
                 console.error("Failed to load auction", e);
@@ -110,15 +108,18 @@ export default function SeeInfoAuction() {
         load();
     }, [id]);
 
-    const fetchPriceHistory = async (plantId) => {
+    const fetchPriceHistoryData = async (plantId, supplierName) => {
+        if (!plantId) return;
+        
         setLoadingHistory(true);
         try {
-            const history = await fetchMaybe(`/api/Plants/${plantId}/price-history`);
-            if (history) {
-                setPriceHistory(history);
+            const response = await fetch(`/api/PriceHistory/plant/${plantId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setPriceHistory({ ...data, supplierName });
             }
-        } catch (e) {
-            console.error("Failed to load price history", e);
+        } catch (error) {
+            console.error("Failed to fetch price history", error);
         } finally {
             setLoadingHistory(false);
         }
@@ -217,11 +218,11 @@ export default function SeeInfoAuction() {
 
                                     <div className="sia-detail-item">
                                         <span className="sia-label">Min Price:</span>
-                                        <span className="sia-value">{(auction.minPrice || 0).toFixed(2)}</span>
+                                        <span className="sia-value">€{(auction.minPrice || 0).toFixed(2)}</span>
                                     </div>
                                     <div className="sia-detail-item">
                                         <span className="sia-label">Start Price:</span>
-                                        <span className="sia-value">{(auction.startPrice || 0).toFixed(2)}</span>
+                                        <span className="sia-value">€{(auction.startPrice || 0).toFixed(2)}</span>
                                     </div>
                                 </div>
 
@@ -236,7 +237,7 @@ export default function SeeInfoAuction() {
                         <div className="sia-actions">
                             <button 
                                 className="sia-btn sia-btn-primary"
-                                onClick={() => navigate(`/cActiveAuction/${auction.auction_id}`)}
+                                onClick={() => navigate(`/ActiveAuction/${auction.auction_id}`)}
                             >
                                 Go to auction
                             </button>
@@ -249,38 +250,80 @@ export default function SeeInfoAuction() {
                         </div>
                     </div>
 
-                    {/* Price History Section - Right Side */}
-                    {priceHistory.length > 0 && (
+                    {/* Price History Card - Right Side */}
+                    {priceHistory && (
                         <div className="sia-price-history-card">
                             <h2 className="sia-history-title">Price History</h2>
-                            {loadingHistory ? (
-                                <div className="sia-history-loading">Loading price history...</div>
-                            ) : (
-                                <div className="sia-history-table-wrapper">
-                                    <table className="sia-history-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Changed Date</th>
-                                                <th>Old Min Price</th>
-                                                <th>New Min Price</th>
-                                                <th>Old Start Price</th>
-                                                <th>New Start Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {priceHistory.map((entry, idx) => (
-                                                <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
-                                                    <td className="sia-history-date">
-                                                        {new Date(entry.changed_at).toLocaleString()}
-                                                    </td>
-                                                    <td className="sia-history-price">{(entry.old_min_price || 0).toFixed(2)}</td>
-                                                    <td className="sia-history-price">{(entry.new_min_price || 0).toFixed(2)}</td>
-                                                    <td className="sia-history-price">{(entry.old_start_price || 0).toFixed(2)}</td>
-                                                    <td className="sia-history-price">{(entry.new_start_price || 0).toFixed(2)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                            
+                            {loadingHistory && <div className="sia-history-loading">Loading...</div>}
+                            
+                            {!loadingHistory && (
+                                <div className="sia-history-content">
+                                    {/* Supplier Section */}
+                                    <div className="sia-supplier-section">
+                                        <h4 className="sia-supplier-section-title">Supplier: {auction.supplierName} (Last 10)</h4>
+                                        <div className="sia-history-table-wrapper">
+                                            <table className="sia-history-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Old Price</th>
+                                                        <th>New Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {priceHistory.currentSupplierHistory?.length > 0 ? (
+                                                        priceHistory.currentSupplierHistory.map((entry, idx) => (
+                                                            <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
+                                                                <td className="sia-history-date">{entry.date}</td>
+                                                                <td className="sia-history-price">€{Number(entry.old_start_price || 0).toFixed(2)}</td>
+                                                                <td className="sia-history-price">€{Number(entry.new_start_price || 0).toFixed(2)}</td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr><td colSpan="3" style={{ textAlign: 'center', color: '#999', padding: '10px' }}>No data</td></tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <p className="sia-average-price">
+                                            Avg: €{Number(priceHistory.currentSupplierAverage || 0).toFixed(2)}
+                                        </p>
+                                    </div>
+
+                                    {/* All Suppliers Section */}
+                                    <div className="sia-supplier-section">
+                                        <h4 className="sia-supplier-section-title">All Suppliers (Last 10)</h4>
+                                        <div className="sia-history-table-wrapper">
+                                            <table className="sia-history-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Product</th>
+                                                        <th>Supplier</th>
+                                                        <th>Date</th>
+                                                        <th>Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {priceHistory.allSuppliersHistory?.length > 0 ? (
+                                                        priceHistory.allSuppliersHistory.map((entry, idx) => (
+                                                            <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
+                                                                <td>{entry.productName}</td>
+                                                                <td>{entry.supplierName || "Unknown Supplier"}</td>
+                                                                <td className="sia-history-date">{entry.date}</td>
+                                                                <td className="sia-history-price">€{Number(entry.price || 0).toFixed(2)}</td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr><td colSpan="4" style={{ textAlign: 'center', color: '#999', padding: '10px' }}>No data</td></tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <p className="sia-average-price">
+                                            Avg: €{Number(priceHistory.allSuppliersAverage || 0).toFixed(2)}
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                         </div>

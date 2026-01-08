@@ -29,6 +29,10 @@ export default function ActiveAuction() {
     const [currentPrice, setCurrentPrice] = useState(0);
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [showPriceHistory, setShowPriceHistory] = useState(false);
+    const [priceHistory, setPriceHistory] = useState(null);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [notification, setNotification] = useState(null);
 
     const showNotification = (message, type = 'success') => {
@@ -227,6 +231,24 @@ export default function ActiveAuction() {
         }
     };
 
+    const fetchPriceHistory = async () => {
+        if (!auction?.plant_id) return;
+        
+        setLoadingHistory(true);
+        try {
+            const response = await fetch(`/api/PriceHistory/plant/${auction.plant_id}`);
+            if (response.ok) {
+                const data = await response.json();
+                setPriceHistory(data);
+                setShowPriceHistory(true);
+            }
+        } catch (error) {
+            console.error("Failed to fetch price history", error);
+        } finally {
+            setLoadingHistory(false);
+        }
+    };
+
     if (loading) return <div className="c-aa-loading">Loading...</div>;
     if (!auction) return <div className="c-aa-loading">Auction not found or invalid ID</div>;
 
@@ -300,6 +322,13 @@ export default function ActiveAuction() {
                 </div>
 
                 <div className="c-aa-clock-panel">
+                    {/* Static Price Display */}
+                    <div className="c-aa-static-price-display">
+                        <div className="c-aa-static-price-value">
+                            {currentPrice.toFixed(2).replace('.', ',')}
+                        </div>
+                        <div className="c-aa-static-price-label">Current Price</div>
+                    </div>
                     <AuctionClock
                         startPrice={auction.startPrice}
                         minPrice={auction.minPrice}
@@ -320,6 +349,141 @@ export default function ActiveAuction() {
                     </div>
                     
                     <button className="c-aa-buy-btn" onClick={handleBuy}>BUY</button>
+
+                    <button 
+                        className="price-history-btn"
+                        onClick={fetchPriceHistory}
+                        disabled={loadingHistory}
+                        style={{ marginTop: '12px' }}
+                    >
+                        {loadingHistory ? "Loading..." : "View Price History"}
+                    </button>
+
+                    {/* Price History - Now visible in modal/overlay style */}
+                    {showPriceHistory && priceHistory && (
+                        <div className="price-history-modal" onClick={() => setShowPriceHistory(false)}>
+                            <div className="price-history-modal-content" onClick={e => e.stopPropagation()}>
+                                <div className="price-history-section">
+                                    <div className="price-history-header">
+                                        <h3>Price History</h3>
+                                        <button 
+                                            className="close-btn"
+                                            onClick={() => setShowPriceHistory(false)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                    <div className="price-history-content">
+                                        <div className="supplier-section">
+                                            <h4>Supplier: {auction.supplierName} (Last 10)</h4>
+                                            <div className="price-table">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Old Price</th>
+                                                            <th>New Price</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {priceHistory.currentSupplierHistory?.length > 0 ? (
+                                                            priceHistory.currentSupplierHistory.map((entry, idx) => (
+                                                                <tr key={idx}>
+                                                                    <td>{entry.date}</td>
+                                                                    <td>€{Number(entry.old_start_price || 0).toFixed(2)}</td>
+                                                                    <td>€{Number(entry.new_start_price || 0).toFixed(2)}</td>
+                                                                </tr>
+                                                            ))
+                                                        ) : (
+                                                            <tr><td colSpan="3" style={{ textAlign: 'center', color: '#999' }}>No data</td></tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <p className="average-price">
+                                                Avg: €{Number(priceHistory.currentSupplierAverage || 0).toFixed(2)}
+                                            </p>
+                                        </div>
+                                        <div className="supplier-section">
+                                            <h4>All Suppliers (Last 10)</h4>
+                                            <div className="price-table">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Product</th>
+                                                            <th>Date</th>
+                                                            <th>Price</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {priceHistory.allSuppliersHistory?.length > 0 ? (
+                                                            priceHistory.allSuppliersHistory.map((entry, idx) => (
+                                                                <tr key={idx}>
+                                                                    <td>{entry.productName}</td>
+                                                                    <td>{entry.date}</td>
+                                                                    <td>€{Number(entry.price || 0).toFixed(2)}</td>
+                                                                </tr>
+                                                            ))
+                                                        ) : (
+                                                            <tr><td colSpan="3" style={{ textAlign: 'center', color: '#999' }}>No data</td></tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <p className="average-price">
+                                                Avg: €{Number(priceHistory.allSuppliersAverage || 0).toFixed(2)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Details Modal - Bottom Slide */}
+                    {showDetailsModal && auction && (
+                        <div className="c-aa-details-modal">
+                            <div className="c-aa-details-modal-header">
+                                <h2>Product Specifications</h2>
+                                <button 
+                                    className="c-aa-details-modal-close"
+                                    onClick={() => setShowDetailsModal(false)}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div className="c-aa-details-modal-body">
+                                <div className="c-aa-detail-group">
+                                    <label>Product</label>
+                                    <div className="c-aa-detail-val box-white">{auction.productname}</div>
+                                </div>
+                                <div className="c-aa-detail-group">
+                                    <label>Supplier</label>
+                                    <div className="c-aa-detail-val box-white">{auction.supplierName}</div>
+                                </div>
+                                <div className="c-aa-detail-group">
+                                    <label>Form</label>
+                                    <div className="c-aa-detail-val box-white">{auction.form}</div>
+                                </div>
+                                <div className="c-aa-detail-group">
+                                    <label>Maturity</label>
+                                    <div className="c-aa-detail-val box-white">{auction.maturity}</div>
+                                </div>
+                                <div className="c-aa-detail-group">
+                                    <label>Quality</label>
+                                    <div className="c-aa-detail-val box-white">{auction.quality}</div>
+                                </div>
+                                <div className="c-aa-detail-group">
+                                    <label>Stems per Unit</label>
+                                    <div className="c-aa-detail-val box-white">{auction.quantityStems}</div>
+                                </div>
+                                <div className="c-aa-detail-group">
+                                    <label>Min Stem Length</label>
+                                    <div className="c-aa-detail-val box-white">{auction.minStemLength}</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="c-aa-card c-aa-details-panel">
