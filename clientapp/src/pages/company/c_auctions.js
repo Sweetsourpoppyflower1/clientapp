@@ -116,6 +116,7 @@ function AuctionCard({ a }) {
                     <div>Stems/Bunch: <strong>{a.stemsPerBunch ?? a.stems_bunch ?? "—"}</strong></div>
                     <div>Min Stems: <strong>{a.minStems ?? a.min_stem ?? "—"}</strong></div>
                     <div>Maturity: <strong>{a.maturity ?? "—"}</strong></div>
+                    <div>Duration: <strong>{a.durationMinutes ?? a.duration_minutes ?? "—"} min</strong></div>
                 </div>
 
                 <div className="c-auctions-description-box">
@@ -244,6 +245,7 @@ export default function CAuctions() {
                         description: plant?.desc ?? a.description,
                         startPrice: plant?.start_price ?? a.startPrice,
                         minPrice: plant?.min_price ?? a.minPrice,
+                        durationMinutes: a.duration_minutes ?? a.durationMinutes,
                         images: media && media.length ? media : (a.images ?? (plant ? [resolveUrl(plant.image ?? plant.url)].filter(Boolean) : [])),
                         supplierName: supplier?.name ?? supplier?.displayName ?? a.supplierName,
                     };
@@ -255,7 +257,7 @@ export default function CAuctions() {
                         // merge images and fill missing fields
                         const ex = mapByKey.get(key);
                         ex.images = Array.from(new Set([...(ex.images || []), ...(enriched.images || [])]));
-                        for (const f of ["plantName", "category", "form", "quality", "description", "startPrice", "minPrice", "supplierName", "startDate", "endDate"]) {
+                        for (const f of ["plantName", "category", "form", "quality", "description", "startPrice", "minPrice", "supplierName", "startDate", "durationMinutes"]) {
                             if ((ex[f] === undefined || ex[f] === null || ex[f] === "") && enriched[f] != null) ex[f] = enriched[f];
                         }
                     }

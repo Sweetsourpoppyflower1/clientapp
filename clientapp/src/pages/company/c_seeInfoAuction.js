@@ -236,7 +236,7 @@ export default function SeeInfoAuction() {
                         <div className="sia-actions">
                             <button 
                                 className="sia-btn sia-btn-primary"
-                                onClick={() => navigate(`/cActiveAuction/${auction.auction_id}`)}
+                                onClick={() => navigate(`/ActiveAuction/${auction.auction_id}`)}
                             >
                                 Go to auction
                             </button>
