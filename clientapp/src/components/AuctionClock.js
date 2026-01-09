@@ -119,17 +119,17 @@ const AuctionClock = ({
                     <div className="current-price">
                         €{currentPrice.toFixed(2).replace('.', ',')}
                     </div>
-                    <div className="price-label-text">Huidige prijs</div>
+                    <div className="price-label-text">Current Price</div>
                 </div>
             </div>
             
             <div className="auction-clock-price-range">
                 <div className="price-range-item">
-                    <span className="price-range-label">Max Prijs</span>
+                    <span className="price-range-label">Max Price</span>
                     <span className="price-range-value">€{startPrice.toFixed(2).replace('.', ',')}</span>
                 </div>
                 <div className="price-range-item">
-                    <span className="price-range-label">Min Prijs</span>
+                    <span className="price-range-label">Min Price</span>
                     <span className="price-range-value">€{minPrice.toFixed(2).replace('.', ',')}</span>
                 </div>
             </div>
