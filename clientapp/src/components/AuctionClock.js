@@ -128,10 +128,6 @@ const AuctionClock = ({
                     <span className="price-range-label">Max Price</span>
                     <span className="price-range-value">€{startPrice.toFixed(2).replace('.', ',')}</span>
                 </div>
-                <div className="price-range-item">
-                    <span className="price-range-label">Min Price</span>
-                    <span className="price-range-value">€{minPrice.toFixed(2).replace('.', ',')}</span>
-                </div>
             </div>
         </div>
     );
