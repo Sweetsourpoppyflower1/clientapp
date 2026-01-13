@@ -30,14 +30,19 @@ export default function ActiveAuction() {
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [notification, setNotification] = useState(null);
+    const [notificationPersist, setNotificationPersist] = useState(false);
     const [timerReference, setTimerReference] = useState(null);
+    const [durationMinutes, setDurationMinutes] = useState(60);
     const [showPriceHistory, setShowPriceHistory] = useState(false);
     const [priceHistory, setPriceHistory] = useState({ supplier: [], allSuppliers: [] });
     const [priceHistoryLoading, setPriceHistoryLoading] = useState(false);
 
-    const showNotification = (message, type = 'success') => {
+    const showNotification = (message, type = 'success', persist = false) => {
         setNotification({ message, type });
-        setTimeout(() => setNotification(null), 4000);
+        setNotificationPersist(persist);
+        if (!persist) {
+            setTimeout(() => setNotification(null), 4000);
+        }
     };
 
     useEffect(() => {
@@ -55,57 +60,55 @@ export default function ActiveAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const a = await fetchMaybe(`/api/Auctions/${id}`);
-                if (!a) {
-                    setAuction(null); 
-                    setLoading(false);
-                    return; 
+                const aData = await fetchMaybe(`/api/Auctions/${id}`);
+                if (!aData) {
+                    setAuction(null);
+                    return;
                 }
 
-                const plant = await fetchMaybe(`/api/Plants/${a.plant_id}`);
-                
+                // 🔑 SERVER is source of truth
+                const effectiveStartTime = aData.effective_start_time;
+                const durationMinutes = aData.duration_minutes;
+
+                const plant = await fetchMaybe(`/api/Plants/${aData.plant_id}`);
+
                 let supplier = null;
-                if (plant && plant.supplier_id) {
-                     supplier = await fetchMaybe(`/api/Suppliers/${plant.supplier_id}`);
+                if (plant?.supplier_id) {
+                    supplier = await fetchMaybe(`/api/Suppliers/${plant.supplier_id}`);
                 }
 
                 const lots = await fetchMaybe(`/api/AuctionLots`);
-                let lot = null;
-                if (Array.isArray(lots)) {
-                    lot = lots.find(l => Number(l.plant_id) === Number(a.plant_id)); 
-                }
+                const lot = Array.isArray(lots)
+                    ? lots.find(l => Number(l.plant_id) === Number(aData.plant_id))
+                    : null;
+
                 setActiveLot(lot);
 
                 const mediaAll = await fetchMaybe("/api/MediaPlant");
                 let images = [];
                 let imageUrl = null;
+
                 if (Array.isArray(mediaAll)) {
-                     const plantMedia = mediaAll.filter(m => Number(m.plant_id) === Number(a.plant_id));
-                     if (plantMedia.length > 0) {
-                         plantMedia.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
-                         images = plantMedia.map(m => resolveUrl(m.url)).filter(Boolean);
-                         imageUrl = images[0];
-                     }
-                }
-                setPlantImages(images.length > 0 ? images : ["https://via.placeholder.com/400x300?text=No+Image"]);
-
-                // Fetch acceptance history to find the most recent one
-                const acceptances = await fetchMaybe(`/api/Acceptances?auctionId=${id}`);
-                let mostRecentAcceptance = null;
-                if (Array.isArray(acceptances) && acceptances.length > 0) {
-                    mostRecentAcceptance = acceptances.reduce((latest, current) => {
-                        const latestTime = new Date(latest.time).getTime();
-                        const currentTime = new Date(current.time).getTime();
-                        return currentTime > latestTime ? current : latest;
-                    });
+                    const plantMedia = mediaAll.filter(
+                        m => Number(m.plant_id) === Number(aData.plant_id)
+                    );
+                    if (plantMedia.length > 0) {
+                        plantMedia.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
+                        images = plantMedia.map(m => resolveUrl(m.url)).filter(Boolean);
+                        imageUrl = images[0];
+                    }
                 }
 
-                // Timer reference: use acceptance time if exists, otherwise use auction start_time
-                const timerRef = mostRecentAcceptance?.time || a.start_time;
+                setPlantImages(
+                    images.length > 0
+                        ? images
+                        : ["https://via.placeholder.com/400x300?text=No+Image"]
+                );
+
 
                 const enriched = {
-                    auction_id: a.auction_id,
-                    plant_id: a.plant_id,
+                    auction_id: aData.auction_id,
+                    plant_id: aData.plant_id,
                     productname: plant?.productname || "Unknown Product",
                     imageUrl: imageUrl || "https://via.placeholder.com/400x300?text=No+Image",
                     supplierName: supplier?.name || supplier?.displayName || "Unknown Supplier",
@@ -120,53 +123,59 @@ export default function ActiveAuction() {
                     minPickup: lot?.min_pickup || 1,
                     startPrice: plant?.start_price || 0,
                     minPrice: plant?.min_price || plant?.start_price * 0.3 || 10,
-                    startTime: a.start_time,
-                    durationMinutes: a.duration_minutes
+
+                    effectiveStartTime,
+                    durationMinutes
                 };
-                
+
                 setAuction(enriched);
-                setTimerReference(timerRef);
                 setMinBuy(enriched.minPickup);
                 setUserAmount(enriched.minPickup);
                 setCurrentPrice(enriched.startPrice);
 
+                // Upcoming auctions (ongewijzigd)
                 const allAuctions = await fetchMaybe("/api/Auctions");
                 if (Array.isArray(allAuctions)) {
-                     const allPlants = await fetchMaybe("/api/Plants");
-                     const plantsMap = new Map();
-                     if(Array.isArray(allPlants)) allPlants.forEach(p => plantsMap.set(p.plant_id, p));
-                     
-                     const allMedia = await fetchMaybe("/api/MediaPlant");
-                     const mediaMap = new Map();
-                     if(Array.isArray(allMedia)) {
-                         allMedia.forEach(m => {
-                             if (!mediaMap.has(m.plant_id)) {
-                                 mediaMap.set(m.plant_id, []);
-                             }
-                             mediaMap.get(m.plant_id).push(m);
-                         });
-                     }
-                     
-                     const upcomingList = allAuctions
-                        .filter(x => x.status === 'upcoming' && String(x.auction_id) !== String(id))
+                    const allPlants = await fetchMaybe("/api/Plants");
+                    const plantsMap = new Map();
+                    if (Array.isArray(allPlants)) {
+                        allPlants.forEach(p => plantsMap.set(p.plant_id, p));
+                    }
+
+                    const allMedia = await fetchMaybe("/api/MediaPlant");
+                    const mediaMap = new Map();
+                    if (Array.isArray(allMedia)) {
+                        allMedia.forEach(m => {
+                            if (!mediaMap.has(m.plant_id)) {
+                                mediaMap.set(m.plant_id, []);
+                            }
+                            mediaMap.get(m.plant_id).push(m);
+                        });
+                    }
+
+                    const upcomingList = allAuctions
+                        .filter(x => x.status === "upcoming" && String(x.auction_id) !== String(id))
                         .slice(0, 10)
                         .map(x => {
                             const p = plantsMap.get(x.plant_id);
                             const plantMediaList = mediaMap.get(x.plant_id) || [];
-                            
-                            let imageUrl = null;
+
+                            let img = null;
                             if (plantMediaList.length > 0) {
-                                plantMediaList.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
-                                imageUrl = resolveUrl(plantMediaList[0].url);
+                                plantMediaList.sort(
+                                    (a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0)
+                                );
+                                img = resolveUrl(plantMediaList[0].url);
                             }
-                            
+
                             return {
                                 ...x,
                                 plantName: p?.productname || "Auction Product",
-                                imageUrl: imageUrl || "https://via.placeholder.com/400x300?text=No+Image"
+                                imageUrl: img || "https://via.placeholder.com/400x300?text=No+Image"
                             };
                         });
-                     setUpcoming(upcomingList);
+
+                    setUpcoming(upcomingList);
                 }
 
             } catch (e) {
@@ -175,6 +184,7 @@ export default function ActiveAuction() {
                 setLoading(false);
             }
         };
+
 
         load();
     }, [id]);
@@ -237,13 +247,14 @@ export default function ActiveAuction() {
                 throw new Error("Could not update quantity");
             }
 
-            setActiveLot(updatedLot);
-            setAuction(prev => ({ ...prev, contInLot: updatedLot.remaining_quantity }));
-            
-            // Update timer reference to the acceptance timestamp
-            setTimerReference(acceptanceTime);
-            
-            showNotification(`Purchased: ${userAmount} containers for €${currentPrice.toFixed(2)}`, "success");
+            // Show success notification and persist it
+            const successMessage = `Purchased: ${userAmount} containers for €${currentPrice.toFixed(2)}`;
+            showNotification(successMessage, "success", true);
+
+            // Reload page after 2 seconds to show notification and refresh data
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
 
         } catch (err) {
             console.error(err);
@@ -284,12 +295,23 @@ export default function ActiveAuction() {
     if (loading) return <div className="c-aa-loading">Loading...</div>;
     if (!auction) return <div className="c-aa-loading">Auction not found or invalid ID</div>;
 
-    // Calculate timer based on timerReference (either start_time or acceptance time)
+    // Duration in ms
     const durationMs = (auction.durationMinutes || 60) * 60 * 1000;
+
+    // Timer start time = effectiveStartTime from server
+    const timerStartTime = new Date(auction.effectiveStartTime);
     const now = new Date();
-    const timerStartTime = timerReference ? new Date(timerReference) : new Date(auction.startTime);
-    const hasStarted = now >= timerStartTime;
+    const elapsed = now - timerStartTime;
+    const remaining = Math.max(durationMs - elapsed, 0);
+    const hasStarted = elapsed >= 0;
     const timeUntilStart = hasStarted ? 0 : timerStartTime.getTime() - now.getTime();
+    const parsedStartTime = auction.effectiveStartTime
+        ? Date.parse(auction.effectiveStartTime)
+        : Date.now();
+
+    // Ensure parsedStartTime is valid; if NaN, use current time
+    const validStartTime = isNaN(parsedStartTime) ? Date.now() : parsedStartTime;
+
 
     // Single return statement
     return (
@@ -300,7 +322,9 @@ export default function ActiveAuction() {
                         {notification.type === 'success' ? '✓' : '✕'}
                     </span>
                     <span className="notification-message">{notification.message}</span>
-                    <button className="notification-close" onClick={() => setNotification(null)}>×</button>
+                    {!notificationPersist && (
+                        <button className="notification-close" onClick={() => setNotification(null)}>×</button>
+                    )}
                 </div>
             )}
 
@@ -500,20 +524,21 @@ export default function ActiveAuction() {
                     </div>
                 </div>
 
-                <div className="c-aa-clock-panel">
-                    {!hasStarted ? (
-                        <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                            Auction starts in {Math.ceil(timeUntilStart / 1000)} seconds
-                        </div>
-                    ) : (
+                    <div className="c-aa-clock-panel">
+        {!hasStarted ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                Auction starts in {Math.ceil(timeUntilStart / 1000)} seconds
+            </div>
+                     ) : (
                         <AuctionClock
                             startPrice={auction.startPrice}
                             minPrice={auction.minPrice}
                             durationMs={durationMs}
                             onPriceUpdate={(price) => setCurrentPrice(price)}
-                            timerReference={timerStartTime}
-                        />
+                            startTime={validStartTime}
+                         />
                     )}
+
                     
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
                         <div className="c-aa-info-box" style={{ display: 'inline-block', margin: '10px' }}>
