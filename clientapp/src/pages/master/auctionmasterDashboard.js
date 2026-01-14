@@ -4,6 +4,8 @@ import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE = process.env.REACT_APP_API_URL || '';
+
 export default function AuctionmasterDashboard() {
     const [logo, setLogo] = useState(null);
     const [buttonLogos, setButtonLogos] = useState([null, null, null, null]);
@@ -12,14 +14,14 @@ export default function AuctionmasterDashboard() {
     useEffect(() => {
         // Top logo (media id 1)
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
             .catch(() => { /* silent fallback */ });
     }, []);
@@ -29,15 +31,16 @@ export default function AuctionmasterDashboard() {
         const ids = [2, 3, 4, 5];
         Promise.all(
             ids.map(id =>
-                fetch(`/api/Media/${id}`)
+                fetch(`${API_BASE}/api/Media/${id}`)
                     .then(res => (res.ok ? res.json() : null))
                     .catch(() => null)
             )
         ).then(results => {
             const normalized = results.map(r => {
                 if (!r || !r.url) return null;
+                const normalizedUrl = r.url.startsWith('/') ? r.url : `/${r.url}`;
                 return {
-                    url: r.url.startsWith('/') ? r.url : `/${r.url}`,
+                    url: `${API_BASE}${normalizedUrl}`,
                     alt: r.alt_text ?? ''
                 };
             });

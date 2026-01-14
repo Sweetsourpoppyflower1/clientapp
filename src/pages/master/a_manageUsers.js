@@ -4,17 +4,6 @@ import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
-
-const fetchMaybe = async (url) => {
-    try {
-        const r = await fetch(url, { credentials: "same-origin" });
-        return r.ok ? r.json().catch(() => null) : null;
-    } catch {
-        return null;
-    }
-};
-
 export default function AManageUsers() {
     const [companies, setCompanies] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
@@ -85,7 +74,7 @@ export default function AManageUsers() {
 
         try {
             const token = localStorage.getItem("auth_token");
-            const res = await fetch(`${API_BASE}/api/Companies/${companyId}`, {
+            const res = await fetch(`/api/Companies/${companyId}`, {
                 method: "DELETE",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
@@ -112,7 +101,7 @@ export default function AManageUsers() {
 
         try {
             const token = localStorage.getItem("auth_token");
-            const res = await fetch(`${API_BASE}/api/Suppliers/${supplierId}`, {
+            const res = await fetch(`/api/Suppliers/${supplierId}`, {
                 method: "DELETE",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
@@ -131,7 +120,6 @@ export default function AManageUsers() {
 
     return (
         <div className="manage-users-page">
-            {/* Welcome section */}
             <section className="manage-users-welcome-section" role="region" aria-label="manage-users-banner">
                 <div className="manage-users-welcome-header">
                     <div className="manage-users-welcome-text">
@@ -143,11 +131,9 @@ export default function AManageUsers() {
                 </div>
             </section>
 
-            {/* Main content */}
             <main className="manage-users-main">
                 <div className="manage-users-container">
                     <div className="manage-users-tables-wrapper">
-                        {/* Companies Table */}
                         <div className="manage-users-table-section">
                             <div className="manage-users-section-header">
                                 <h2 className="manage-users-section-title">Companies</h2>
@@ -199,7 +185,6 @@ export default function AManageUsers() {
                             )}
                         </div>
 
-                        {/* Suppliers Table */}
                         <div className="manage-users-table-section">
                             <div className="manage-users-section-header">
                                 <h2 className="manage-users-section-title">Suppliers</h2>

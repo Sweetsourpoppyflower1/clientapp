@@ -116,6 +116,7 @@ function AuctionCard({ a }) {
                     <div>Stems/Bunch: <strong>{a.stemsPerBunch ?? a.stems_bunch ?? "—"}</strong></div>
                     <div>Min Stems: <strong>{a.minStems ?? a.min_stem ?? "—"}</strong></div>
                     <div>Maturity: <strong>{a.maturity ?? "—"}</strong></div>
+                    <div>Duration: <strong>{a.durationMinutes ?? a.duration_minutes ?? "—"} min</strong></div>
                 </div>
 
                 <div className="c-auctions-description-box">
@@ -161,16 +162,16 @@ export default function CAuctions() {
     useEffect(() => {
         // Top logo (media id 1)
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
-            .catch(() => { /* silent fallback */ });
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -178,7 +179,7 @@ export default function CAuctions() {
         const load = async () => {
             setLoading(true);
             try {
-                const auctions = await fetchArray("/api/auctions");
+                const auctions = await fetchArray(`${API_BASE}/api/auctions`);
                 if (!mounted || !auctions.length) {
                     if (mounted) { setActive([]); setUpcoming([]); }
                     return;
@@ -188,17 +189,17 @@ export default function CAuctions() {
                 const supplierIds = [...new Set(auctions.map((a) => a.supplier_id ?? a.supplierId ?? a.auctionmaster_id).filter(Boolean))];
 
                 // plants
-                let plants = (await fetchMaybe(`/api/Plants?ids=${plantIds.join(",")}`)) ?? (await fetchMaybe(`/api/Plants/batch?ids=${plantIds.join(",")}`));
+                let plants = (await fetchMaybe(`${API_BASE}/api/Plants?ids=${plantIds.join(",")}`)) ?? (await fetchMaybe(`${API_BASE}/api/Plants/batch?ids=${plantIds.join(",")}`));
                 if (!plants || (Array.isArray(plants) && plants.length === 0)) {
-                    const r = await Promise.all(plantIds.map((id) => fetchMaybe(`/api/Plants/${id}`)));
+                    const r = await Promise.all(plantIds.map((id) => fetchMaybe(`${API_BASE}/api/Plants/${id}`)));
                     plants = r.flat().filter(Boolean);
                 }
                 plants = plants?.flat?.() || [];
 
                 const plantsById = new Map(plants.map((p) => [Number(p?.plant_id ?? p?.id), p]).filter(Boolean));
 
-                // media (single endpoint, local filter)
-                const mediaPayload = await fetchMaybe("/api/MediaPlant");
+                // media 
+                const mediaPayload = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 const mediaByPlant = new Map();
                 if (Array.isArray(mediaPayload)) {
                     mediaPayload.filter(m => plantIds.includes(Number(m.plant_id))).forEach(m => {
@@ -213,9 +214,9 @@ export default function CAuctions() {
                 }
 
                 // suppliers
-                let suppliers = (await fetchMaybe(`/api/Suppliers?ids=${supplierIds.join(",")}`)) ?? null;
+                let suppliers = (await fetchMaybe(`${API_BASE}/api/Suppliers?ids=${supplierIds.join(",")}`)) ?? null;
                 if (!suppliers || (Array.isArray(suppliers) && suppliers.length === 0)) {
-                    const r = await Promise.all(supplierIds.map((id) => fetchMaybe(`/api/Suppliers/${id}`)));
+                    const r = await Promise.all(supplierIds.map((id) => fetchMaybe(`${API_BASE}/api/Suppliers/${id}`)));
                     suppliers = r.flat().filter(Boolean);
                 }
                 suppliers = suppliers?.flat?.() || [];
@@ -244,6 +245,7 @@ export default function CAuctions() {
                         description: plant?.desc ?? a.description,
                         startPrice: plant?.start_price ?? a.startPrice,
                         minPrice: plant?.min_price ?? a.minPrice,
+                        durationMinutes: a.duration_minutes ?? a.durationMinutes,
                         images: media && media.length ? media : (a.images ?? (plant ? [resolveUrl(plant.image ?? plant.url)].filter(Boolean) : [])),
                         supplierName: supplier?.name ?? supplier?.displayName ?? a.supplierName,
                     };
@@ -255,7 +257,7 @@ export default function CAuctions() {
                         // merge images and fill missing fields
                         const ex = mapByKey.get(key);
                         ex.images = Array.from(new Set([...(ex.images || []), ...(enriched.images || [])]));
-                        for (const f of ["plantName", "category", "form", "quality", "description", "startPrice", "minPrice", "supplierName", "startDate", "endDate"]) {
+                        for (const f of ["plantName", "category", "form", "quality", "description", "startPrice", "minPrice", "supplierName", "startDate", "durationMinutes"]) {
                             if ((ex[f] === undefined || ex[f] === null || ex[f] === "") && enriched[f] != null) ex[f] = enriched[f];
                         }
                     }

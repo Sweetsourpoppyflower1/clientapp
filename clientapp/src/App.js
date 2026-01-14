@@ -44,6 +44,7 @@ function App() {
                 <Route path="/aManageUsers" element={<AManageUsers />} />
                 <Route path="/ActiveAuction/:id" element={<ActiveAuction />} />
                 <Route path="/sEditPlant/:plantId" element={<SEditPlant />} />  {/* later nog aanpassen naar /naam ipv id */}
+                <Route path="/ActiveAuction/:id" element={<ActiveAuction />} />
                 <Route path="/cSeeInfoAuction/:id" element={<CSeeInfo />} />
             </Routes>
         </Router>

@@ -2,20 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/login_registerPages/registerOptionsStyle.css";
 
+const API_BASE = process.env.REACT_APP_API_URL || '';
+
 export default function RegisterOptions() {
     const navigate = useNavigate();
     const [logo, setLogo] = useState(null);
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
             .catch(() => { });
     }, []);
@@ -27,7 +29,7 @@ export default function RegisterOptions() {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="u-top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">Loadingï¿½</span>
                 )}
             </header>
 
