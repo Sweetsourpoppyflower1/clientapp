@@ -1,9 +1,10 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-const API_BASE = process.env.REACT_APP_API_URL || '';
 import '../../styles/supplierPages/s_addProductStyle.css';
 import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
+
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 export default function SAddProduct() {
   const navigate = useNavigate();

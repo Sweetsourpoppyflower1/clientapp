@@ -1,7 +1,8 @@
 ﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/registerStyle.css";
-const API_BASE = process.env.REACT_APP_API_URL || '';
 import * as IBAN from "iban";
+
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 export default function RegisterSupplier() {
     const [form, setForm] = useState({

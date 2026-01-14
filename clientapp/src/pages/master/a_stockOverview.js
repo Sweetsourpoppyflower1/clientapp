@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-const API_BASE = process.env.REACT_APP_API_URL || '';
 import "../../styles/masterPages/a_stockOverviewStyle.css";
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
+
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 export default function AStockOverview() {
     const [expandedIndex, setExpandedIndex] = useState(null);

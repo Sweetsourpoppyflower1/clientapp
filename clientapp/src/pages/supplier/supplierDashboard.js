@@ -1,9 +1,10 @@
 ﻿import React, { useEffect, useState } from 'react';
 import '../../styles/supplierPages/supplierDashboardStyle.css';
-const API_BASE = process.env.REACT_APP_API_URL || '';
 import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
+
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 export default function SupplierDashboard() {
     const [logo, setLogo] = useState(null);

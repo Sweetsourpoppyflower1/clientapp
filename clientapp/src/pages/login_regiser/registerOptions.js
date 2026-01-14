@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-const API_BASE = process.env.REACT_APP_API_URL || '';
 import { useNavigate } from "react-router-dom";
 import "../../styles/login_registerPages/registerOptionsStyle.css";
+
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 export default function RegisterOptions() {
     const navigate = useNavigate();
