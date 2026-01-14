@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import '../../styles/companyPages/c_myOrdersStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
+import { API_BASE } from "../../config/api";
 
 export default function CMyOrders() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function CMyOrders() {
   const [plantMediaMap, setPlantMediaMap] = useState({});
   const [loadingPlants, setLoadingPlants] = useState({});
 
-  const API_ENDPOINT = "/api/acceptances";
+  const API_ENDPOINT = `${API_BASE}/api/acceptances`;
 
   const normalizeUrl = (url) => {
     if (!url) return null;
@@ -30,7 +31,7 @@ export default function CMyOrders() {
   useEffect(() => {
     async function loadMediaPlants() {
       try {
-        const res = await fetch("/api/MediaPlant");
+        const res = await fetch(`${API_BASE}/api/MediaPlant`);
         if (res.ok) {
           const mediaList = await res.json();
           const mediaMap = {};
@@ -57,7 +58,7 @@ export default function CMyOrders() {
 
   useEffect(() => {
     const mediaId = 1;
-    fetch(`/api/Media/${mediaId}`)
+    fetch(`${API_BASE}/api/Media/${mediaId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch media');
         return res.json();
@@ -129,7 +130,7 @@ export default function CMyOrders() {
       setLoadingPlants(prev => ({ ...prev, [auctionId]: true }));
       try {
         const token = localStorage.getItem("auth_token");
-        const res = await fetch(`/api/Auctions/${auctionId}`, {
+        const res = await fetch(`${API_BASE}/api/Auctions/${auctionId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
 
@@ -139,7 +140,7 @@ export default function CMyOrders() {
 
           if (plantId) {
             // Fetch plant details
-            const plantRes = await fetch(`/api/Plants/${plantId}`, {
+            const plantRes = await fetch(`${API_BASE}/api/Plants/${plantId}`, {
               headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
 
