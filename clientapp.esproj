@@ -20,12 +20,12 @@
     <None Include="clientapp\public\assets\Chrysanthemum_71s58-f3rQL_AC_UF894%2C1000_QL80_.webp" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="clientapp\build\asset-manifest.json">
+    <None Update="build\asset-manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
-    <None Update="clientapp\build\manifest.json">
+    <None Update="build\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
