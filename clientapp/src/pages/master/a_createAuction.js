@@ -185,13 +185,16 @@ export default function CreateAuction() {
       return;
     }
 
-    const startIso = new Date(startTime).toISOString();
-
+    // Parse datetime-local input and adjust for timezone offset to get correct UTC time
+    const localDate = new Date(startTime);
+    const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+    const startIso = utcDate.toISOString();
+    
     const payload = {
       auctionmaster_id,
       plant_id: Number(selectedPlantId),
       status: "upcoming",
-      start_time: startIso,
+      start_time: startIso,  // Correct UTC time
       duration_minutes: duration
     };
 

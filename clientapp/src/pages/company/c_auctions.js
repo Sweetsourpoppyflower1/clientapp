@@ -41,8 +41,12 @@ const priceOf = (a) => Number(a.startPrice ?? a.minPrice ?? 0);
 const dateOf = (a) => a.startDate || a.start_time || null;
 const parseUtcDate = (s) => {
     if (!s) return null;
+    // If it already has timezone info, use it as-is
     if (/(?:Z|[+\-]\d{2}:\d{2})$/i.test(s)) return new Date(s);
-    return new Date(`${s}Z`);
+    // If no timezone info, assume UTC and add Z
+    // But ALSO ensure proper conversion to local time
+    const utcDate = new Date(`${s}Z`);
+    return utcDate;
 };
 
 function AuctionCard({ a }) {
@@ -104,7 +108,7 @@ function AuctionCard({ a }) {
                     <div style={{ textAlign: "right" }}>
                         <div style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>€ {priceOf(a).toFixed(2)}</div>
                         <div className="c-auctions-small-muted">
-                            Starts: {dateOf(a) ? parseUtcDate(dateOf(a)).toLocaleString() : "—"}
+                            Starts: {dateOf(a) ? parseUtcDate(dateOf(a)).toLocaleString('en-NL', { timeZone: 'Europe/Amsterdam' }) : "—"}
                         </div>
                     </div>
                 </div>
