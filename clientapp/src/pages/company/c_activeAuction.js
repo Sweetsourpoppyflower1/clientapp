@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../styles/companyPages/c_activeAuctionStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -53,6 +53,14 @@ export default function ActiveAuction() {
     };
 
     useEffect(() => {
+        // Clear old auction timer data from localStorage
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.startsWith('auction_timer_')) {
+                localStorage.removeItem(key);
+            }
+        });
+
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => res.ok ? res.json() : null)
@@ -132,7 +140,8 @@ export default function ActiveAuction() {
                     minPrice: plant?.min_price || plant?.start_price * 0.3 || 10,
 
                     effectiveStartTime,
-                    durationMinutes
+                    durationMinutes,
+                    start_time: aData.start_time  // ADD THIS LINE
                 };
 
                 setAuction(enriched);
@@ -217,12 +226,14 @@ export default function ActiveAuction() {
         }
         
         const acceptanceTime = new Date().toISOString();
+        const totalAmount = currentPrice * userAmount; // Calculate total
+        
         const acceptance = {
             auction_id: auction.auction_id,
             company_id: companyId,
             auction_lot_id: activeLot.auctionlot_id,
             tick_number: 0, 
-            accepted_price: currentPrice,
+            accepted_price: totalAmount, // Send total amount instead of single price
             accepted_quantity: userAmount,
             time: acceptanceTime
         };
@@ -254,14 +265,61 @@ export default function ActiveAuction() {
                 throw new Error("Could not update quantity");
             }
 
-            // Show success notification and persist it
-            const successMessage = `Purchased: ${userAmount} containers for €${currentPrice.toFixed(2)}`;
+            // Show success notification with total amount
+            const successMessage = `Purchased: ${userAmount} containers for €${totalAmount.toFixed(2)}`;
             showNotification(successMessage, "success", true);
 
-            // Reload page after 2 seconds to show notification and refresh data
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // Refetch fresh auction and lot data
+            setTimeout(async () => {
+                const freshData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
+                if (freshData) {
+                    // Update auction with fresh data
+                    const effectiveStartTime = freshData.effective_start_time;
+                    const updatedAuction = {
+                        ...auction,
+                        effectiveStartTime,
+                        start_time: freshData.start_time
+                    };
+                    setAuction(updatedAuction);
+                    setCurrentPrice(auction.startPrice);
+                }
+
+                // Refetch fresh lot data with updated remaining_quantity
+                const freshLots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
+                if (Array.isArray(freshLots)) {
+                    const freshLot = freshLots.find(l => Number(l.plant_id) === Number(auction.plant_id));
+                    if (freshLot) {
+                        setActiveLot(freshLot);
+                        // ALSO update the auction state's contInLot to reflect new quantity
+                        setAuction(prev => ({
+                            ...prev,
+                            contInLot: freshLot.remaining_quantity
+                        }));
+
+                        // Check if auction should end (no quantity left or below minimum)
+                        if (freshLot.remaining_quantity <= 0 || freshLot.remaining_quantity < minBuy) {
+                            // Update auction status to completed
+                            const completedAuction = {
+                                ...auction,
+                                status: "completed"
+                            };
+                            const resStatus = await fetch(`${API_BASE}/api/Auctions/${id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(completedAuction)
+                            });
+
+                            if (resStatus.ok) {
+                                showNotification("Auction completed!", "success", true);
+                                // Redirect to auctions page after 2 seconds
+                                setTimeout(() => {
+                                    navigate('/cAuctions');
+                                }, 2000);
+                            }
+                        }
+                    }
+                }
+            }, 500);
 
         } catch (err) {
             console.error(err);
@@ -309,6 +367,10 @@ export default function ActiveAuction() {
         setShowPriceHistory(false);
     };
 
+    const handlePriceUpdate = useCallback((price) => {
+        setCurrentPrice(price);
+    }, []);
+
     // Guard clauses FIRST
     if (loading) return <div className="c-aa-loading">Loading...</div>;
     if (!auction) return <div className="c-aa-loading">Auction not found or invalid ID</div>;
@@ -330,6 +392,19 @@ export default function ActiveAuction() {
     // Ensure parsedStartTime is valid; if NaN, use current time
     const validStartTime = isNaN(parsedStartTime) ? Date.now() : parsedStartTime;
 
+
+
+    // DEBUG
+    console.log('Auction Data:', {
+        auctionId: auction.auction_id,
+        effectiveStartTime: auction.effectiveStartTime,
+        durationMinutes: auction.durationMinutes,
+        parsedStartTime,
+        validStartTime,
+        hasStarted,
+        now: Date.now(),
+        elapsed
+    });
 
     // Single return statement
     return (
@@ -493,15 +568,15 @@ export default function ActiveAuction() {
                         </div>
                         
                         <div className="c-aa-input-row">
-                            <div className="c-aa-input-group">
-                                <label>Minimum to buy</label>
-                                <div className="c-aa-input-box">{minBuy}</div>
-                            </div>
-                            <div className="c-aa-input-group">
-                                <label>Your amount:</label>
-                                <div className="c-aa-input-box">{userAmount}</div>
-                            </div>
-                        </div>
+        <div className="c-aa-input-group">
+            <label>Minimum to buy</label>
+            <div className="c-aa-input-box">{minBuy}</div>
+        </div>
+        <div className="c-aa-input-group">
+            <label>Your amount:</label>
+            <div className="c-aa-input-box">{userAmount}</div>
+        </div>
+    </div>
                     </div>
                 </div>
 
@@ -514,9 +589,9 @@ export default function ActiveAuction() {
                         <AuctionClock
                             startPrice={auction.startPrice}
                             minPrice={auction.minPrice}
-                            durationMs={durationMs}
-                            onPriceUpdate={(price) => setCurrentPrice(price)}
-                            startTime={validStartTime}
+                            durationMs={durationMs}  // Always full duration, not adjusted
+                            onPriceUpdate={handlePriceUpdate}
+                            startTime={validStartTime}  // Effective start time (acceptance or original)
                          />
                     )}
 

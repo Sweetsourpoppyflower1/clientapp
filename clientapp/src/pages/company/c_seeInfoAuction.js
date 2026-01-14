@@ -38,7 +38,7 @@ export default function SeeInfoAuction() {
             .then(m => {
                 if(m) {
                     const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                    setLogo({ url: normalizedUrl, alt: m.alt_text });
+                    setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
                 }
             })
             .catch(() => {});
@@ -46,7 +46,7 @@ export default function SeeInfoAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const a = await fetchMaybe(`/api/Auctions/${id}`);
+                const a = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
                 if (!a) {
                     setAuction(null); 
                     setLoading(false);
@@ -302,7 +302,7 @@ export default function SeeInfoAuction() {
                                                     </table>
                                                 </div>
                                                 <div className="sia-history-avg">
-                                                    Avg Start Price: €{priceHistory.currentSupplierAverage?.toFixed(2)}
+                                                    Avg Start Price: â‚¬{priceHistory.currentSupplierAverage?.toFixed(2)}
                                                 </div>
                                             </>
                                         ) : (
@@ -333,14 +333,14 @@ export default function SeeInfoAuction() {
                                                                     <td className="sia-history-date">
                                                                         {new Date(entry.date).toLocaleString()}
                                                                     </td>
-                                                                    <td className="sia-history-price">€{(entry.price || 0).toFixed(2)}</td>
+                                                                    <td className="sia-history-price">â‚¬{(entry.price || 0).toFixed(2)}</td>
                                                                 </tr>
                                                             ))}
                                                         </tbody>
                                                     </table>
                                                 </div>
                                                 <div className="sia-history-avg">
-                                                    Avg Price (All): €{priceHistory.allSuppliersAverage?.toFixed(2)}
+                                                    Avg Price (All): â‚¬{priceHistory.allSuppliersAverage?.toFixed(2)}
                                                 </div>
                                             </>
                                         ) : (
