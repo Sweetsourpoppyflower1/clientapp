@@ -25,6 +25,8 @@ jobs:
 
       - name: npm install and build
         working-directory: ./clientapp
+        env:
+          CI: false
         run: |
           npm install
           npm run build
