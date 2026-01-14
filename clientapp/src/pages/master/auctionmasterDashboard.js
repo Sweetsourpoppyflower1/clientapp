@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import '../../styles/masterPages/auctionmasterDashboardStyle.css';
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -12,7 +13,7 @@ export default function AuctionmasterDashboard() {
     useEffect(() => {
         // Top logo (media id 1)
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
@@ -29,7 +30,7 @@ export default function AuctionmasterDashboard() {
         const ids = [2, 3, 4, 5];
         Promise.all(
             ids.map(id =>
-                fetch(`/api/Media/${id}`)
+                fetch(`${API_BASE}/api/Media/${id}`)
                     .then(res => (res.ok ? res.json() : null))
                     .catch(() => null)
             )

@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import '../../styles/supplierPages/supplierDashboardStyle.css';
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
@@ -118,7 +119,7 @@ export default function SupplierDashboard() {
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 };
 
-                const url = `/api/Suppliers/${encodeURIComponent(supplierId)}/plants`;
+                const url = `${API_BASE}/api/Suppliers/${encodeURIComponent(supplierId)}/plants`;
                 const response = await fetch(url, { headers, method: 'GET' });
 
                 if (response.status === 404) {

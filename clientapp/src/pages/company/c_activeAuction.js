@@ -47,7 +47,7 @@ export default function ActiveAuction() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => res.ok ? res.json() : null)
             .then(m => {
                 if(m) {
@@ -60,7 +60,7 @@ export default function ActiveAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const aData = await fetchMaybe(`/api/Auctions/${id}`);
+                const aData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
                 if (!aData) {
                     setAuction(null);
                     return;
@@ -70,14 +70,14 @@ export default function ActiveAuction() {
                 const effectiveStartTime = aData.effective_start_time;
                 const durationMinutes = aData.duration_minutes;
 
-                const plant = await fetchMaybe(`/api/Plants/${aData.plant_id}`);
+                const plant = await fetchMaybe(`${API_BASE}/api/Plants/${aData.plant_id}`);
 
                 let supplier = null;
                 if (plant?.supplier_id) {
-                    supplier = await fetchMaybe(`/api/Suppliers/${plant.supplier_id}`);
+                    supplier = await fetchMaybe(`${API_BASE}/api/Suppliers/${plant.supplier_id}`);
                 }
 
-                const lots = await fetchMaybe(`/api/AuctionLots`);
+                const lots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
                 const lot = Array.isArray(lots)
                     ? lots.find(l => Number(l.plant_id) === Number(aData.plant_id))
                     : null;
@@ -237,7 +237,7 @@ export default function ActiveAuction() {
                 remaining_quantity: activeLot.remaining_quantity - userAmount
             };
 
-            const resLot = await fetch(`/api/AuctionLots/${activeLot.auctionlot_id}`, {
+            const resLot = await fetch(`${API_BASE}/api/AuctionLots/${activeLot.auctionlot_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedLot)
@@ -270,10 +270,10 @@ export default function ActiveAuction() {
             const supplierId = auction.supplierId;
 
             // Fetch supplier-specific price history
-            const supplierHistory = await fetchMaybe(`/api/PriceHistory?plantId=${plantId}&supplierId=${supplierId}&limit=10`);
+            const supplierHistory = await fetchMaybe(`${API_BASE}/api/PriceHistory?plantId=${plantId}&supplierId=${supplierId}&limit=10`);
             
             // Fetch all suppliers price history for same plant
-            const allHistory = await fetchMaybe(`/api/PriceHistory?plantId=${plantId}&limit=10`);
+            const allHistory = await fetchMaybe(`${API_BASE}/api/PriceHistory?plantId=${plantId}&limit=10`);
 
             setPriceHistory({
                 supplier: Array.isArray(supplierHistory) ? supplierHistory : [],

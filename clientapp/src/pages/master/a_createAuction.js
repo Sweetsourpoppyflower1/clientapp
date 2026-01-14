@@ -53,7 +53,7 @@ export default function CreateAuction() {
 
   useEffect(() => {
     const mediaId = 1;
-    fetch(`/api/Media/${mediaId}`)
+    fetch(`${API_BASE}/api/Media/${mediaId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch media');
         return res.json();
@@ -228,7 +228,7 @@ export default function CreateAuction() {
         {logo ? (
           <img src={resolveMediaUrl(logo.url)} alt={logo.alt} className="top-logo" />
         ) : (
-          <span className="loading-label">Loading…</span>
+          <span className="loading-label">Loadingï¿½</span>
         )}
       </div>
 

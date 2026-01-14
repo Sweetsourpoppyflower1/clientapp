@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import "../../styles/masterPages/a_overviewUpcomingAuctionsStyle.css";
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -17,7 +18,7 @@ export default function AOverviewUpcomingAuctions() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
@@ -120,7 +121,7 @@ export default function AOverviewUpcomingAuctions() {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="u-top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">Loadingï¿½</span>
                 )}
             </div>
 

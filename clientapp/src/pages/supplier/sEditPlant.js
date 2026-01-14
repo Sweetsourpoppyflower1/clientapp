@@ -31,7 +31,7 @@ export default function SEditPlant() {
     // Fetch logo and plant data together
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => res.ok ? res.json() : null)
             .then(m => {
                 if(m) {
@@ -51,7 +51,7 @@ export default function SEditPlant() {
             setIsLoading(true);
             try {
                 // Fetch plant data
-                const plant = await fetchMaybe(`/api/Plants/${plantId}`);
+                const plant = await fetchMaybe(`${API_BASE}/api/Plants/${plantId}`);
                 
                 if (!plant) {
                     setError('Plant not found or access denied');
@@ -129,7 +129,7 @@ export default function SEditPlant() {
 
             console.log('Saving plant with data:', updatedPlant);
 
-            const response = await fetch(`/api/Plants/${plantData.plant_id}`, {
+            const response = await fetch(`${API_BASE}/api/Plants/${plantData.plant_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'same-origin',

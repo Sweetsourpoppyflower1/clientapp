@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import '../../styles/companyPages/companyDashboardStyle.css';
 import { useNavigate } from 'react-router-dom';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -12,7 +13,7 @@ export default function CompanyDashboard() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
@@ -28,7 +29,7 @@ export default function CompanyDashboard() {
         const ids = [2, 4];
         Promise.all(
             ids.map(id =>
-                fetch(`/api/Media/${id}`)
+                fetch(`${API_BASE}/api/Media/${id}`)
                     .then(res => (res.ok ? res.json() : null))
                     .catch(() => null)
             )

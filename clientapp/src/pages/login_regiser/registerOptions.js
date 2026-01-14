@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import { useNavigate } from "react-router-dom";
 import "../../styles/login_registerPages/registerOptionsStyle.css";
 
@@ -8,7 +9,7 @@ export default function RegisterOptions() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
@@ -27,7 +28,7 @@ export default function RegisterOptions() {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="u-top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">Loadingï¿½</span>
                 )}
             </header>
 

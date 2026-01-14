@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/registerStyle.css";
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import * as IBAN from "iban";
 
 export default function RegisterCompany() {
@@ -28,7 +29,7 @@ export default function RegisterCompany() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();

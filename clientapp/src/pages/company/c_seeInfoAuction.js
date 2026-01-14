@@ -28,7 +28,7 @@ export default function SeeInfoAuction() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => res.ok ? res.json() : null)
             .then(m => {
                 if(m) {
@@ -41,21 +41,21 @@ export default function SeeInfoAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const a = await fetchMaybe(`/api/Auctions/${id}`);
+                const a = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
                 if (!a) {
                     setAuction(null); 
                     setLoading(false);
                     return; 
                 }
 
-                const plant = await fetchMaybe(`/api/Plants/${a.plant_id}`);
+                const plant = await fetchMaybe(`${API_BASE}/api/Plants/${a.plant_id}`);
                 
                 let supplier = null;
                 if (plant && plant.supplier_id) {
-                     supplier = await fetchMaybe(`/api/Suppliers/${plant.supplier_id}`);
+                     supplier = await fetchMaybe(`${API_BASE}/api/Suppliers/${plant.supplier_id}`);
                 }
 
-                const lots = await fetchMaybe(`/api/AuctionLots`);
+                const lots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
                 let lot = null;
                 if (Array.isArray(lots)) {
                     lot = lots.find(l => Number(l.plant_id) === Number(a.plant_id)); 
@@ -113,7 +113,7 @@ export default function SeeInfoAuction() {
     const fetchPriceHistory = async (plantId) => {
         setLoadingHistory(true);
         try {
-            const history = await fetchMaybe(`/api/Plants/${plantId}/price-history`);
+            const history = await fetchMaybe(`${API_BASE}/api/Plants/${plantId}/price-history`);
             if (history) {
                 setPriceHistory(history);
             }

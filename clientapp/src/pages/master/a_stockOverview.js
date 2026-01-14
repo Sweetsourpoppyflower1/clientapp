@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const API_BASE = process.env.REACT_APP_API_URL || '';
 import "../../styles/masterPages/a_stockOverviewStyle.css";
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -35,7 +36,7 @@ export default function AStockOverview() {
 
         try {
             const token = localStorage.getItem("auth_token");
-            const res = await fetch(`/api/Plants/${plantId}`, {
+            const res = await fetch(`${API_BASE}/api/Plants/${plantId}`, {
                 method: "DELETE",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
@@ -72,7 +73,7 @@ export default function AStockOverview() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch media");
                 return res.json();
