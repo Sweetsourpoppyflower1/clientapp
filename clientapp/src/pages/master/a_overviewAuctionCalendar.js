@@ -46,7 +46,7 @@ const parseUtcDate = (s) => {
     return new Date(`${s}Z`);
 };
 
-function AuctionCard({ a, onDelete }) {
+function AuctionCard({ a, navigate,  onDelete }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [deleting, setDeleting] = useState(false);
 
@@ -60,6 +60,10 @@ function AuctionCard({ a, onDelete }) {
     const handleNextImage = (e) => {
         e.stopPropagation();
         setImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const handleGoToAuctionLog = () => {
+        navigate(`/a_auctionLog/${a.auction_id || a.id}`);
     };
 
     const handleDeleteAuction = async () => {
@@ -147,7 +151,7 @@ function AuctionCard({ a, onDelete }) {
                 </div>
 
                 <div style={{ display: "flex", gap: 12 }}>
-                    <button className="c-auctions-cta-wide" style={{ flex: 1 }}>
+                    <button onClick={handleGoToAuctionLog} className="c-auctions-cta-wide" style={{ flex: 1 }}>
                         Go to auction
                     </button>
                     <button 
@@ -379,7 +383,7 @@ export default function AAuctions() {
 
             <div>
                 <div className="c-auctions-section-title"><strong>Active Auctions</strong></div>
-                {loading ? <div>Loading...</div> : active.length ? <div className="c-auctions-carousel">{active.map(a => <AuctionCard key={getId(a)} a={a} onDelete={handleDeleteAuction} />)}</div> : <div className="c-auctions-carousel-card c-auctions-carousel-card--empty">No active auctions</div>}
+                {loading ? <div>Loading...</div> : active.length ? <div className="c-auctions-carousel">{active.map(a => <AuctionCard key={getId(a)} a={a} navigate={navigate} onDelete={handleDeleteAuction} />)}</div> : <div className="c-auctions-carousel-card c-auctions-carousel-card--empty">No active auctions</div>}
             </div>
 
             <div style={{ height: 18 }} />
@@ -457,10 +461,10 @@ export default function AAuctions() {
                     </div>
 
                     <div className="c-auctions-upcoming-list">
-                        {loading ? <div>Loading upcoming auctions...</div> : pageItems.length ? pageItems.map(a => <AuctionCard key={getId(a)} a={a} onDelete={handleDeleteAuction} />) : <div>No upcoming auctions matching your filters.</div>}
+                        {loading ? <div>Loading upcoming auctions...</div> : pageItems.length ? pageItems.map(a => <AuctionCard key={getId(a)} a={a} navigate={navigate} onDelete={handleDeleteAuction} />) : <div>No upcoming auctions matching your filters.</div>}
 
                         <div className="c-auctions-pager">
-                            <button onClick={() => setPage(1)} disabled={page === 1} className="c-auctions-btn c-auctions-pager-btn" title="First page">⟨⟨</button>
+                            <button onClick={() => setPage(1)} disabled={page === 1} className="c-auctions-btn c-auctions-pager-btn" title="First page">⟨⟩</button>
                             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="c-auctions-btn c-auctions-pager-btn" title="Previous page">‹</button>
                             <div style={{ margin: "0 12px", fontWeight: 600 }}>{page} / {totalPages}</div>
                             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="c-auctions-btn c-auctions-pager-btn" title="Next page">›</button>
