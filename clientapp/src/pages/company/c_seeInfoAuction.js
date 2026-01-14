@@ -41,7 +41,6 @@ export default function SeeInfoAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const a = await fetchMaybe(`/api/Auctions/${id}`);
                 const a = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
                 if (!a) {
                     setAuction(null); 
