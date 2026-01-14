@@ -34,7 +34,14 @@ export default function ActiveAuction() {
     const [timerReference, setTimerReference] = useState(null);
     const [durationMinutes, setDurationMinutes] = useState(60);
     const [showPriceHistory, setShowPriceHistory] = useState(false);
-    const [priceHistory, setPriceHistory] = useState({ supplier: [], allSuppliers: [] });
+    const [priceHistory, setPriceHistory] = useState({
+        plantName: null,
+        currentSupplierName: null,
+        currentSupplierHistory: [],
+        currentSupplierAverage: 0,
+        allSuppliersHistory: [],
+        allSuppliersAverage: 0
+    });
     const [priceHistoryLoading, setPriceHistoryLoading] = useState(false);
 
     const showNotification = (message, type = 'success', persist = false) => {
@@ -267,21 +274,32 @@ export default function ActiveAuction() {
         setPriceHistoryLoading(true);
         try {
             const plantId = auction.plant_id;
-            const supplierId = auction.supplierId;
 
-            // Fetch supplier-specific price history
-            const supplierHistory = await fetchMaybe(`${API_BASE}/api/PriceHistory?plantId=${plantId}&supplierId=${supplierId}&limit=10`);
+            // Use the existing endpoint that returns PlantPriceHistory data
+            const response = await fetchMaybe(
+                `${API_BASE}/api/PriceHistory/plant/${plantId}`
+            );
             
-            // Fetch all suppliers price history for same plant
-            const allHistory = await fetchMaybe(`${API_BASE}/api/PriceHistory?plantId=${plantId}&limit=10`);
-
-            setPriceHistory({
-                supplier: Array.isArray(supplierHistory) ? supplierHistory : [],
-                allSuppliers: Array.isArray(allHistory) ? allHistory : []
-            });
+            if (response) {
+                setPriceHistory({
+                    plantName: auction.productname,
+                    currentSupplierName: auction.supplierName,
+                    currentSupplierHistory: response.currentSupplierHistory || [],
+                    currentSupplierAverage: response.currentSupplierAverage || 0,
+                    allSuppliersHistory: response.allSuppliersHistory || [],
+                    allSuppliersAverage: response.allSuppliersAverage || 0
+                });
+            }
         } catch (e) {
             console.error("Failed to load price history", e);
-            setPriceHistory({ supplier: [], allSuppliers: [] });
+            setPriceHistory({
+                plantName: auction.productname,
+                currentSupplierName: auction.supplierName,
+                currentSupplierHistory: [],
+                currentSupplierAverage: 0,
+                allSuppliersHistory: [],
+                allSuppliersAverage: 0
+            });
         } finally {
             setPriceHistoryLoading(false);
         }
@@ -330,135 +348,98 @@ export default function ActiveAuction() {
 
             {/* Price History Modal */}
             {showPriceHistory && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        padding: '30px',
-                        maxWidth: '900px',
-                        maxHeight: '80vh',
-                        overflow: 'auto',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                        position: 'relative'
-                    }}>
+                <div className="c-aa-price-history-modal">
+                    <div className="c-aa-price-history-modal-content">
                         <button
                             onClick={closePriceHistory}
-                            style={{
-                                position: 'absolute',
-                                top: '15px',
-                                right: '15px',
-                                background: 'none',
-                                border: 'none',
-                                fontSize: '28px',
-                                cursor: 'pointer',
-                                color: '#666'
-                            }}
+                            className="c-aa-price-history-close"
                         >
                             ×
                         </button>
 
-                        <h2 style={{ marginTop: 0, marginBottom: '20px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
-                            Price History
+                        <h2 className="c-aa-price-history-title">
+                            Price History - {priceHistory.plantName}
                         </h2>
 
                         {priceHistoryLoading ? (
-                            <div style={{ textAlign: 'center', padding: '20px' }}>Loading price history...</div>
+                            <div className="c-aa-price-history-loading">Loading price history...</div>
                         ) : (
-                            <div style={{ display: 'flex', gap: '30px' }}>
-                                {/* Supplier Specific History */}
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{ marginTop: 0, fontSize: '14px', fontWeight: '600', textTransform: 'uppercase', color: '#666' }}>
-                                        {auction.supplierName.toUpperCase()} (Last 10)
+                            <div className="c-aa-price-history-tables">
+                                {/* Current Supplier Price Changes */}
+                                <div className="c-aa-price-history-table-section">
+                                    <h3 className="c-aa-price-history-table-title">
+                                        {priceHistory.currentSupplierName?.toUpperCase()} (LAST 10 CHANGES)
                                     </h3>
-                                    <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                                        <thead>
-                                            <tr style={{ borderBottom: '1px solid #ddd' }}>
-                                                <th style={{ textAlign: 'left', padding: '8px 0', fontWeight: '600' }}>Date</th>
-                                                <th style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>Old Price</th>
-                                                <th style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>New Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {priceHistory.supplier.length > 0 ? (
-                                                priceHistory.supplier.map((item, idx) => (
-                                                    <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                                        <td style={{ padding: '8px 0' }}>
-                                                            {item.date ? new Date(item.date).toLocaleDateString() : '-'}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '8px 0' }}>
-                                                            €{item.old_price?.toFixed(2) || '-'}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>
-                                                            €{item.new_price?.toFixed(2) || '-'}
-                                                        </td>
+                                    {priceHistory.currentSupplierHistory.length > 0 ? (
+                                        <>
+                                            <table className="c-aa-price-history-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date Changed</th>
+                                                        <th>Old Min Price</th>
+                                                        <th>New Min Price</th>
+                                                        <th>Old Start Price</th>
+                                                        <th>New Start Price</th>
                                                     </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="3" style={{ padding: '16px', textAlign: 'center', color: '#999' }}>
-                                                        No price history available
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                    {priceHistory.supplier.length > 0 && (
-                                        <div style={{ marginTop: '12px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', fontSize: '12px', textAlign: 'center' }}>
-                                            Avg: €{(priceHistory.supplier.reduce((sum, item) => sum + (item.new_price || 0), 0) / priceHistory.supplier.length).toFixed(2)}
-                                        </div>
+                                                </thead>
+                                                <tbody>
+                                                    {priceHistory.currentSupplierHistory.map((entry, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>{new Date(entry.changed_at).toLocaleDateString()}</td>
+                                                            <td>€{entry.old_min_price?.toFixed(2)}</td>
+                                                            <td className="c-aa-price-history-price">
+                                                                €{entry.new_min_price?.toFixed(2)}
+                                                            </td>
+                                                            <td>€{entry.old_start_price?.toFixed(2)}</td>
+                                                            <td className="c-aa-price-history-price">
+                                                                €{entry.new_start_price?.toFixed(2)}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div className="c-aa-price-history-avg">
+                                                Average Start Price: €{priceHistory.currentSupplierAverage?.toFixed(2)}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="c-aa-price-history-loading">No price history available</div>
                                     )}
                                 </div>
 
-                                {/* All Suppliers History */}
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{ marginTop: 0, fontSize: '14px', fontWeight: '600', textTransform: 'uppercase', color: '#666' }}>
-                                        All Suppliers (Last 10)
+                                {/* All Suppliers Price History */}
+                                <div className="c-aa-price-history-table-section">
+                                    <h3 className="c-aa-price-history-table-title">
+                                        ALL SUPPLIERS (LAST 10)
                                     </h3>
-                                    <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                                        <thead>
-                                            <tr style={{ borderBottom: '1px solid #ddd' }}>
-                                                <th style={{ textAlign: 'left', padding: '8px 0', fontWeight: '600' }}>Product</th>
-                                                <th style={{ textAlign: 'left', padding: '8px 0', fontWeight: '600' }}>Date</th>
-                                                <th style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {priceHistory.allSuppliers.length > 0 ? (
-                                                priceHistory.allSuppliers.map((item, idx) => (
-                                                    <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                                        <td style={{ padding: '8px 0' }}>{item.product_name || '-'}</td>
-                                                        <td style={{ padding: '8px 0' }}>
-                                                            {item.date ? new Date(item.date).toLocaleDateString() : '-'}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>
-                                                            €{item.price?.toFixed(2) || '-'}
-                                                        </td>
+                                    {priceHistory.allSuppliersHistory.length > 0 ? (
+                                        <>
+                                            <table className="c-aa-price-history-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Supplier</th>
+                                                        <th>Date Changed</th>
+                                                        <th>Price</th>
                                                     </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="3" style={{ padding: '16px', textAlign: 'center', color: '#999' }}>
-                                                        No price history available
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                    {priceHistory.allSuppliers.length > 0 && (
-                                        <div style={{ marginTop: '12px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', fontSize: '12px', textAlign: 'center' }}>
-                                            Avg: €{(priceHistory.allSuppliers.reduce((sum, item) => sum + (item.price || 0), 0) / priceHistory.allSuppliers.length).toFixed(2)}
-                                        </div>
+                                                </thead>
+                                                <tbody>
+                                                    {priceHistory.allSuppliersHistory.map((entry, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>{entry.supplierName}</td>
+                                                            <td>{new Date(entry.date).toLocaleDateString()}</td>
+                                                            <td className="c-aa-price-history-price">
+                                                                €{entry.price?.toFixed(2)}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div className="c-aa-price-history-avg">
+                                                Average Price (All): €{priceHistory.allSuppliersAverage?.toFixed(2)}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="c-aa-price-history-loading">No price history available</div>
                                     )}
                                 </div>
                             </div>
