@@ -19,6 +19,7 @@ import AOverviewAcceptances from "./pages/master/a_overviewAcceptances.js";
 import AManageUsers from "./pages/master/a_manageUsers.js";
 import SEditPlant from "./pages/supplier/sEditPlant.js";
 import CSeeInfo from "./pages/company/c_seeInfoAuction.js";
+import AAuctionLog from "./pages/master/a_auctionLog.js";
 
 function App() {
     return (
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/sEditPlant/:plantId" element={<SEditPlant />} />  {/* later nog aanpassen naar /naam ipv id */}
                 <Route path="/ActiveAuction/:id" element={<ActiveAuction />} />
                 <Route path="/cSeeInfoAuction/:id" element={<CSeeInfo />} />
+                <Route path="/a_auctionLog/:id" element={<AAuctionLog />} />
             </Routes>
         </Router>
     );
