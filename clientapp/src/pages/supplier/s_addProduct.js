@@ -61,7 +61,7 @@ export default function SAddProduct() {
       })
       .then(m => {
         const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-        setLogo({ url: normalizedUrl, alt: m.alt_text || m.altText || '' });
+        setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text || m.altText || '' });
       })
       .catch(() => { /* silent fallback */ });
   }, []);

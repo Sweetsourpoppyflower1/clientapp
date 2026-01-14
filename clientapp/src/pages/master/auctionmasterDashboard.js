@@ -21,7 +21,7 @@ export default function AuctionmasterDashboard() {
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
             .catch(() => { /* silent fallback */ });
     }, []);
@@ -38,8 +38,9 @@ export default function AuctionmasterDashboard() {
         ).then(results => {
             const normalized = results.map(r => {
                 if (!r || !r.url) return null;
+                const normalizedUrl = r.url.startsWith('/') ? r.url : `/${r.url}`;
                 return {
-                    url: r.url.startsWith('/') ? r.url : `/${r.url}`,
+                    url: `${API_BASE}${normalizedUrl}`,
                     alt: r.alt_text ?? ''
                 };
             });

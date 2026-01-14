@@ -52,7 +52,7 @@ export default function ActiveAuction() {
             .then(m => {
                 if(m) {
                     const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                    setLogo({ url: normalizedUrl, alt: m.alt_text });
+                    setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
                 }
             })
             .catch(() => {});
