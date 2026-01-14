@@ -23,7 +23,12 @@ export default function SeeInfoAuction() {
     const [loading, setLoading] = useState(true);
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [priceHistory, setPriceHistory] = useState([]);
+    const [priceHistory, setPriceHistory] = useState({
+        currentSupplierHistory: [],
+        currentSupplierAverage: 0,
+        allSuppliersHistory: [],
+        allSuppliersAverage: 0
+    });
     const [loadingHistory, setLoadingHistory] = useState(false);
 
     useEffect(() => {
@@ -41,7 +46,7 @@ export default function SeeInfoAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const a = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
+                const a = await fetchMaybe(`/api/Auctions/${id}`);
                 if (!a) {
                     setAuction(null); 
                     setLoading(false);
@@ -81,6 +86,7 @@ export default function SeeInfoAuction() {
                     description: plant?.desc || "No description available",
                     imageUrl: imageUrl || "https://via.placeholder.com/400x300?text=No+Image",
                     supplierName: supplier?.name || supplier?.displayName || "Unknown Supplier",
+                    supplierId: plant?.supplier_id,
                     supplierEmail: supplier?.email || "-",
                     supplierPhone: supplier?.phone || supplier?.phoneNumber || "-",
                     form: plant?.form || "-",
@@ -98,7 +104,7 @@ export default function SeeInfoAuction() {
                 setAuction(enriched);
 
                 // Fetch price history
-                await fetchPriceHistory(plant.plant_id);
+                await fetchPriceHistory(plant.plant_id, plant?.supplier_id);
 
             } catch (e) {
                 console.error("Failed to load auction", e);
@@ -110,12 +116,17 @@ export default function SeeInfoAuction() {
         load();
     }, [id]);
 
-    const fetchPriceHistory = async (plantId) => {
+    const fetchPriceHistory = async (plantId, supplierId) => {
         setLoadingHistory(true);
         try {
-            const history = await fetchMaybe(`${API_BASE}/api/Plants/${plantId}/price-history`);
+            const history = await fetchMaybe(`${API_BASE}/api/PriceHistory/plant/${plantId}`);
             if (history) {
-                setPriceHistory(history);
+                setPriceHistory({
+                    currentSupplierHistory: history.currentSupplierHistory || [],
+                    currentSupplierAverage: history.currentSupplierAverage || 0,
+                    allSuppliersHistory: history.allSuppliersHistory || [],
+                    allSuppliersAverage: history.allSuppliersAverage || 0
+                });
             }
         } catch (e) {
             console.error("Failed to load price history", e);
@@ -250,41 +261,96 @@ export default function SeeInfoAuction() {
                     </div>
 
                     {/* Price History Section - Right Side */}
-                    {priceHistory.length > 0 && (
+                    {priceHistory.currentSupplierHistory.length > 0 || priceHistory.allSuppliersHistory.length > 0 ? (
                         <div className="sia-price-history-card">
                             <h2 className="sia-history-title">Price History</h2>
                             {loadingHistory ? (
                                 <div className="sia-history-loading">Loading price history...</div>
                             ) : (
-                                <div className="sia-history-table-wrapper">
-                                    <table className="sia-history-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Changed Date</th>
-                                                <th>Old Min Price</th>
-                                                <th>New Min Price</th>
-                                                <th>Old Start Price</th>
-                                                <th>New Start Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {priceHistory.map((entry, idx) => (
-                                                <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
-                                                    <td className="sia-history-date">
-                                                        {new Date(entry.changed_at).toLocaleString()}
-                                                    </td>
-                                                    <td className="sia-history-price">{(entry.old_min_price || 0).toFixed(2)}</td>
-                                                    <td className="sia-history-price">{(entry.new_min_price || 0).toFixed(2)}</td>
-                                                    <td className="sia-history-price">{(entry.old_start_price || 0).toFixed(2)}</td>
-                                                    <td className="sia-history-price">{(entry.new_start_price || 0).toFixed(2)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                <div className="sia-price-history-tables">
+                                    {/* Current Supplier History */}
+                                    <div className="sia-price-history-section">
+                                        <h3 className="sia-history-section-title">
+                                            {auction.supplierName.toUpperCase()} (LAST 10 CHANGES)
+                                        </h3>
+                                        {priceHistory.currentSupplierHistory.length > 0 ? (
+                                            <>
+                                                <div className="sia-history-table-wrapper">
+                                                    <table className="sia-history-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date Changed</th>
+                                                                <th>Old Min Price</th>
+                                                                <th>New Min Price</th>
+                                                                <th>Old Start Price</th>
+                                                                <th>New Start Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {priceHistory.currentSupplierHistory.map((entry, idx) => (
+                                                                <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
+                                                                    <td className="sia-history-date">
+                                                                        {new Date(entry.changed_at).toLocaleString()}
+                                                                    </td>
+                                                                    <td className="sia-history-price">{(entry.old_min_price || 0).toFixed(2)}</td>
+                                                                    <td className="sia-history-price">{(entry.new_min_price || 0).toFixed(2)}</td>
+                                                                    <td className="sia-history-price">{(entry.old_start_price || 0).toFixed(2)}</td>
+                                                                    <td className="sia-history-price">{(entry.new_start_price || 0).toFixed(2)}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="sia-history-avg">
+                                                    Avg Start Price: €{priceHistory.currentSupplierAverage?.toFixed(2)}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="sia-history-loading">No price history available</div>
+                                        )}
+                                    </div>
+
+                                    {/* All Suppliers History */}
+                                    <div className="sia-price-history-section">
+                                        <h3 className="sia-history-section-title">
+                                            ALL SUPPLIERS (LAST 10)
+                                        </h3>
+                                        {priceHistory.allSuppliersHistory.length > 0 ? (
+                                            <>
+                                                <div className="sia-history-table-wrapper">
+                                                    <table className="sia-history-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Supplier</th>
+                                                                <th>Date Changed</th>
+                                                                <th>Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {priceHistory.allSuppliersHistory.map((entry, idx) => (
+                                                                <tr key={idx} className={idx % 2 === 0 ? 'sia-history-row-even' : 'sia-history-row-odd'}>
+                                                                    <td>{entry.supplierName}</td>
+                                                                    <td className="sia-history-date">
+                                                                        {new Date(entry.date).toLocaleString()}
+                                                                    </td>
+                                                                    <td className="sia-history-price">€{(entry.price || 0).toFixed(2)}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="sia-history-avg">
+                                                    Avg Price (All): €{priceHistory.allSuppliersAverage?.toFixed(2)}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="sia-history-loading">No price history available</div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    )}
+                    ) : null}
                 </div>
             </main>
 

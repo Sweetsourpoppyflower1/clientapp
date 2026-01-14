@@ -62,11 +62,11 @@ html, body, #root {
 /* Wrapper for side-by-side layout */
 .sia-wrapper {
     width: 100%;
-    max-width: 1400px;
+    max-width: 1600px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    align-items: start;
+    grid-template-columns: 500px 1fr;
+    gap: 32px;
+    align-items: stretch;
 }
 
 /* Info Card */
@@ -77,6 +77,9 @@ html, body, #root {
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 /* Header */
@@ -316,20 +319,134 @@ html, body, #root {
     width: 100%;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: visible;
     border-left: 4px solid var(--primary-pink);
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .sia-history-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     margin: 0;
-    padding: 24px 24px 16px 24px;
+    padding: 28px 28px 20px 28px;
     color: #222;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 3px solid var(--primary-pink);
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+}
+
+.sia-price-history-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 28px;
+    flex: 1;
+    align-items: stretch;
+    width: 100%;
+    overflow: visible;
+}
+
+.sia-price-history-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    min-height: 320px;
+    overflow: visible;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.sia-history-section-title {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #333;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--primary-pink);
+    padding-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.sia-history-table-wrapper {
+    overflow-x: auto;
+    flex: 1;
+    border-radius: 6px;
+}
+
+.sia-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.sia-history-table thead {
+    background-color: #f0f0f0;
+    position: sticky;
+    top: 0;
+}
+
+.sia-history-table th {
+    padding: 14px 10px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.sia-history-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #555;
+}
+
+.sia-history-row-even {
+    background-color: #ffffff;
+}
+
+.sia-history-row-odd {
+    background-color: #fafafa;
+}
+
+.sia-history-row-even:hover,
+.sia-history-row-odd:hover {
+    background-color: #f0f8ff;
+}
+
+.sia-history-date {
+    font-weight: 500;
+    color: #333;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.sia-history-price {
+    font-weight: 700;
+    color: var(--primary-pink);
+    font-size: 13px;
+}
+
+.sia-history-avg {
+    margin-top: auto;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(90, 120, 107, 0.06) 0%, rgba(179, 86, 120, 0.06) 100%);
+    border-left: 3px solid var(--primary-teal);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    flex-shrink: 0;
+    letter-spacing: 0.2px;
 }
 
 .sia-history-loading {
@@ -337,72 +454,6 @@ html, body, #root {
     text-align: center;
     color: #999;
     font-size: 14px;
-}
-
-.sia-history-table-wrapper {
-    overflow-x: auto;
-    flex: 1;
-}
-
-.sia-history-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.sia-history-table thead {
-    background-color: #f9f9f9;
-}
-
-.sia-history-table th {
-    padding: 12px 10px;
-    text-align: left;
-    font-weight: 700;
-    color: #222;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    font-size: 11px;
-    border-bottom: 2px solid #e0e0e0;
-    white-space: nowrap;
-}
-
-.sia-history-table td {
-    padding: 10px;
-    border-bottom: 1px solid #f0f0f0;
-    color: #555;
-}
-
-.sia-history-row-even {
-    background-color: #fafafa;
-}
-
-.sia-history-row-odd {
-    background-color: white;
-}
-
-.sia-history-row-even:hover,
-.sia-history-row-odd:hover {
-    background-color: #f5f5f5;
-}
-
-.sia-history-date {
-    font-weight: 500;
-    color: #222;
-    font-size: 12px;
-    white-space: nowrap;
-}
-
-.sia-history-price {
-    font-weight: 600;
-    color: var(--primary-pink);
-}
-
-/* Loading */
-.sia-loading {
-    padding: 40px 20px;
-    text-align: center;
-    font-size: 16px;
-    color: #666;
     flex: 1;
     display: flex;
     align-items: center;
@@ -413,6 +464,17 @@ html, body, #root {
 @media (max-width: 1024px) {
     .sia-wrapper {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .sia-info-card,
+    .sia-price-history-card {
+        height: auto;
+    }
+
+    .sia-price-history-tables {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 }
 
@@ -465,6 +527,24 @@ html, body, #root {
     .sia-history-table td {
         padding: 8px 6px;
     }
+
+    .sia-history-title {
+        font-size: 18px;
+        padding: 16px 16px 12px 16px;
+    }
+
+    .sia-price-history-tables {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .sia-history-section-title {
+        font-size: 12px;
+    }
+
+    .sia-price-history-section {
+        min-height: 280px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -501,5 +581,9 @@ html, body, #root {
     .sia-history-table th,
     .sia-history-table td {
         padding: 6px 4px;
+    }
+
+    .sia-price-history-tables {
+        grid-template-columns: 1fr;
     }
 }
