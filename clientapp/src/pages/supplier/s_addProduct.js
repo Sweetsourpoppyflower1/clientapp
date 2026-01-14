@@ -4,6 +4,8 @@ import '../../styles/supplierPages/s_addProductStyle.css';
 import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 
+const API_BASE = process.env.REACT_APP_API_URL || '';
+
 export default function SAddProduct() {
   const navigate = useNavigate();
 
@@ -52,14 +54,14 @@ export default function SAddProduct() {
 
   useEffect(() => {
     const mediaId = 1;
-    fetch(`/api/Media/${mediaId}`)
+    fetch(`${API_BASE}/api/Media/${mediaId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch media');
         return res.json();
       })
       .then(m => {
         const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-        setLogo({ url: normalizedUrl, alt: m.alt_text || m.altText || '' });
+        setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text || m.altText || '' });
       })
       .catch(() => { /* silent fallback */ });
   }, []);

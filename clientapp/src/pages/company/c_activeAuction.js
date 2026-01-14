@@ -30,24 +30,36 @@ export default function ActiveAuction() {
     const [plantImages, setPlantImages] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [notification, setNotification] = useState(null);
+    const [notificationPersist, setNotificationPersist] = useState(false);
     const [timerReference, setTimerReference] = useState(null);
+    const [durationMinutes, setDurationMinutes] = useState(60);
     const [showPriceHistory, setShowPriceHistory] = useState(false);
-    const [priceHistory, setPriceHistory] = useState({ supplier: [], allSuppliers: [] });
+    const [priceHistory, setPriceHistory] = useState({
+        plantName: null,
+        currentSupplierName: null,
+        currentSupplierHistory: [],
+        currentSupplierAverage: 0,
+        allSuppliersHistory: [],
+        allSuppliersAverage: 0
+    });
     const [priceHistoryLoading, setPriceHistoryLoading] = useState(false);
 
-    const showNotification = (message, type = 'success') => {
+    const showNotification = (message, type = 'success', persist = false) => {
         setNotification({ message, type });
-        setTimeout(() => setNotification(null), 4000);
+        setNotificationPersist(persist);
+        if (!persist) {
+            setTimeout(() => setNotification(null), 4000);
+        }
     };
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => res.ok ? res.json() : null)
             .then(m => {
                 if(m) {
                     const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                    setLogo({ url: normalizedUrl, alt: m.alt_text });
+                    setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
                 }
             })
             .catch(() => {});
@@ -55,57 +67,55 @@ export default function ActiveAuction() {
         const load = async () => {
             setLoading(true);
             try {
-                const a = await fetchMaybe(`/api/Auctions/${id}`);
-                if (!a) {
-                    setAuction(null); 
-                    setLoading(false);
-                    return; 
+                const aData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
+                if (!aData) {
+                    setAuction(null);
+                    return;
                 }
 
-                const plant = await fetchMaybe(`/api/Plants/${a.plant_id}`);
-                
+                // 🔑 SERVER is source of truth
+                const effectiveStartTime = aData.effective_start_time;
+                const durationMinutes = aData.duration_minutes;
+
+                const plant = await fetchMaybe(`${API_BASE}/api/Plants/${aData.plant_id}`);
+
                 let supplier = null;
-                if (plant && plant.supplier_id) {
-                     supplier = await fetchMaybe(`/api/Suppliers/${plant.supplier_id}`);
+                if (plant?.supplier_id) {
+                    supplier = await fetchMaybe(`${API_BASE}/api/Suppliers/${plant.supplier_id}`);
                 }
 
-                const lots = await fetchMaybe(`/api/AuctionLots`);
-                let lot = null;
-                if (Array.isArray(lots)) {
-                    lot = lots.find(l => Number(l.plant_id) === Number(a.plant_id)); 
-                }
+                const lots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
+                const lot = Array.isArray(lots)
+                    ? lots.find(l => Number(l.plant_id) === Number(aData.plant_id))
+                    : null;
+
                 setActiveLot(lot);
 
-                const mediaAll = await fetchMaybe("/api/MediaPlant");
+                const mediaAll = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 let images = [];
                 let imageUrl = null;
+
                 if (Array.isArray(mediaAll)) {
-                     const plantMedia = mediaAll.filter(m => Number(m.plant_id) === Number(a.plant_id));
-                     if (plantMedia.length > 0) {
-                         plantMedia.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
-                         images = plantMedia.map(m => resolveUrl(m.url)).filter(Boolean);
-                         imageUrl = images[0];
-                     }
-                }
-                setPlantImages(images.length > 0 ? images : ["https://via.placeholder.com/400x300?text=No+Image"]);
-
-                // Fetch acceptance history to find the most recent one
-                const acceptances = await fetchMaybe(`/api/Acceptances?auctionId=${id}`);
-                let mostRecentAcceptance = null;
-                if (Array.isArray(acceptances) && acceptances.length > 0) {
-                    mostRecentAcceptance = acceptances.reduce((latest, current) => {
-                        const latestTime = new Date(latest.time).getTime();
-                        const currentTime = new Date(current.time).getTime();
-                        return currentTime > latestTime ? current : latest;
-                    });
+                    const plantMedia = mediaAll.filter(
+                        m => Number(m.plant_id) === Number(aData.plant_id)
+                    );
+                    if (plantMedia.length > 0) {
+                        plantMedia.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
+                        images = plantMedia.map(m => resolveUrl(m.url)).filter(Boolean);
+                        imageUrl = images[0];
+                    }
                 }
 
-                // Timer reference: use acceptance time if exists, otherwise use auction start_time
-                const timerRef = mostRecentAcceptance?.time || a.start_time;
+                setPlantImages(
+                    images.length > 0
+                        ? images
+                        : ["https://via.placeholder.com/400x300?text=No+Image"]
+                );
+
 
                 const enriched = {
-                    auction_id: a.auction_id,
-                    plant_id: a.plant_id,
+                    auction_id: aData.auction_id,
+                    plant_id: aData.plant_id,
                     productname: plant?.productname || "Unknown Product",
                     imageUrl: imageUrl || "https://via.placeholder.com/400x300?text=No+Image",
                     supplierName: supplier?.name || supplier?.displayName || "Unknown Supplier",
@@ -120,53 +130,59 @@ export default function ActiveAuction() {
                     minPickup: lot?.min_pickup || 1,
                     startPrice: plant?.start_price || 0,
                     minPrice: plant?.min_price || plant?.start_price * 0.3 || 10,
-                    startTime: a.start_time,
-                    durationMinutes: a.duration_minutes
+
+                    effectiveStartTime,
+                    durationMinutes
                 };
-                
+
                 setAuction(enriched);
-                setTimerReference(timerRef);
                 setMinBuy(enriched.minPickup);
                 setUserAmount(enriched.minPickup);
                 setCurrentPrice(enriched.startPrice);
 
-                const allAuctions = await fetchMaybe("/api/Auctions");
+                // Upcoming auctions (ongewijzigd)
+                const allAuctions = await fetchMaybe(`${API_BASE}/api/Auctions`);
                 if (Array.isArray(allAuctions)) {
-                     const allPlants = await fetchMaybe("/api/Plants");
-                     const plantsMap = new Map();
-                     if(Array.isArray(allPlants)) allPlants.forEach(p => plantsMap.set(p.plant_id, p));
-                     
-                     const allMedia = await fetchMaybe("/api/MediaPlant");
-                     const mediaMap = new Map();
-                     if(Array.isArray(allMedia)) {
-                         allMedia.forEach(m => {
-                             if (!mediaMap.has(m.plant_id)) {
-                                 mediaMap.set(m.plant_id, []);
-                             }
-                             mediaMap.get(m.plant_id).push(m);
-                         });
-                     }
-                     
-                     const upcomingList = allAuctions
-                        .filter(x => x.status === 'upcoming' && String(x.auction_id) !== String(id))
+                    const allPlants = await fetchMaybe(`${API_BASE}/api/Plants`);
+                    const plantsMap = new Map();
+                    if (Array.isArray(allPlants)) {
+                        allPlants.forEach(p => plantsMap.set(p.plant_id, p));
+                    }
+
+                    const allMedia = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
+                    const mediaMap = new Map();
+                    if (Array.isArray(allMedia)) {
+                        allMedia.forEach(m => {
+                            if (!mediaMap.has(m.plant_id)) {
+                                mediaMap.set(m.plant_id, []);
+                            }
+                            mediaMap.get(m.plant_id).push(m);
+                        });
+                    }
+
+                    const upcomingList = allAuctions
+                        .filter(x => x.status === "upcoming" && String(x.auction_id) !== String(id))
                         .slice(0, 10)
                         .map(x => {
                             const p = plantsMap.get(x.plant_id);
                             const plantMediaList = mediaMap.get(x.plant_id) || [];
-                            
-                            let imageUrl = null;
+
+                            let img = null;
                             if (plantMediaList.length > 0) {
-                                plantMediaList.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
-                                imageUrl = resolveUrl(plantMediaList[0].url);
+                                plantMediaList.sort(
+                                    (a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0)
+                                );
+                                img = resolveUrl(plantMediaList[0].url);
                             }
-                            
+
                             return {
                                 ...x,
                                 plantName: p?.productname || "Auction Product",
-                                imageUrl: imageUrl || "https://via.placeholder.com/400x300?text=No+Image"
+                                imageUrl: img || "https://via.placeholder.com/400x300?text=No+Image"
                             };
                         });
-                     setUpcoming(upcomingList);
+
+                    setUpcoming(upcomingList);
                 }
 
             } catch (e) {
@@ -175,6 +191,7 @@ export default function ActiveAuction() {
                 setLoading(false);
             }
         };
+
 
         load();
     }, [id]);
@@ -211,7 +228,7 @@ export default function ActiveAuction() {
         };
 
         try {
-            const resAcc = await fetch('/api/Acceptances', {
+            const resAcc = await fetch(`${API_BASE}/api/Acceptances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(acceptance)
@@ -227,7 +244,7 @@ export default function ActiveAuction() {
                 remaining_quantity: activeLot.remaining_quantity - userAmount
             };
 
-            const resLot = await fetch(`/api/AuctionLots/${activeLot.auctionlot_id}`, {
+            const resLot = await fetch(`${API_BASE}/api/AuctionLots/${activeLot.auctionlot_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedLot)
@@ -237,13 +254,14 @@ export default function ActiveAuction() {
                 throw new Error("Could not update quantity");
             }
 
-            setActiveLot(updatedLot);
-            setAuction(prev => ({ ...prev, contInLot: updatedLot.remaining_quantity }));
-            
-            // Update timer reference to the acceptance timestamp
-            setTimerReference(acceptanceTime);
-            
-            showNotification(`Purchased: ${userAmount} containers for €${currentPrice.toFixed(2)}`, "success");
+            // Show success notification and persist it
+            const successMessage = `Purchased: ${userAmount} containers for €${currentPrice.toFixed(2)}`;
+            showNotification(successMessage, "success", true);
+
+            // Reload page after 2 seconds to show notification and refresh data
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
 
         } catch (err) {
             console.error(err);
@@ -256,21 +274,32 @@ export default function ActiveAuction() {
         setPriceHistoryLoading(true);
         try {
             const plantId = auction.plant_id;
-            const supplierId = auction.supplierId;
 
-            // Fetch supplier-specific price history
-            const supplierHistory = await fetchMaybe(`/api/PriceHistory?plantId=${plantId}&supplierId=${supplierId}&limit=10`);
+            // Use the existing endpoint that returns PlantPriceHistory data
+            const response = await fetchMaybe(
+                `${API_BASE}/api/PriceHistory/plant/${plantId}`
+            );
             
-            // Fetch all suppliers price history for same plant
-            const allHistory = await fetchMaybe(`/api/PriceHistory?plantId=${plantId}&limit=10`);
-
-            setPriceHistory({
-                supplier: Array.isArray(supplierHistory) ? supplierHistory : [],
-                allSuppliers: Array.isArray(allHistory) ? allHistory : []
-            });
+            if (response) {
+                setPriceHistory({
+                    plantName: auction.productname,
+                    currentSupplierName: auction.supplierName,
+                    currentSupplierHistory: response.currentSupplierHistory || [],
+                    currentSupplierAverage: response.currentSupplierAverage || 0,
+                    allSuppliersHistory: response.allSuppliersHistory || [],
+                    allSuppliersAverage: response.allSuppliersAverage || 0
+                });
+            }
         } catch (e) {
             console.error("Failed to load price history", e);
-            setPriceHistory({ supplier: [], allSuppliers: [] });
+            setPriceHistory({
+                plantName: auction.productname,
+                currentSupplierName: auction.supplierName,
+                currentSupplierHistory: [],
+                currentSupplierAverage: 0,
+                allSuppliersHistory: [],
+                allSuppliersAverage: 0
+            });
         } finally {
             setPriceHistoryLoading(false);
         }
@@ -284,12 +313,23 @@ export default function ActiveAuction() {
     if (loading) return <div className="c-aa-loading">Loading...</div>;
     if (!auction) return <div className="c-aa-loading">Auction not found or invalid ID</div>;
 
-    // Calculate timer based on timerReference (either start_time or acceptance time)
+    // Duration in ms
     const durationMs = (auction.durationMinutes || 60) * 60 * 1000;
+
+    // Timer start time = effectiveStartTime from server
+    const timerStartTime = new Date(auction.effectiveStartTime);
     const now = new Date();
-    const timerStartTime = timerReference ? new Date(timerReference) : new Date(auction.startTime);
-    const hasStarted = now >= timerStartTime;
+    const elapsed = now - timerStartTime;
+    const remaining = Math.max(durationMs - elapsed, 0);
+    const hasStarted = elapsed >= 0;
     const timeUntilStart = hasStarted ? 0 : timerStartTime.getTime() - now.getTime();
+    const parsedStartTime = auction.effectiveStartTime
+        ? Date.parse(auction.effectiveStartTime)
+        : Date.now();
+
+    // Ensure parsedStartTime is valid; if NaN, use current time
+    const validStartTime = isNaN(parsedStartTime) ? Date.now() : parsedStartTime;
+
 
     // Single return statement
     return (
@@ -300,141 +340,106 @@ export default function ActiveAuction() {
                         {notification.type === 'success' ? '✓' : '✕'}
                     </span>
                     <span className="notification-message">{notification.message}</span>
-                    <button className="notification-close" onClick={() => setNotification(null)}>×</button>
+                    {!notificationPersist && (
+                        <button className="notification-close" onClick={() => setNotification(null)}>×</button>
+                    )}
                 </div>
             )}
 
             {/* Price History Modal */}
             {showPriceHistory && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        padding: '30px',
-                        maxWidth: '900px',
-                        maxHeight: '80vh',
-                        overflow: 'auto',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                        position: 'relative'
-                    }}>
+                <div className="c-aa-price-history-modal">
+                    <div className="c-aa-price-history-modal-content">
                         <button
                             onClick={closePriceHistory}
-                            style={{
-                                position: 'absolute',
-                                top: '15px',
-                                right: '15px',
-                                background: 'none',
-                                border: 'none',
-                                fontSize: '28px',
-                                cursor: 'pointer',
-                                color: '#666'
-                            }}
+                            className="c-aa-price-history-close"
                         >
                             ×
                         </button>
 
-                        <h2 style={{ marginTop: 0, marginBottom: '20px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
-                            Price History
+                        <h2 className="c-aa-price-history-title">
+                            Price History - {priceHistory.plantName}
                         </h2>
 
                         {priceHistoryLoading ? (
-                            <div style={{ textAlign: 'center', padding: '20px' }}>Loading price history...</div>
+                            <div className="c-aa-price-history-loading">Loading price history...</div>
                         ) : (
-                            <div style={{ display: 'flex', gap: '30px' }}>
-                                {/* Supplier Specific History */}
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{ marginTop: 0, fontSize: '14px', fontWeight: '600', textTransform: 'uppercase', color: '#666' }}>
-                                        {auction.supplierName.toUpperCase()} (Last 10)
+                            <div className="c-aa-price-history-tables">
+                                {/* Current Supplier Price Changes */}
+                                <div className="c-aa-price-history-table-section">
+                                    <h3 className="c-aa-price-history-table-title">
+                                        {priceHistory.currentSupplierName?.toUpperCase()} (LAST 10 CHANGES)
                                     </h3>
-                                    <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                                        <thead>
-                                            <tr style={{ borderBottom: '1px solid #ddd' }}>
-                                                <th style={{ textAlign: 'left', padding: '8px 0', fontWeight: '600' }}>Date</th>
-                                                <th style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>Old Price</th>
-                                                <th style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>New Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {priceHistory.supplier.length > 0 ? (
-                                                priceHistory.supplier.map((item, idx) => (
-                                                    <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                                        <td style={{ padding: '8px 0' }}>
-                                                            {item.date ? new Date(item.date).toLocaleDateString() : '-'}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '8px 0' }}>
-                                                            €{item.old_price?.toFixed(2) || '-'}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>
-                                                            €{item.new_price?.toFixed(2) || '-'}
-                                                        </td>
+                                    {priceHistory.currentSupplierHistory.length > 0 ? (
+                                        <>
+                                            <table className="c-aa-price-history-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date Changed</th>
+                                                        <th>Old Min Price</th>
+                                                        <th>New Min Price</th>
+                                                        <th>Old Start Price</th>
+                                                        <th>New Start Price</th>
                                                     </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="3" style={{ padding: '16px', textAlign: 'center', color: '#999' }}>
-                                                        No price history available
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                    {priceHistory.supplier.length > 0 && (
-                                        <div style={{ marginTop: '12px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', fontSize: '12px', textAlign: 'center' }}>
-                                            Avg: €{(priceHistory.supplier.reduce((sum, item) => sum + (item.new_price || 0), 0) / priceHistory.supplier.length).toFixed(2)}
-                                        </div>
+                                                </thead>
+                                                <tbody>
+                                                    {priceHistory.currentSupplierHistory.map((entry, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>{new Date(entry.changed_at).toLocaleDateString()}</td>
+                                                            <td>€{entry.old_min_price?.toFixed(2)}</td>
+                                                            <td className="c-aa-price-history-price">
+                                                                €{entry.new_min_price?.toFixed(2)}
+                                                            </td>
+                                                            <td>€{entry.old_start_price?.toFixed(2)}</td>
+                                                            <td className="c-aa-price-history-price">
+                                                                €{entry.new_start_price?.toFixed(2)}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div className="c-aa-price-history-avg">
+                                                Average Start Price: €{priceHistory.currentSupplierAverage?.toFixed(2)}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="c-aa-price-history-loading">No price history available</div>
                                     )}
                                 </div>
 
-                                {/* All Suppliers History */}
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{ marginTop: 0, fontSize: '14px', fontWeight: '600', textTransform: 'uppercase', color: '#666' }}>
-                                        All Suppliers (Last 10)
+                                {/* All Suppliers Price History */}
+                                <div className="c-aa-price-history-table-section">
+                                    <h3 className="c-aa-price-history-table-title">
+                                        ALL SUPPLIERS (LAST 10)
                                     </h3>
-                                    <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                                        <thead>
-                                            <tr style={{ borderBottom: '1px solid #ddd' }}>
-                                                <th style={{ textAlign: 'left', padding: '8px 0', fontWeight: '600' }}>Product</th>
-                                                <th style={{ textAlign: 'left', padding: '8px 0', fontWeight: '600' }}>Date</th>
-                                                <th style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {priceHistory.allSuppliers.length > 0 ? (
-                                                priceHistory.allSuppliers.map((item, idx) => (
-                                                    <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                                        <td style={{ padding: '8px 0' }}>{item.product_name || '-'}</td>
-                                                        <td style={{ padding: '8px 0' }}>
-                                                            {item.date ? new Date(item.date).toLocaleDateString() : '-'}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '8px 0', fontWeight: '600' }}>
-                                                            €{item.price?.toFixed(2) || '-'}
-                                                        </td>
+                                    {priceHistory.allSuppliersHistory.length > 0 ? (
+                                        <>
+                                            <table className="c-aa-price-history-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Supplier</th>
+                                                        <th>Date Changed</th>
+                                                        <th>Price</th>
                                                     </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="3" style={{ padding: '16px', textAlign: 'center', color: '#999' }}>
-                                                        No price history available
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                    {priceHistory.allSuppliers.length > 0 && (
-                                        <div style={{ marginTop: '12px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', fontSize: '12px', textAlign: 'center' }}>
-                                            Avg: €{(priceHistory.allSuppliers.reduce((sum, item) => sum + (item.price || 0), 0) / priceHistory.allSuppliers.length).toFixed(2)}
-                                        </div>
+                                                </thead>
+                                                <tbody>
+                                                    {priceHistory.allSuppliersHistory.map((entry, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>{entry.supplierName}</td>
+                                                            <td>{new Date(entry.date).toLocaleDateString()}</td>
+                                                            <td className="c-aa-price-history-price">
+                                                                €{entry.price?.toFixed(2)}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div className="c-aa-price-history-avg">
+                                                Average Price (All): €{priceHistory.allSuppliersAverage?.toFixed(2)}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="c-aa-price-history-loading">No price history available</div>
                                     )}
                                 </div>
                             </div>
@@ -500,20 +505,21 @@ export default function ActiveAuction() {
                     </div>
                 </div>
 
-                <div className="c-aa-clock-panel">
-                    {!hasStarted ? (
-                        <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                            Auction starts in {Math.ceil(timeUntilStart / 1000)} seconds
-                        </div>
-                    ) : (
+                    <div className="c-aa-clock-panel">
+        {!hasStarted ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                Auction starts in {Math.ceil(timeUntilStart / 1000)} seconds
+            </div>
+                     ) : (
                         <AuctionClock
                             startPrice={auction.startPrice}
                             minPrice={auction.minPrice}
                             durationMs={durationMs}
                             onPriceUpdate={(price) => setCurrentPrice(price)}
-                            timerReference={timerStartTime}
-                        />
+                            startTime={validStartTime}
+                         />
                     )}
+
                     
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
                         <div className="c-aa-info-box" style={{ display: 'inline-block', margin: '10px' }}>

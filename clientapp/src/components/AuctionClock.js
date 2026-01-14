@@ -1,79 +1,68 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './AuctionClock.css';
 
-const AuctionClock = ({ 
-    startPrice = 100, 
-    minPrice = 10, 
+const AuctionClock = ({
+    startPrice = 100,
+    minPrice = 10,
     durationMs = 60000,
     onPriceUpdate,
-    resetTrigger = 0
+    resetTrigger = 0,
+    startTime
 }) => {
     const [currentPrice, setCurrentPrice] = useState(startPrice);
     const [progress, setProgress] = useState(0);
     const [timeRemaining, setTimeRemaining] = useState('');
     const intervalRef = useRef(null);
-    const startTimeRef = useRef(Date.now());
 
-    const calculatePrice = (elapsedTime, totalDuration) => {
-        const ratio = Math.min(elapsedTime / totalDuration, 1);
-        const priceRange = startPrice - minPrice;
-        const price = startPrice - (priceRange * ratio);
-        return Math.max(price, minPrice);
+    const calculatePrice = (elapsedTime) => {
+        const ratio = Math.min(elapsedTime / durationMs, 1);
+        return Math.max(startPrice - (startPrice - minPrice) * ratio, minPrice);
     };
 
     const formatTimeRemaining = (ms) => {
         if (ms <= 0) return '00:00:00';
-        const hours = Math.floor(ms / 3600000);
-        const minutes = Math.floor((ms % 3600000) / 60000);
-        const seconds = Math.floor((ms % 60000) / 1000);
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        const h = Math.floor(ms / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        const s = Math.floor((ms % 60000) / 1000);
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     };
-
-    useEffect(() => {
-        startTimeRef.current = Date.now();
-        setCurrentPrice(startPrice);
-        setProgress(0);
-    }, [resetTrigger, startPrice]);
 
     useEffect(() => {
         const updateClock = () => {
             const now = Date.now();
-            const elapsedTime = now - startTimeRef.current;
-            
-            if (elapsedTime >= durationMs) {
-                setCurrentPrice(minPrice);
-                setProgress(100);
-                setTimeRemaining('00:00:00');
-                if (onPriceUpdate) {
-                    onPriceUpdate(minPrice);
-                }
-                clearInterval(intervalRef.current);
+            const elapsedTime = now - startTime;
+
+            if (elapsedTime < 0) {
+                setTimeRemaining(formatTimeRemaining(-elapsedTime));
+                setCurrentPrice(startPrice);
+                setProgress(0);
+                if (onPriceUpdate) onPriceUpdate(startPrice);
                 return;
             }
-            
+
+            const remainingTime = Math.max(durationMs - elapsedTime, 0);
+            setTimeRemaining(formatTimeRemaining(remainingTime));
+
+            const price = calculatePrice(elapsedTime);
+            setCurrentPrice(price);
+
             const progressPercent = Math.min((elapsedTime / durationMs) * 100, 100);
             setProgress(progressPercent);
-            
-            const price = calculatePrice(elapsedTime, durationMs);
-            setCurrentPrice(price);
-            
-            const remaining = Math.max(durationMs - elapsedTime, 0);
-            setTimeRemaining(formatTimeRemaining(remaining));
-            
-            if (onPriceUpdate) {
-                onPriceUpdate(price);
-            }
-        };
-        
-        updateClock();
-        intervalRef.current = setInterval(updateClock, 100);
-        
-        return () => {
-            if (intervalRef.current) {
+
+            if (onPriceUpdate) onPriceUpdate(price);
+
+            if (elapsedTime >= durationMs && intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [startPrice, minPrice, durationMs, onPriceUpdate]);
+
+        updateClock();
+        intervalRef.current = setInterval(updateClock, 100);
+
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+    }, [startTime, startPrice, minPrice, durationMs, resetTrigger, onPriceUpdate]);
 
     const circumference = 2 * Math.PI * 85;
     const strokeDashoffset = circumference * (1 - progress / 100);
@@ -87,16 +76,14 @@ const AuctionClock = ({
                         cy="100"
                         r="85"
                         fill="none"
-                        stroke="#3a3a3a"
                         strokeWidth="12"
                     />
-                    
+
                     <circle
                         cx="100"
                         cy="100"
                         r="85"
                         fill="none"
-                        stroke="#5A786B"
                         strokeWidth="12"
                         strokeDasharray={circumference}
                         strokeDashoffset={strokeDashoffset}
@@ -104,16 +91,22 @@ const AuctionClock = ({
                         className="progress-circle"
                         strokeLinecap="round"
                     />
-                    
+
                     <circle
                         cx="100"
                         cy="100"
                         r="65"
-                        fill="#1a1a2e"
+                        className="center-circle"
+                    />
+                    
+                    <circle
+                        cx="100"
+                        cy="100"
+                        r="58"
                         className="center-circle"
                     />
                 </svg>
-                
+
                 <div className="auction-clock-center">
                     <div className="time-remaining">{timeRemaining}</div>
                     <div className="current-price">
@@ -122,7 +115,7 @@ const AuctionClock = ({
                     <div className="price-label-text">Current Price</div>
                 </div>
             </div>
-            
+
             <div className="auction-clock-price-range">
                 <div className="price-range-item">
                     <span className="price-range-label">Max Price</span>

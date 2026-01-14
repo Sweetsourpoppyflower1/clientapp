@@ -4,6 +4,8 @@ import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE = process.env.REACT_APP_API_URL || '';
+
 export default function AOverviewUpcomingAuctions() {
     const [upcoming, setUpcoming] = useState([]);
     const [logo, setLogo] = useState(null);
@@ -17,14 +19,14 @@ export default function AOverviewUpcomingAuctions() {
 
     useEffect(() => {
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
             .catch(() => {});
     }, []);
@@ -120,7 +122,7 @@ export default function AOverviewUpcomingAuctions() {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="u-top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">Loadingï¿½</span>
                 )}
             </div>
 
