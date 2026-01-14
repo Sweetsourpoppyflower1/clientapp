@@ -41,11 +41,11 @@ export default function CreateAuction() {
 
   const [plants, setPlants] = useState([]);
   const [selectedPlantId, setSelectedPlantId] = useState(null);
-  const [plantMedia, setPlantMedia] = useState([]); 
+  const [plantMedia, setPlantMedia] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -53,14 +53,14 @@ export default function CreateAuction() {
 
   useEffect(() => {
     const mediaId = 1;
-    fetch(`/api/Media/${mediaId}`)
+    fetch(`${API_BASE}/api/Media/${mediaId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch media');
         return res.json();
       })
       .then(m => {
         const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-        setLogo({ url: normalizedUrl, alt: m.alt_text });
+        setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
       })
       .catch(() => {});
 
@@ -174,20 +174,25 @@ export default function CreateAuction() {
       setError("Select a plant first.");
       return;
     }
-    if (!startTime || !endTime) {
-      setError("Provide both start and end times.");
+    if (!startTime || !durationMinutes) {
+      setError("Provide both start time and auction duration.");
+      return;
+    }
+
+    const duration = parseInt(durationMinutes, 10);
+    if (isNaN(duration) || duration <= 0) {
+      setError("Auction duration must be a positive number (in minutes).");
       return;
     }
 
     const startIso = new Date(startTime).toISOString();
-    const endIso = new Date(endTime).toISOString();
 
     const payload = {
       auctionmaster_id,
       plant_id: Number(selectedPlantId),
       status: "upcoming",
       start_time: startIso,
-      end_time: endIso
+      duration_minutes: duration
     };
 
     try {
@@ -204,8 +209,8 @@ export default function CreateAuction() {
         throw new Error(`Save failed: ${res.status} ${txt}`);
       }
       const created = await res.json();
-        setSuccessMessage("Auction created successfully.");
-        window.location.reload();
+      setSuccessMessage("Auction created successfully.");
+      window.location.reload();
     } catch (err) {
       console.error(err);
       setError("Failed to create auction. " + err.message);
@@ -223,7 +228,7 @@ export default function CreateAuction() {
         {logo ? (
           <img src={resolveMediaUrl(logo.url)} alt={logo.alt} className="top-logo" />
         ) : (
-          <span className="loading-label">Loading…</span>
+          <span className="loading-label">Loadingï¿½</span>
         )}
       </div>
 
@@ -306,12 +311,14 @@ export default function CreateAuction() {
             onChange={(e) => setStartTime(e.target.value)}
           />
 
-          <label className="label">End Time</label>
+          <label className="label">Auction Duration (minutes)</label>
           <input
             className="input"
-            type="datetime-local"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
+            type="number"
+            min="1"
+            value={durationMinutes}
+            onChange={(e) => setDurationMinutes(e.target.value)}
+            placeholder="Enter duration in minutes"
           />
 
           <div style={{ marginTop: 20 }}>

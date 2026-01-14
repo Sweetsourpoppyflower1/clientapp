@@ -1,7 +1,8 @@
 ﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/loginStyle.css";
 
-const AUTH_ENDPOINT = "/api/Auth/login";
+const API_BASE = process.env.REACT_APP_API_URL || "";
+const AUTH_ENDPOINT = `${API_BASE}/api/Auth/login`;
 
 function decodeJwt(token) {
   try {
@@ -23,14 +24,14 @@ export default function Login() {
 
   useEffect(() => {
     const mediaId = 1;
-    fetch(`/api/Media/${mediaId}`)
+    fetch(`${API_BASE}/api/Media/${mediaId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch media');
         return res.json();
       })
       .then(m => {
         const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-        setLogo({ url: normalizedUrl, alt: m.alt_text });
+        setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
       })
       .catch((err) => {
         console.warn("Logo fetch failed:", err);

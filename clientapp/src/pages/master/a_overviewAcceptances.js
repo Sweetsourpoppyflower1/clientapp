@@ -105,14 +105,14 @@ export default function AOverviewAcceptances() {
     useEffect(() => {
         // Fetch logo
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
             .catch(() => { /* silent fallback */ });
     }, []);
@@ -136,18 +136,18 @@ export default function AOverviewAcceptances() {
             const companyIds = [...new Set(acceptancesData.map(a => a.company_id).filter(Boolean))];
 
             // Fetch auctions to get plant info
-            const auctionsPromises = auctionIds.map(id => fetchMaybe(`/api/Auctions/${id}`));
+            const auctionsPromises = auctionIds.map(id => fetchMaybe(`${API_BASE}/api/Auctions/${id}`));
             const auctions = await Promise.all(auctionsPromises);
             const auctionsMap = new Map(auctions.filter(Boolean).map(a => [a.auction_id, a]));
 
             // Fetch plants
             const plantIds = [...new Set(auctions.filter(Boolean).map(a => a.plant_id).filter(Boolean))];
-            const plantsPromises = plantIds.map(id => fetchMaybe(`/api/Plants/${id}`));
+            const plantsPromises = plantIds.map(id => fetchMaybe(`${API_BASE}/api/Plants/${id}`));
             const plants = await Promise.all(plantsPromises);
             const plantsMap = new Map(plants.filter(Boolean).map(p => [p.plant_id, p]));
 
             // Fetch companies
-            const companiesPromises = companyIds.map(id => fetchMaybe(`/api/Companies/${id}`));
+            const companiesPromises = companyIds.map(id => fetchMaybe(`${API_BASE}/api/Companies/${id}`));
             const companies = await Promise.all(companiesPromises);
             const companiesMap = new Map(companies.filter(Boolean).map(c => [c.id || c.company_id, c]));
 
@@ -189,7 +189,7 @@ export default function AOverviewAcceptances() {
         try {
             // Delete the acceptance
             const token = localStorage.getItem("auth_token");
-            const res = await fetch(`/api/Acceptances/${acceptance.id}`, {
+            const res = await fetch(`${API_BASE}/api/Acceptances/${acceptance.id}`, {
                 method: "DELETE",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });

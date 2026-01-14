@@ -85,7 +85,7 @@ export default function AManageUsers() {
 
         try {
             const token = localStorage.getItem("auth_token");
-            const res = await fetch(`/api/Companies/${companyId}`, {
+            const res = await fetch(`${API_BASE}/api/Companies/${companyId}`, {
                 method: "DELETE",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
@@ -112,7 +112,7 @@ export default function AManageUsers() {
 
         try {
             const token = localStorage.getItem("auth_token");
-            const res = await fetch(`/api/Suppliers/${supplierId}`, {
+            const res = await fetch(`${API_BASE}/api/Suppliers/${supplierId}`, {
                 method: "DELETE",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
