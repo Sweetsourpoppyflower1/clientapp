@@ -18,6 +18,7 @@ import CompanyDashboard from "./pages/company/companyDashboard.js";
 import AOverviewAcceptances from "./pages/master/a_overviewAcceptances.js";
 import AManageUsers from "./pages/master/a_manageUsers.js";
 import SEditPlant from "./pages/supplier/sEditPlant.js";
+import CSeeInfo from "./pages/company/c_seeInfoAuction.js";
 
 function App() {
     return (
