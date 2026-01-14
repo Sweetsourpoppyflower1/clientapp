@@ -61,7 +61,7 @@ export default function SeeInfoAuction() {
                     lot = lots.find(l => Number(l.plant_id) === Number(a.plant_id)); 
                 }
 
-                const mediaAll = await fetchMaybe("/api/MediaPlant");
+                const mediaAll = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 let images = [];
                 let imageUrl = null;
                 if (Array.isArray(mediaAll)) {

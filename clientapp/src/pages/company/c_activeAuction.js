@@ -84,7 +84,7 @@ export default function ActiveAuction() {
 
                 setActiveLot(lot);
 
-                const mediaAll = await fetchMaybe("/api/MediaPlant");
+                const mediaAll = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 let images = [];
                 let imageUrl = null;
 
@@ -134,15 +134,15 @@ export default function ActiveAuction() {
                 setCurrentPrice(enriched.startPrice);
 
                 // Upcoming auctions (ongewijzigd)
-                const allAuctions = await fetchMaybe("/api/Auctions");
+                const allAuctions = await fetchMaybe(`${API_BASE}/api/Auctions`);
                 if (Array.isArray(allAuctions)) {
-                    const allPlants = await fetchMaybe("/api/Plants");
+                    const allPlants = await fetchMaybe(`${API_BASE}/api/Plants`);
                     const plantsMap = new Map();
                     if (Array.isArray(allPlants)) {
                         allPlants.forEach(p => plantsMap.set(p.plant_id, p));
                     }
 
-                    const allMedia = await fetchMaybe("/api/MediaPlant");
+                    const allMedia = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                     const mediaMap = new Map();
                     if (Array.isArray(allMedia)) {
                         allMedia.forEach(m => {
@@ -221,7 +221,7 @@ export default function ActiveAuction() {
         };
 
         try {
-            const resAcc = await fetch('/api/Acceptances', {
+            const resAcc = await fetch(`${API_BASE}/api/Acceptances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(acceptance)
