@@ -33,7 +33,7 @@ export default function SeeInfoAuction() {
             .then(m => {
                 if(m) {
                     const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                    setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
+                    setLogo({ url: normalizedUrl, alt: m.alt_text });
                 }
             })
             .catch(() => {});
@@ -41,6 +41,7 @@ export default function SeeInfoAuction() {
         const load = async () => {
             setLoading(true);
             try {
+                const a = await fetchMaybe(`/api/Auctions/${id}`);
                 const a = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
                 if (!a) {
                     setAuction(null); 
