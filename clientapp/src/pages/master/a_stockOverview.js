@@ -176,11 +176,7 @@ export default function AStockOverview() {
                                                                 <div className="stock-details-image">
                                                                     {p.imageUrl ? (
                                                                         <img
-                                                                            src={
-                                                                                p.imageUrl && !p.imageUrl.startsWith("/")
-                                                                                    ? "/" + p.imageUrl
-                                                                                    : p.imageUrl
-                                                                            }
+                                                                            src={normalizeUrl(p.imageUrl)}
                                                                             alt={p.imageAlt ?? p.productName}
                                                                             className="stock-picture"
                                                                         />
