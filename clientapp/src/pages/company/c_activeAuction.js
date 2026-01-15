@@ -16,6 +16,18 @@ const fetchMaybe = async (url) => {
     } catch { return null; }
 };
 
+const parseUtcDate = (s) => {
+    if (!s) return null;
+    if (/(?:Z|[+\-]\d{2}:\d{2})$/i.test(s)) return new Date(s);
+    return new Date(s);  // Parse as-is (local time, no Z)
+};
+
+const parseLocalDateTime = (s) => {
+    if (!s) return Date.now();
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? Date.now() : d.getTime();
+};
+
 export default function ActiveAuction() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -43,6 +55,7 @@ export default function ActiveAuction() {
         allSuppliersAverage: 0
     });
     const [priceHistoryLoading, setPriceHistoryLoading] = useState(false);
+    const [secondsUntilStart, setSecondsUntilStart] = useState(0);
 
     const showNotification = (message, type = 'success', persist = false) => {
         setNotification({ message, type });
@@ -205,6 +218,23 @@ export default function ActiveAuction() {
         load();
     }, [id]);
 
+    useEffect(() => {
+        if (!auction) return;
+        
+        const timerStartTime = new Date(auction.effectiveStartTime);
+        
+        const updateCountdown = () => {
+            const now = Date.now();
+            const remaining = Math.max(timerStartTime.getTime() - now, 0);
+            setSecondsUntilStart(Math.ceil(remaining / 1000));
+        };
+        
+        updateCountdown(); // Initial update
+        const interval = setInterval(updateCountdown, 1000);
+        
+        return () => clearInterval(interval);
+    }, [auction?.effectiveStartTime]);
+
     const handleBuy = async () => {
         if (!auction || !activeLot) return;
         
@@ -225,15 +255,25 @@ export default function ActiveAuction() {
             return;
         }
         
-        const acceptanceTime = new Date().toISOString();
-        const totalAmount = currentPrice * userAmount; // Calculate total
+        // Format local time (not UTC) as ISO-like string
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ms = String(now.getMilliseconds()).padStart(3, '0');
+        const acceptanceTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}`;
+        
+        const totalAmount = currentPrice * userAmount;
         
         const acceptance = {
             auction_id: auction.auction_id,
             company_id: companyId,
             auction_lot_id: activeLot.auctionlot_id,
             tick_number: 0, 
-            accepted_price: totalAmount, // Send total amount instead of single price
+            accepted_price: totalAmount,
             accepted_quantity: userAmount,
             time: acceptanceTime
         };
@@ -265,59 +305,72 @@ export default function ActiveAuction() {
                 throw new Error("Could not update quantity");
             }
 
-            // Show success notification with total amount
             const successMessage = `Purchased: ${userAmount} containers for €${totalAmount.toFixed(2)}`;
             showNotification(successMessage, "success", true);
 
             // Refetch fresh auction and lot data
             setTimeout(async () => {
-                const freshData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
-                if (freshData) {
-                    // Update auction with fresh data
-                    const effectiveStartTime = freshData.effective_start_time;
-                    const updatedAuction = {
-                        ...auction,
-                        effectiveStartTime,
-                        start_time: freshData.start_time
-                    };
-                    setAuction(updatedAuction);
-                    setCurrentPrice(auction.startPrice);
-                }
+                try {
+                    const freshData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
+                    if (freshData) {
+                        const updatedAuction = {
+                            auction_id: freshData.auction_id,
+                            plant_id: auction.plant_id,
+                            productname: auction.productname,
+                            imageUrl: auction.imageUrl,
+                            supplierName: auction.supplierName,
+                            supplierId: auction.supplierId,
+                            form: auction.form,
+                            maturity: auction.maturity,
+                            quality: auction.quality,
+                            quantityStems: auction.quantityStems,
+                            minStemLength: auction.minStemLength,
+                            unitPerCont: auction.unitPerCont,
+                            contInLot: auction.contInLot,
+                            minPickup: auction.minPickup,
+                            startPrice: auction.startPrice,
+                            minPrice: auction.minPrice,
+                            effectiveStartTime: freshData.effective_start_time,
+                            durationMinutes: freshData.duration_minutes,
+                            start_time: freshData.start_time
+                        };
+                        setAuction(updatedAuction);
+                        setCurrentPrice(auction.startPrice);
+                    }
 
-                // Refetch fresh lot data with updated remaining_quantity
-                const freshLots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
-                if (Array.isArray(freshLots)) {
-                    const freshLot = freshLots.find(l => Number(l.plant_id) === Number(auction.plant_id));
-                    if (freshLot) {
-                        setActiveLot(freshLot);
-                        // ALSO update the auction state's contInLot to reflect new quantity
-                        setAuction(prev => ({
-                            ...prev,
-                            contInLot: freshLot.remaining_quantity
-                        }));
+                    const freshLots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
+                    if (Array.isArray(freshLots)) {
+                        const freshLot = freshLots.find(l => Number(l.plant_id) === Number(auction.plant_id));
+                        if (freshLot) {
+                            setActiveLot(freshLot);
+                            setAuction(prev => ({
+                                ...prev,
+                                contInLot: freshLot.remaining_quantity
+                            }));
 
-                        // Check if auction should end (no quantity left or below minimum)
-                        if (freshLot.remaining_quantity <= 0 || freshLot.remaining_quantity < minBuy) {
-                            // Update auction status to completed
-                            const completedAuction = {
-                                ...auction,
-                                status: "completed"
-                            };
-                            const resStatus = await fetch(`${API_BASE}/api/Auctions/${id}`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(completedAuction)
-                            });
+                            if (freshLot.remaining_quantity <= 0 || freshLot.remaining_quantity < minBuy) {
+                                const completedAuction = {
+                                    ...auction,
+                                    status: "completed"
+                                };
+                                const resStatus = await fetch(`${API_BASE}/api/Auctions/${id}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(completedAuction)
+                                });
 
-                            if (resStatus.ok) {
-                                showNotification("Auction completed!", "success", true);
-                                // Redirect to auctions page after 2 seconds
-                                setTimeout(() => {
-                                    navigate('/cAuctions');
-                                }, 2000);
+                                if (resStatus.ok) {
+                                    showNotification("Auction completed!", "success", true);
+                                    setTimeout(() => {
+                                        navigate('/cAuctions');
+                                    }, 2000);
+                                }
                             }
                         }
                     }
+                } catch (err) {
+                    console.error("Error refreshing auction after purchase:", err);
+                    showNotification("Warning: Could not refresh auction data", "error");
                 }
             }, 500);
 
@@ -382,16 +435,9 @@ export default function ActiveAuction() {
     const timerStartTime = new Date(auction.effectiveStartTime);
     const now = new Date();
     const elapsed = now - timerStartTime;
-    const remaining = Math.max(durationMs - elapsed, 0);
+    const timeUntilStart = Math.max(timerStartTime.getTime() - now.getTime(), 0);
     const hasStarted = elapsed >= 0;
-    const timeUntilStart = hasStarted ? 0 : timerStartTime.getTime() - now.getTime();
-    const parsedStartTime = auction.effectiveStartTime
-        ? Date.parse(auction.effectiveStartTime)
-        : Date.now();
-
-    // Ensure parsedStartTime is valid; if NaN, use current time
-    const validStartTime = isNaN(parsedStartTime) ? Date.now() : parsedStartTime;
-
+    const validStartTime = timerStartTime.getTime();
 
 
     // DEBUG
@@ -399,7 +445,6 @@ export default function ActiveAuction() {
         auctionId: auction.auction_id,
         effectiveStartTime: auction.effectiveStartTime,
         durationMinutes: auction.durationMinutes,
-        parsedStartTime,
         validStartTime,
         hasStarted,
         now: Date.now(),
@@ -583,16 +628,16 @@ export default function ActiveAuction() {
                     <div className="c-aa-clock-panel">
         {!hasStarted ? (
             <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                Auction starts in {Math.ceil(timeUntilStart / 1000)} seconds
+                Auction starts in {secondsUntilStart} seconds
             </div>
                      ) : (
                         <AuctionClock
-                            startPrice={auction.startPrice}
-                            minPrice={auction.minPrice}
-                            durationMs={durationMs}  // Always full duration, not adjusted
-                            onPriceUpdate={handlePriceUpdate}
-                            startTime={validStartTime}  // Effective start time (acceptance or original)
-                         />
+    startPrice={auction.startPrice}
+    minPrice={auction.minPrice}
+    durationMs={durationMs}
+    onPriceUpdate={handlePriceUpdate}
+    startTime={timerStartTime.getTime()}
+/>
                     )}
 
                     
@@ -686,7 +731,9 @@ export default function ActiveAuction() {
                                      </div>
                                      <div className="c-aa-detail-group">
                                          <label>Starts at:</label>
-                                         <div className="c-aa-detail-val box-white">{mk.start_time ? new Date(mk.start_time).toLocaleString() : "TBD"}</div>
+                                         <div className="c-aa-detail-val box-white">
+                                             {mk.start_time ? parseUtcDate(mk.start_time).toLocaleString('en-NL') : "TBD"}
+                                         </div>
                                      </div>
                                  </div>
                              </div>
