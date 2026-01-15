@@ -22,7 +22,7 @@ const AuctionLog = () => {
     const [timeRemaining, setTimeRemaining] = useState("00:00:00");
     const [logo, setLogo] = useState(null);
 
-    // Helper function to get auth headers
+    // helpt met auth headers
     const getAuthHeaders = () => {
         const token = localStorage.getItem("token");
         return {
@@ -32,7 +32,7 @@ const AuctionLog = () => {
     };
 
     useEffect(() => {
-        // Top logo (media id 1)
+        // het logo ophalen uit de database (altijd media ID 1)
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
@@ -43,7 +43,7 @@ const AuctionLog = () => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
-            .catch(() => { /* silent fallback */ });
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -51,7 +51,7 @@ const AuctionLog = () => {
             setLoading(true);
             setError(null);
             try {
-                // Fetch auction details
+                // fetch alle auction details
                 const auctionRes = await fetch(`${API_BASE}/api/Auctions/${id}`, {
                     credentials: "same-origin",
                     headers: getAuthHeaders()
@@ -60,7 +60,7 @@ const AuctionLog = () => {
                 const auctionData = await auctionRes.json();
                 setAuction(auctionData);
 
-                // Fetch plant details
+                // fetch alle plant details
                 const plantRes = await fetch(`${API_BASE}/api/Plants/${auctionData.plant_id}`, {
                     credentials: "same-origin",
                     headers: getAuthHeaders()
@@ -69,7 +69,7 @@ const AuctionLog = () => {
                     const plantData = await plantRes.json();
                     setPlant(plantData);
 
-                    // Fetch supplier details
+                    // fetch alle supplier details
                     if (plantData.supplier_id) {
                         const supplierRes = await fetch(`${API_BASE}/api/Suppliers/${plantData.supplier_id}`, {
                             credentials: "same-origin",
@@ -82,7 +82,7 @@ const AuctionLog = () => {
                     }
                 }
 
-                // Fetch auction lot details
+                // fetch alle auction lot details
                 const lotsRes = await fetch(`${API_BASE}/api/AuctionLots`, {
                     credentials: "same-origin",
                     headers: getAuthHeaders()
@@ -97,7 +97,7 @@ const AuctionLog = () => {
                     }
                 }
 
-                // Fetch acceptances (transactions) for this auction
+                // fetch alle acceptances voor deze veiling
                 const acceptancesRes = await fetch(`${API_BASE}/api/Acceptances`, {
                     credentials: "same-origin",
                     headers: getAuthHeaders()
@@ -110,7 +110,7 @@ const AuctionLog = () => {
                         );
                         setAcceptances(auctionAcceptances);
 
-                        // Fetch company details for all unique company IDs
+                        // fetch alle companies voor de acceptances
                         const uniqueCompanyIds = [...new Set(auctionAcceptances.map(a => a.company_id))];
                         const companiesMapTemp = {};
 
@@ -152,7 +152,7 @@ const AuctionLog = () => {
         }
     }, [id]);
 
-    // Update progress bar and timer
+    // update de voortgang en prijs elke 100ms
     useEffect(() => {
         if (!auction) return;
 
@@ -166,7 +166,6 @@ const AuctionLog = () => {
             const progressPercent = Math.min((elapsed / durationMs) * 100, 100);
             setProgress(progressPercent);
 
-            // Calculate current price based on progress
             const minPrice = plant?.min_price || plant?.start_price * 0.3 || 10;
             const startPrice = plant?.start_price || 100;
             const calculatedPrice = Math.max(
@@ -175,7 +174,6 @@ const AuctionLog = () => {
             );
             setCurrentPrice(calculatedPrice);
 
-            // Format time remaining
             const h = Math.floor(remaining / 3600000);
             const m = Math.floor((remaining % 3600000) / 60000);
             const s = Math.floor((remaining % 60000) / 1000);
@@ -215,7 +213,6 @@ const AuctionLog = () => {
 
     return (
         <div className="a-auction-log-page">
-            {/* Header */}
             <div className="section-top" role="region" aria-label="section-1">
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="top-logo" />
@@ -224,7 +221,6 @@ const AuctionLog = () => {
                 )}
             </div>
 
-            {/* Progress Bar */}
             <div className="a-auction-log-progress-section">
                 <div className="a-auction-log-progress-container">
                     <div className="a-auction-log-progress-bar">
@@ -246,11 +242,8 @@ const AuctionLog = () => {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="a-auction-log-content">
-                {/* Left Sidebar - Plant Info */}
                 <aside className="a-auction-log-sidebar">
-                    {/* Supplier Info Card */}
                     <div className="a-auction-log-card">
                         <div className="a-auction-log-card-title">Supplier</div>
                         <div className="a-auction-log-supplier-info">
@@ -261,7 +254,6 @@ const AuctionLog = () => {
                         </div>
                     </div>
 
-                    {/* Product Info Card */}
                     <div className="a-auction-log-card">
                         <div className="a-auction-log-card-title">Product Info</div>
                         <div className="a-auction-log-product-info">
@@ -293,7 +285,6 @@ const AuctionLog = () => {
                     </div>
                 </aside>
 
-                {/* Right Side - Transactions Table */}
                 <main className="a-auction-log-main">
                     <div className="a-auction-log-table-container">
                         <h3 className="a-auction-log-table-title">Transaction Log</h3>
@@ -331,7 +322,6 @@ const AuctionLog = () => {
                 </main>
             </div>
 
-            {/* Navigation */}
             <NavigationDropdownMenu navigateFn={(p) => navigate(p)} />
             <AccountDropdownMenu />
         </div>

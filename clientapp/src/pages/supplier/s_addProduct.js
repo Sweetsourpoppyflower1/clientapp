@@ -63,7 +63,7 @@ export default function SAddProduct() {
         const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
         setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text || m.altText || '' });
       })
-      .catch(() => { /* silent fallback */ });
+      .catch(() => {});
   }, []);
 
   async function uploadPlantMedia(file, plantId, isPrimary, token) {
@@ -236,7 +236,6 @@ export default function SAddProduct() {
             <div className="sd-stock-body" role="region" aria-label="Add product form">
               <form onSubmit={handleSubmit} className="add-product-form">
                 
-                {/* Column 1: Basic Product Info */}
                 <div className="form-column">
                   <div className="form-group">
                     <label className="form-label form-required">Product name</label>
@@ -326,7 +325,6 @@ export default function SAddProduct() {
                   </div>
                 </div>
 
-                {/* Column 2: Pricing, Auction, Description & Media */}
                 <div className="form-column">
                   <div className="form-group">
                     <label className="form-label">Start Price (whole numbers only)</label>
@@ -440,7 +438,6 @@ export default function SAddProduct() {
               </form>
             </div>
 
-            {/* Footer with buttons */}
             <div className="form-footer">
               <button onClick={handleSubmit} disabled={loading} className="btn btn-primary">
                 {loading ? "Saving..." : "Save product"}

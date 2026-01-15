@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 
+// zorgt ervoor dat media urls correct worden opgebouwd
 function resolveMediaUrl(url) {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
@@ -13,6 +14,7 @@ function resolveMediaUrl(url) {
   return API_BASE ? `${API_BASE}${path}` : path;
 }
 
+// pakt auctionMasterId uit localStorage op verschillende mogelijke plekken
 function getAuctionMasterIdFromStorage() {
   const direct = localStorage.getItem("auctionMasterId") || localStorage.getItem("userId");
   if (direct && direct.trim() !== "") return direct;
@@ -52,7 +54,9 @@ export default function CreateAuction() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
+
   useEffect(() => {
+    // het logo ophalen uit de database (altijd media ID 1)
     const mediaId = 1;
     fetch(`${API_BASE}/api/Media/${mediaId}`)
       .then(res => {
@@ -68,6 +72,7 @@ export default function CreateAuction() {
     fetchPlants();
   }, []);
 
+    // wanneer selectedPlantId verandert, media en containers ophalen
   useEffect(() => {
     if (selectedPlantId !== null) {
       fetchMediaForPlant(selectedPlantId);
@@ -79,6 +84,7 @@ export default function CreateAuction() {
     }
   }, [selectedPlantId]);
 
+    // fetch alle planten
   async function fetchPlants() {
     try {
       setLoading(true);
@@ -97,6 +103,7 @@ export default function CreateAuction() {
     }
   }
 
+    // fetch media voor geselecteerde plant
   async function fetchMediaForPlant(plantId) {
     setPlantMedia([]);
     setSelectedImageIndex(0);
@@ -132,8 +139,9 @@ export default function CreateAuction() {
       console.warn("error fetching media for plant", plantId, err);
       setPlantMedia([]);
     }
-  }
+    }
 
+    // fetch remaining containers voor geselecteerde plant
   async function fetchRemainingContainers(plantId) {
     try {
       const res = await fetch("/api/AuctionLots");
@@ -212,7 +220,7 @@ export default function CreateAuction() {
       return;
     }
 
-    // Parse datetime-local input and adjust for timezone offset to get correct UTC time
+      // zorgt ervoor dat de start_time in UTC wordt opgeslagen
     const localDate = new Date(startTime);
     const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
     const startIso = utcDate.toISOString();
@@ -221,7 +229,7 @@ export default function CreateAuction() {
       auctionmaster_id,
       plant_id: Number(selectedPlantId),
       status: "upcoming",
-      start_time: startIso,  // Correct UTC time
+      start_time: startIso,  
       duration_minutes: duration
     };
 

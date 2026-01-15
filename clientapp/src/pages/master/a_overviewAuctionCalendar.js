@@ -15,6 +15,7 @@ const inlinePlaceholder =
       font-family='Arial' font-size='12'>No image</text></svg>`
     );
 
+// zorgt ervoor dat media urls correct worden opgebouwd
 const resolveUrl = (url = "") =>
     !url ? "" : url.startsWith("http") ? url : `${API_BASE}${url.startsWith("/") ? url : `/${url}`}`;
 
@@ -40,6 +41,8 @@ const getId = (a) => a?.id ?? a?.auction_id ?? a?.AuctionId ?? `${a?.auctionmast
 const priceOf = (a) => Number(a.startPrice ?? a.minPrice ?? 0);
 const dateOf = (a) => a.startDate || a.start_time || null;
 const dateEnd = (a) => a.endDate || a.end_time || null;
+
+// veranderd naar utc date
 const parseUtcDate = (s) => {
     if (!s) return null;
     if (/(?:Z|[+\-]\d{2}:\d{2})$/i.test(s)) return new Date(s);
@@ -175,7 +178,6 @@ export default function AAuctions() {
     const [logo, setLogo] = useState(null);
     const navigate = useNavigate();
 
-    // filters & controls
     const [query, setQuery] = useState("");
     const [priceMin, setPriceMin] = useState(0);
     const [priceMax, setPriceMax] = useState(100);
@@ -190,7 +192,7 @@ export default function AAuctions() {
     const perPage = 6;
 
     useEffect(() => {
-        // Top logo (media id 1)
+        // het logo ophalen uit de database (altijd media ID 1)
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
@@ -201,7 +203,7 @@ export default function AAuctions() {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
-            .catch(() => { /* silent fallback */ });
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -218,7 +220,6 @@ export default function AAuctions() {
                 const plantIds = [...new Set(auctions.map((a) => a.plant_id ?? a.plantId).filter(Boolean))];
                 const supplierIds = [...new Set(auctions.map((a) => a.supplier_id ?? a.supplierId ?? a.auctionmaster_id).filter(Boolean))];
 
-                // plants
                 let plants = (await fetchMaybe(`${API_BASE}/api/Plants?ids=${plantIds.join(",")}`)) ?? (await fetchMaybe(`${API_BASE}/api/Plants/batch?ids=${plantIds.join(",")}`));
                 if (!plants || (Array.isArray(plants) && plants.length === 0)) {
                     const r = await Promise.all(plantIds.map((id) => fetchMaybe(`${API_BASE}/api/Plants/${id}`)));
@@ -228,7 +229,6 @@ export default function AAuctions() {
 
                 const plantsById = new Map(plants.map((p) => [Number(p?.plant_id ?? p?.id), p]).filter(Boolean));
 
-                // media (single endpoint, local filter)
                 const mediaPayload = await fetchMaybe("/api/MediaPlant");
                 const mediaByPlant = new Map();
                 if (Array.isArray(mediaPayload)) {
@@ -243,7 +243,6 @@ export default function AAuctions() {
                     });
                 }
 
-                // suppliers
                 let suppliers = (await fetchMaybe(`${API_BASE}/api/Suppliers?ids=${supplierIds.join(",")}`)) ?? null;
                 if (!suppliers || (Array.isArray(suppliers) && suppliers.length === 0)) {
                     const r = await Promise.all(supplierIds.map((id) => fetchMaybe(`${API_BASE}/api/Suppliers/${id}`)));
@@ -252,7 +251,6 @@ export default function AAuctions() {
                 suppliers = suppliers?.flat?.() || [];
                 const suppliersById = new Map(suppliers.map(s => [String(s?.id ?? s?.supplier_id), s]).filter(Boolean));
 
-                // merge auctions
                 const merged = [];
                 const mapByKey = new Map();
                 for (const a of auctions) {
@@ -283,7 +281,6 @@ export default function AAuctions() {
                         mapByKey.set(key, enriched);
                         merged.push(enriched);
                     } else {
-                        // merge images and fill missing fields
                         const ex = mapByKey.get(key);
                         ex.images = Array.from(new Set([...(ex.images || []), ...(enriched.images || [])]));
                         for (const f of ["plantName", "category", "form", "quality", "description", "startPrice", "minPrice", "supplierName", "startDate", "endDate"]) {
@@ -309,7 +306,6 @@ export default function AAuctions() {
         return () => { mounted = false; };
     }, []);
 
-    // filter options
     const options = useMemo(() => {
         const all = [...active, ...upcoming];
         const collect = (k) => [...new Set(all.map(a => a[k]).filter(Boolean))].sort();
@@ -322,7 +318,6 @@ export default function AAuctions() {
         return s;
     });
 
-    // filtered upcoming
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         const list = (upcoming || []).filter(a => {

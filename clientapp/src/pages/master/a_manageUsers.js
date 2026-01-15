@@ -27,6 +27,7 @@ export default function AManageUsers() {
         loadSuppliers();
     }, []);
 
+    // fetch alle companies and suppliers
     const loadCompanies = async () => {
         setLoadingCompanies(true);
         try {
@@ -131,7 +132,6 @@ export default function AManageUsers() {
 
     return (
         <div className="manage-users-page">
-            {/* Welcome section */}
             <section className="manage-users-welcome-section" role="region" aria-label="manage-users-banner">
                 <div className="manage-users-welcome-header">
                     <div className="manage-users-welcome-text">
@@ -143,11 +143,9 @@ export default function AManageUsers() {
                 </div>
             </section>
 
-            {/* Main content */}
             <main className="manage-users-main">
                 <div className="manage-users-container">
                     <div className="manage-users-tables-wrapper">
-                        {/* Companies Table */}
                         <div className="manage-users-table-section">
                             <div className="manage-users-section-header">
                                 <h2 className="manage-users-section-title">Companies</h2>
@@ -199,7 +197,6 @@ export default function AManageUsers() {
                             )}
                         </div>
 
-                        {/* Suppliers Table */}
                         <div className="manage-users-table-section">
                             <div className="manage-users-section-header">
                                 <h2 className="manage-users-section-title">Suppliers</h2>
