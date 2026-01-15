@@ -24,7 +24,7 @@ export default function AStockOverview() {
         if (!url) return null;
         const t = url.trim();
         if (t.startsWith("http://") || t.startsWith("https://")) return t;
-        return t.startsWith("/") ? t : `/${t}`;
+        return API_BASE ? `${API_BASE}${t.startsWith("/") ? t : `/${t}`}` : (t.startsWith("/") ? t : `/${t}`);
     };
 
     const handleDeletePlant = async (plantId, plantName) => {
