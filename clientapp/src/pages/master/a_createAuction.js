@@ -88,7 +88,7 @@ export default function CreateAuction() {
   async function fetchPlants() {
     try {
       setLoading(true);
-      const res = await fetch("/api/Plants");
+      const res = await fetch(`${API_BASE}/api/Plants`);
       if (!res.ok) throw new Error(`Failed to load plants: ${res.status}`);
       const data = await res.json();
       setPlants(data);
@@ -110,7 +110,7 @@ export default function CreateAuction() {
     setError(null);
 
     try {
-      const res = await fetch("/api/MediaPlant");
+      const res = await fetch(`${API_BASE}/api/MediaPlant`);
       if (!res.ok) {
         console.warn("Failed to load MediaPlant:", res.status);
         setPlantMedia([]);
@@ -144,7 +144,7 @@ export default function CreateAuction() {
     // fetch remaining containers voor geselecteerde plant
   async function fetchRemainingContainers(plantId) {
     try {
-      const res = await fetch("/api/AuctionLots");
+      const res = await fetch(`${API_BASE}/api/AuctionLots`);
       if (!res.ok) {
         console.warn("Failed to load AuctionLots:", res.status);
         setRemainingContainers(null);
@@ -235,7 +235,7 @@ export default function CreateAuction() {
 
     try {
       setSaving(true);
-      const res = await fetch("/api/Auctions", {
+      const res = await fetch(`${API_BASE}/api/Auctions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -73,7 +73,7 @@ export default function SAddProduct() {
     fd.append("alt_text", file.name || "");
     fd.append("is_primary", isPrimary ? "true" : "false");
 
-    const res = await fetch("/api/MediaPlant/upload", {
+    const res = await fetch(`${API_BASE}/api/MediaPlant/upload`, {
       method: "POST",
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       body: fd,
@@ -129,7 +129,7 @@ export default function SAddProduct() {
         min_price: Math.floor(Number(minPrice) || 0)
       };
 
-      const plantRes = await fetch("/api/Plants", {
+      const plantRes = await fetch(`${API_BASE}/api/Plants`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export default function SAddProduct() {
         remaining_quantity: Number(totalQuantity)
       };
 
-      const lotRes = await fetch("/api/AuctionLots", {
+      const lotRes = await fetch(`${API_BASE}/api/AuctionLots`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

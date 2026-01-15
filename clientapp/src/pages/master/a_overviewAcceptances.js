@@ -123,7 +123,7 @@ export default function AOverviewAcceptances() {
     const loadAcceptances = async () => {
         setLoading(true);
         try {
-            const acceptancesData = await fetchMaybe("/api/Acceptances");
+            const acceptancesData = await fetchMaybe(`${API_BASE}/api/Acceptances`);
             if (!acceptancesData || !Array.isArray(acceptancesData)) {
                 setAcceptances([]);
                 return;

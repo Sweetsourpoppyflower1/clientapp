@@ -36,7 +36,7 @@ export default function AOverviewUpcomingAuctions() {
 
         async function loadAuctionsAndPlants() {
             try {
-                const res = await fetch("/api/Auctions");
+                const res = await fetch(`${API_BASE}/api/Auctions`);
                 if (!res.ok) throw new Error(`Auctions endpoint returned ${res.status}`);
                 const all = await res.json();
 
@@ -51,7 +51,7 @@ export default function AOverviewUpcomingAuctions() {
 
                 let map = {};
                 try {
-                    const pRes = await fetch("/api/Plants");
+                    const pRes = await fetch(`${API_BASE}/api/Plants`);
                     if (pRes.ok) {
                         const plants = await pRes.json();
                         if (Array.isArray(plants)) {

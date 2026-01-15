@@ -59,7 +59,7 @@ export default function AStockOverview() {
     };
 
     useEffect(() => {
-        fetch("/api/plant/overview")
+        fetch(`${API_BASE}/api/plant/overview`)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch plants");
                 return res.json();
@@ -85,7 +85,7 @@ export default function AStockOverview() {
     }, []);
 
     useEffect(() => {
-        fetch("/api/AuctionLots")
+        fetch(`${API_BASE}/api/AuctionLots`)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch auction lots");
                 return res.json();
