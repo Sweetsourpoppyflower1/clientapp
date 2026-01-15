@@ -211,7 +211,7 @@ export default function AAuctions() {
         const load = async () => {
             setLoading(true);
             try {
-                const auctions = await fetchArray("/api/auctions");
+                const auctions = await fetchArray(`${API_BASE}/api/Auctions`);
                 if (!mounted || !auctions.length) {
                     if (mounted) { setActive([]); setUpcoming([]); }
                     return;
@@ -229,7 +229,7 @@ export default function AAuctions() {
 
                 const plantsById = new Map(plants.map((p) => [Number(p?.plant_id ?? p?.id), p]).filter(Boolean));
 
-                const mediaPayload = await fetchMaybe("/api/MediaPlant");
+                const mediaPayload = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 const mediaByPlant = new Map();
                 if (Array.isArray(mediaPayload)) {
                     mediaPayload.filter(m => plantIds.includes(Number(m.plant_id))).forEach(m => {
