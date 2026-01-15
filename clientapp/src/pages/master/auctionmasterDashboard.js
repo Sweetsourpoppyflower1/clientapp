@@ -12,7 +12,7 @@ export default function AuctionmasterDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Top logo (media id 1)
+        // het logo ophalen uit de database (altijd media ID 1)
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
@@ -27,7 +27,7 @@ export default function AuctionmasterDashboard() {
     }, []);
 
     useEffect(() => {
-        // Button media IDs: tile1 -> 2, tile2 -> 3, tile3 -> 4, tile4 -> 5
+        // de button logos ophalen uit de database (media ID 2 t/m 5)
         const ids = [2, 3, 4, 5];
         Promise.all(
             ids.map(id =>

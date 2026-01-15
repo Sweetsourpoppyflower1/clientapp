@@ -103,7 +103,6 @@ export default function AOverviewAcceptances() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch logo
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
@@ -114,7 +113,7 @@ export default function AOverviewAcceptances() {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
-            .catch(() => { /* silent fallback */ });
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -124,34 +123,28 @@ export default function AOverviewAcceptances() {
     const loadAcceptances = async () => {
         setLoading(true);
         try {
-            // Fetch acceptances
             const acceptancesData = await fetchMaybe("/api/Acceptances");
             if (!acceptancesData || !Array.isArray(acceptancesData)) {
                 setAcceptances([]);
                 return;
             }
 
-            // Get unique auction IDs and company IDs
             const auctionIds = [...new Set(acceptancesData.map(a => a.auction_id).filter(Boolean))];
             const companyIds = [...new Set(acceptancesData.map(a => a.company_id).filter(Boolean))];
 
-            // Fetch auctions to get plant info
             const auctionsPromises = auctionIds.map(id => fetchMaybe(`${API_BASE}/api/Auctions/${id}`));
             const auctions = await Promise.all(auctionsPromises);
             const auctionsMap = new Map(auctions.filter(Boolean).map(a => [a.auction_id, a]));
 
-            // Fetch plants
             const plantIds = [...new Set(auctions.filter(Boolean).map(a => a.plant_id).filter(Boolean))];
             const plantsPromises = plantIds.map(id => fetchMaybe(`${API_BASE}/api/Plants/${id}`));
             const plants = await Promise.all(plantsPromises);
             const plantsMap = new Map(plants.filter(Boolean).map(p => [p.plant_id, p]));
 
-            // Fetch companies
             const companiesPromises = companyIds.map(id => fetchMaybe(`${API_BASE}/api/Companies/${id}`));
             const companies = await Promise.all(companiesPromises);
             const companiesMap = new Map(companies.filter(Boolean).map(c => [c.id || c.company_id, c]));
 
-            // Enrich acceptances with additional data
             const enriched = acceptancesData.map(acc => {
                 const auction = auctionsMap.get(acc.auction_id);
                 const plant = auction ? plantsMap.get(auction.plant_id) : null;
@@ -175,8 +168,6 @@ export default function AOverviewAcceptances() {
 
     const handleAccept = async (acceptance) => {
         try {
-            // Here you would call your API to mark the acceptance as accepted
-            // For now, we'll just remove it from the list
             alert(`Acceptance for ${acceptance.plantName} has been accepted!`);
             setAcceptances(prev => prev.filter(a => a.id !== acceptance.id));
         } catch (err) {
@@ -187,7 +178,6 @@ export default function AOverviewAcceptances() {
 
     const handleRefuse = async (acceptance) => {
         try {
-            // Delete the acceptance
             const token = localStorage.getItem("auth_token");
             const res = await fetch(`${API_BASE}/api/Acceptances/${acceptance.id}`, {
                 method: "DELETE",
@@ -208,7 +198,6 @@ export default function AOverviewAcceptances() {
 
     return (
         <div className="acceptances-page">
-            {/* Header with logo */}
             <header className="acceptances-header">
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="acceptances-logo" />
@@ -217,7 +206,6 @@ export default function AOverviewAcceptances() {
                 )}
             </header>
 
-            {/* Welcome section */}
             <section className="acceptances-welcome-section" role="region" aria-label="acceptances-banner">
                 <div className="acceptances-welcome-header">
                     <div className="acceptances-welcome-text">
@@ -229,7 +217,6 @@ export default function AOverviewAcceptances() {
                 </div>
             </section>
 
-            {/* Main content */}
             <main className="acceptances-main">
                 <div className="acceptances-container">
                     <div className="acceptances-section-header">

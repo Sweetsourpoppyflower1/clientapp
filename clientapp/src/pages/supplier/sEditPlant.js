@@ -107,7 +107,6 @@ export default function SEditPlant() {
     const handleSave = async () => {
         if (!plantData) return;
 
-        // Validate prices
         const minPriceNum = parseFloat(minPrice);
         const startPriceNum = parseFloat(startPrice);
 
@@ -125,7 +124,6 @@ export default function SEditPlant() {
         setError(null);
 
         try {
-            // Create object with snake_case properties to match backend
             const updatedPlant = {
                 plant_id: plantData.plant_id,
                 productname: plantData.productname,
@@ -240,9 +238,7 @@ export default function SEditPlant() {
             </header>
 
             <div className="sep-content-section" role="region" aria-label="edit-content">
-                {/* Left panel - Plant image and basic info */}
                 <div className="sep-left-panel">
-                    {/* Plant Image */}
                     <div className="sep-plant-image-container">
                         {plantImage ? (
                             <img
@@ -255,7 +251,6 @@ export default function SEditPlant() {
                         )}
                     </div>
 
-                    {/* Plant Basic Info */}
                     <div className="sep-plant-info">
                         <div className="sep-plant-info-item">
                             <label className="sep-plant-info-label">Product Name:</label>
@@ -292,7 +287,6 @@ export default function SEditPlant() {
                     </div>
                 </div>
 
-                {/* Right panel - Edit form */}
                 <div className="sep-right-panel">
                     <div className="sep-form-section">
                         <h3>Edit Pricing</h3>
@@ -323,7 +317,6 @@ export default function SEditPlant() {
                             />
                         </div>
 
-                        {/* Current values display */}
                         <div className="sep-current-prices">
                             <div className="sep-current-price-item">
                                 <label>Current Min Price:</label>

@@ -47,7 +47,6 @@ export default function AStockOverview() {
                 throw new Error(errMsg);
             }
 
-            // Remove plant from local state
             setPlants(prev => prev.filter(p => p.plantId !== plantId));
             setExpandedIndex(null);
             alert(`"${plantName}" has been deleted successfully.`);
@@ -82,9 +81,7 @@ export default function AStockOverview() {
             .then((m) => {
                 setLogo({ url: normalizeUrl(m.url), alt: m.alt_text ?? "Flauction logo" });
             })
-            .catch(() => {
-                /* silent fallback */
-            });
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -107,7 +104,6 @@ export default function AStockOverview() {
 
     return (
         <div className="stock-page">
-            {/* Header with logo */}
             <header className="stock-header">
                 <div role="region" aria-label="brand-logo">
                     {logo ? (
@@ -118,7 +114,6 @@ export default function AStockOverview() {
                 </div>
             </header>
 
-            {/* Welcome section */}
             <section className="stock-welcome-section" role="region" aria-label="stock-overview-banner">
                 <div className="stock-welcome-header">
                     <div className="stock-welcome-text">
@@ -129,7 +124,6 @@ export default function AStockOverview() {
                 </div>
             </section>
 
-            {/* Main content */}
             <main className="stock-main">
                 <div className="stock-container">
                     <div className="stock-section-header">
@@ -219,7 +213,6 @@ export default function AStockOverview() {
                                                                 </div>
                                                             )}
 
-                                                            {/* Delete button section */}
                                                             <div className="stock-actions">
                                                                 <button
                                                                     className="stock-delete-btn"

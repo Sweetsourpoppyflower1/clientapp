@@ -17,9 +17,7 @@ export default function SupplierDashboard() {
 
     const navigate = useNavigate();
 
-    /**
-     * Normalize URL to ensure proper formatting
-     */
+    //zorgt ervoor dat media urls correct zijn
     const normalizeUrl = (url) => {
         if (!url) return null;
         const trimmed = url.trim();
@@ -27,9 +25,7 @@ export default function SupplierDashboard() {
         return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
     };
 
-    /**
-     * Extract supplier ID from various storage formats
-     */
+     
     const getSupplierId = () => {
         let supplierId = localStorage.getItem('supplierId');
 
@@ -45,13 +41,11 @@ export default function SupplierDashboard() {
                                    parsed?.id || parsed?.Id || parsed?.userId || parsed?.UserId;
                         if (supplierId) break;
                     } catch {
-                        // Not JSON, continue to next key
                     }
                 }
             }
         }
 
-        // Sanitize the supplier ID
         if (supplierId && typeof supplierId === 'string') {
             supplierId = supplierId.trim().replace(/^[^a-zA-Z0-9\-]+/, '');
         }
@@ -59,9 +53,6 @@ export default function SupplierDashboard() {
         return supplierId || null;
     };
 
-    /**
-     * Extract user data from storage
-     */
     const loadUserData = () => {
         try {
             const raw = localStorage.getItem('user_data') || localStorage.getItem('userdata') || localStorage.getItem('user');
@@ -77,9 +68,7 @@ export default function SupplierDashboard() {
         }
     };
 
-    /**
-     * Fetch logo on mount
-     */
+
     useEffect(() => {
         const fetchLogo = async () => {
             try {
@@ -100,9 +89,7 @@ export default function SupplierDashboard() {
         loadUserData();
     }, []);
 
-    /**
-     * Fetch supplier plants on mount
-     */
+
     useEffect(() => {
         const fetchPlants = async () => {
             const supplierId = getSupplierId();
@@ -182,7 +169,6 @@ export default function SupplierDashboard() {
 
     return (
         <div className="sd-page">
-            {/* Header with Logo */}
             <header className="sd-topbar">
                 <div className="sd-logo" role="region" aria-label="Logo section">
                     {logo?.url ? (
@@ -193,7 +179,6 @@ export default function SupplierDashboard() {
                 </div>
             </header>
 
-            {/* Welcome Section */}
             <section className="sd-welcome-section">
                 <div className="sd-welcome-header">
                     <div className="sd-welcome-text">
@@ -206,11 +191,8 @@ export default function SupplierDashboard() {
                 </div>
             </section>
 
-            {/* Main Content */}
             <main className="sd-main">
-                {/* Content Grid - Button and Stock Side by Side */}
                 <div className="sd-content-grid">
-                    {/* Add Products Button Tile */}
                     <div className="sd-buttons-section">
                         <button className="sd-action-btn sd-add-products-btn" onClick={handleAddProducts}>
                             <svg className="sd-btn-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -221,7 +203,6 @@ export default function SupplierDashboard() {
                         </button>
                     </div>
 
-                    {/* Stock View Section */}
                     <section className="sd-stock">
                         <div className="sd-stock-header">
                             <div className="sd-stock-icon">▦</div>
@@ -229,7 +210,6 @@ export default function SupplierDashboard() {
                         </div>
 
                         <div className="sd-stock-body" role="region" aria-label="Product inventory">
-                            {/* Error Message */}
                             {error && (
                                 <div className="sd-error-message" role="alert">
                                     <span className="sd-error-icon">⚠</span>
@@ -237,7 +217,6 @@ export default function SupplierDashboard() {
                                 </div>
                             )}
 
-                            {/* Loading State */}
                             {loadingPlants && !error && (
                                 <div className="sd-loading-message">
                                     <span className="sd-spinner"></span>
@@ -245,7 +224,6 @@ export default function SupplierDashboard() {
                                 </div>
                             )}
 
-                            {/* Empty State */}
                             {!loadingPlants && plants.length === 0 && !error && (
                                 <div className="sd-empty-message">
                                     <span className="sd-empty-icon">📦</span>
@@ -254,7 +232,6 @@ export default function SupplierDashboard() {
                                 </div>
                             )}
 
-                            {/* Products Table */}
                             {!loadingPlants && plants.length > 0 && (
                                 <div className="sd-table-wrapper">
                                     <table className="sd-stock-table" aria-label="Supplier product inventory">
@@ -295,7 +272,6 @@ export default function SupplierDashboard() {
                                                         <tr className="sd-details-row" id={`plant-details-${index}`}>
                                                             <td colSpan="5" className="sd-details-cell">
                                                                 <div className="sd-details-container">
-                                                                    {/* Image on the left */}
                                                                     <div className="sd-details-image">
                                                                         {plant.imageUrl ? (
                                                                             <img
@@ -308,7 +284,6 @@ export default function SupplierDashboard() {
                                                                         )}
                                                                     </div>
 
-                                                                    {/* Details grid on the right */}
                                                                     <div className="sd-details-grid">
                                                                         <div>
                                                                             <div><span className="sd-label">Min Stems</span>{plant.minStem}</div>
@@ -323,7 +298,6 @@ export default function SupplierDashboard() {
                                                                     </div>
                                                                 </div>
                                                                 
-                                                                {/* Description - Full Width */}
                                                                 <div className="sd-description-box">
                                                                     <span className="sd-label">Description</span>
                                                                     <p>{plant.description}</p>
@@ -346,7 +320,6 @@ export default function SupplierDashboard() {
                 </div>
             </main>
 
-            {/* Navigation and Account Menus */}
             <SupplierNavigationDropdownMenu navigateFn={(p) => navigate(p)} />
             <AccountDropdownMenu userName={userData.userName} userRole={userData.userRole} />
         </div>
