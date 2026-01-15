@@ -255,15 +255,25 @@ export default function ActiveAuction() {
             return;
         }
         
-        const acceptanceTime = new Date().toISOString();
-        const totalAmount = currentPrice * userAmount; // Calculate total
+        // Format local time (not UTC) as ISO-like string
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ms = String(now.getMilliseconds()).padStart(3, '0');
+        const acceptanceTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}`;
+        
+        const totalAmount = currentPrice * userAmount;
         
         const acceptance = {
             auction_id: auction.auction_id,
             company_id: companyId,
             auction_lot_id: activeLot.auctionlot_id,
             tick_number: 0, 
-            accepted_price: totalAmount, // Send total amount instead of single price
+            accepted_price: totalAmount,
             accepted_quantity: userAmount,
             time: acceptanceTime
         };
@@ -295,59 +305,72 @@ export default function ActiveAuction() {
                 throw new Error("Could not update quantity");
             }
 
-            // Show success notification with total amount
             const successMessage = `Purchased: ${userAmount} containers for €${totalAmount.toFixed(2)}`;
             showNotification(successMessage, "success", true);
 
             // Refetch fresh auction and lot data
             setTimeout(async () => {
-                const freshData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
-                if (freshData) {
-                    // Update auction with fresh data
-                    const effectiveStartTime = freshData.effective_start_time;
-                    const updatedAuction = {
-                        ...auction,
-                        effectiveStartTime,
-                        start_time: freshData.start_time
-                    };
-                    setAuction(updatedAuction);
-                    setCurrentPrice(auction.startPrice);
-                }
+                try {
+                    const freshData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
+                    if (freshData) {
+                        const updatedAuction = {
+                            auction_id: freshData.auction_id,
+                            plant_id: auction.plant_id,
+                            productname: auction.productname,
+                            imageUrl: auction.imageUrl,
+                            supplierName: auction.supplierName,
+                            supplierId: auction.supplierId,
+                            form: auction.form,
+                            maturity: auction.maturity,
+                            quality: auction.quality,
+                            quantityStems: auction.quantityStems,
+                            minStemLength: auction.minStemLength,
+                            unitPerCont: auction.unitPerCont,
+                            contInLot: auction.contInLot,
+                            minPickup: auction.minPickup,
+                            startPrice: auction.startPrice,
+                            minPrice: auction.minPrice,
+                            effectiveStartTime: freshData.effective_start_time,
+                            durationMinutes: freshData.duration_minutes,
+                            start_time: freshData.start_time
+                        };
+                        setAuction(updatedAuction);
+                        setCurrentPrice(auction.startPrice);
+                    }
 
-                // Refetch fresh lot data with updated remaining_quantity
-                const freshLots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
-                if (Array.isArray(freshLots)) {
-                    const freshLot = freshLots.find(l => Number(l.plant_id) === Number(auction.plant_id));
-                    if (freshLot) {
-                        setActiveLot(freshLot);
-                        // ALSO update the auction state's contInLot to reflect new quantity
-                        setAuction(prev => ({
-                            ...prev,
-                            contInLot: freshLot.remaining_quantity
-                        }));
+                    const freshLots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
+                    if (Array.isArray(freshLots)) {
+                        const freshLot = freshLots.find(l => Number(l.plant_id) === Number(auction.plant_id));
+                        if (freshLot) {
+                            setActiveLot(freshLot);
+                            setAuction(prev => ({
+                                ...prev,
+                                contInLot: freshLot.remaining_quantity
+                            }));
 
-                        // Check if auction should end (no quantity left or below minimum)
-                        if (freshLot.remaining_quantity <= 0 || freshLot.remaining_quantity < minBuy) {
-                            // Update auction status to completed
-                            const completedAuction = {
-                                ...auction,
-                                status: "completed"
-                            };
-                            const resStatus = await fetch(`${API_BASE}/api/Auctions/${id}`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(completedAuction)
-                            });
+                            if (freshLot.remaining_quantity <= 0 || freshLot.remaining_quantity < minBuy) {
+                                const completedAuction = {
+                                    ...auction,
+                                    status: "completed"
+                                };
+                                const resStatus = await fetch(`${API_BASE}/api/Auctions/${id}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(completedAuction)
+                                });
 
-                            if (resStatus.ok) {
-                                showNotification("Auction completed!", "success", true);
-                                // Redirect to auctions page after 2 seconds
-                                setTimeout(() => {
-                                    navigate('/cAuctions');
-                                }, 2000);
+                                if (resStatus.ok) {
+                                    showNotification("Auction completed!", "success", true);
+                                    setTimeout(() => {
+                                        navigate('/cAuctions');
+                                    }, 2000);
+                                }
                             }
                         }
                     }
+                } catch (err) {
+                    console.error("Error refreshing auction after purchase:", err);
+                    showNotification("Warning: Could not refresh auction data", "error");
                 }
             }, 500);
 
