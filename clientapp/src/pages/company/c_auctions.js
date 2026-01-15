@@ -177,7 +177,7 @@ export default function CAuctions() {
         const load = async () => {
             setLoading(true);
             try {
-                const auctions = await fetchArray(`${API_BASE}/api/auctions`);
+                const auctions = await fetchArray(`${API_BASE}/api/Auctions`);
                 if (!mounted || !auctions.length) {
                     if (mounted) { setActive([]); setUpcoming([]); }
                     return;
