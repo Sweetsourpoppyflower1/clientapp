@@ -43,6 +43,7 @@ export default function CreateAuction() {
   const [selectedPlantId, setSelectedPlantId] = useState(null);
   const [plantMedia, setPlantMedia] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [remainingContainers, setRemainingContainers] = useState(null);
 
   const [startTime, setStartTime] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("");
@@ -70,9 +71,11 @@ export default function CreateAuction() {
   useEffect(() => {
     if (selectedPlantId !== null) {
       fetchMediaForPlant(selectedPlantId);
+      fetchRemainingContainers(selectedPlantId);
     } else {
       setPlantMedia([]);
       setSelectedImageIndex(0);
+      setRemainingContainers(null);
     }
   }, [selectedPlantId]);
 
@@ -131,6 +134,26 @@ export default function CreateAuction() {
     }
   }
 
+  async function fetchRemainingContainers(plantId) {
+    try {
+      const res = await fetch("/api/AuctionLots");
+      if (!res.ok) {
+        console.warn("Failed to load AuctionLots:", res.status);
+        setRemainingContainers(null);
+        return;
+      }
+      const lots = await res.json();
+      const plantLot = Array.isArray(lots) 
+        ? lots.find(l => Number(l.plant_id) === Number(plantId))
+        : null;
+      
+      setRemainingContainers(plantLot?.remaining_quantity ?? 0);
+    } catch (err) {
+      console.warn("error fetching auction lots", err);
+      setRemainingContainers(null);
+    }
+  }
+
   function onPrevImage() {
     setSelectedImageIndex((i) => {
       if (plantMedia.length === 0) return 0;
@@ -172,6 +195,10 @@ export default function CreateAuction() {
     }
     if (!selectedPlantId) {
       setError("Select a plant first.");
+      return;
+    }
+    if (remainingContainers <= 0) {
+      setError("Cannot create auction: no containers available for this plant.");
       return;
     }
     if (!startTime || !durationMinutes) {
@@ -224,6 +251,7 @@ export default function CreateAuction() {
 
   const selectedPlant = getSelectedPlant();
   const selectedImage = plantMedia[selectedImageIndex];
+  const isCreateDisabled = remainingContainers === null || remainingContainers <= 0 || saving;
 
   return (
     <div className="create-auction-page">
@@ -231,7 +259,7 @@ export default function CreateAuction() {
         {logo ? (
           <img src={resolveMediaUrl(logo.url)} alt={logo.alt} className="top-logo" />
         ) : (
-          <span className="loading-label">Loading�</span>
+          <span className="loading-label">Loading</span>
         )}
       </div>
 
@@ -288,6 +316,15 @@ export default function CreateAuction() {
           <label className="label">Min price</label>
           <input className="input" type="text" readOnly value={selectedPlant?.min_price ?? ""} />
 
+          <label className="label">Remaining Containers</label>
+          <input 
+            className="input" 
+            type="text" 
+            readOnly 
+            value={remainingContainers === null ? "Loading..." : remainingContainers}
+            style={remainingContainers === 0 ? { color: "#d32f2f" } : {}}
+          />
+
           <label className="label">Description</label>
           <textarea className="input" readOnly value={selectedPlant?.desc ?? ""} rows={7} />
         </div>
@@ -325,7 +362,7 @@ export default function CreateAuction() {
           />
 
           <div style={{ marginTop: 20 }}>
-            <button onClick={onCreateAuction} disabled={saving} className="create-btn">
+            <button onClick={onCreateAuction} disabled={isCreateDisabled} className="create-btn">
               {saving ? "Creating..." : "Create Auction"}
             </button>
             <button onClick={() => window.history.back()} className="cancel-btn" type="button">Cancel</button>

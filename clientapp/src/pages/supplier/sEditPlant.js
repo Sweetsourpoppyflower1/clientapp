@@ -24,6 +24,9 @@ export default function SEditPlant() {
     const [plantImage, setPlantImage] = useState(null);
     const [minPrice, setMinPrice] = useState('');
     const [startPrice, setStartPrice] = useState('');
+    const [currentContainers, setCurrentContainers] = useState(0);
+    const [containersToAdd, setContainersToAdd] = useState('');
+    const [auctionLotId, setAuctionLotId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(null);
@@ -76,6 +79,17 @@ export default function SEditPlant() {
                     }
                 }
                 setPlantImage(imageUrl);
+
+                // Fetch auction lot data
+                const lots = await fetchMaybe("/api/AuctionLots");
+                if (Array.isArray(lots)) {
+                    const plantLot = lots.find(l => Number(l.plant_id) === Number(plant.plant_id));
+                    if (plantLot) {
+                        setAuctionLotId(plantLot.auctionlot_id);
+                        setCurrentContainers(plantLot.remaining_quantity || 0);
+                    }
+                }
+
                 setError(null);
 
             } catch (err) {
@@ -147,6 +161,57 @@ export default function SEditPlant() {
         } catch (err) {
             console.error('Error saving plant:', err);
             setError('Error saving plant: ' + err.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleAddContainers = async () => {
+        if (!auctionLotId) {
+            alert('Auction lot not found');
+            return;
+        }
+
+        const containersNum = parseInt(containersToAdd, 10);
+        if (isNaN(containersNum) || containersNum <= 0) {
+            alert('Please enter a valid number of containers to add');
+            return;
+        }
+
+        setIsSaving(true);
+        setError(null);
+
+        try {
+            const newTotal = currentContainers + containersNum;
+            const updatedLot = {
+                auctionlot_id: auctionLotId,
+                plant_id: plantData.plant_id,
+                remaining_quantity: newTotal,
+                unit_per_container: 0,
+                min_pickup: 0
+            };
+
+            console.log('Updating auction lot with data:', updatedLot);
+
+            const response = await fetch(`${API_BASE}/api/AuctionLots/${auctionLotId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(updatedLot)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Save error response:', errorText);
+                throw new Error(`Failed to update containers: ${response.status}`);
+            }
+
+            setCurrentContainers(newTotal);
+            setContainersToAdd('');
+            alert(`Successfully added ${containersNum} containers. Total: ${newTotal}`);
+        } catch (err) {
+            console.error('Error updating containers:', err);
+            setError('Error updating containers: ' + err.message);
         } finally {
             setIsSaving(false);
         }
@@ -286,6 +351,37 @@ export default function SEditPlant() {
                                 Cancel
                             </button>
                         </div>
+                    </div>
+
+                    <div className="sep-form-section" style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #ddd' }}>
+                        <h3>Manage Containers</h3>
+                        <div className="sep-form-group">
+                            <label>Current Containers:</label>
+                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2d5016', marginBottom: '15px' }}>
+                                {currentContainers} containers
+                            </div>
+                        </div>
+                        <div className="sep-form-group">
+                            <label htmlFor="containersToAdd">Add Containers</label>
+                            <input
+                                id="containersToAdd"
+                                type="number"
+                                min="1"
+                                value={containersToAdd}
+                                onChange={(e) => setContainersToAdd(e.target.value)}
+                                placeholder="Enter number of containers to add"
+                                disabled={isSaving}
+                            />
+                        </div>
+
+                        <button 
+                            className="sep-btn sep-btn-primary" 
+                            onClick={handleAddContainers}
+                            disabled={isSaving || !containersToAdd}
+                            style={{ width: '100%' }}
+                        >
+                            {isSaving ? 'Updating...' : 'Add Containers'}
+                        </button>
                     </div>
                 </div>
             </div>

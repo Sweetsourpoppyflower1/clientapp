@@ -16,6 +16,18 @@ const fetchMaybe = async (url) => {
     } catch { return null; }
 };
 
+const parseUtcDate = (s) => {
+    if (!s) return null;
+    if (/(?:Z|[+\-]\d{2}:\d{2})$/i.test(s)) return new Date(s);
+    return new Date(s);  // Parse as-is (local time, no Z)
+};
+
+const parseLocalDateTime = (s) => {
+    if (!s) return Date.now();
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? Date.now() : d.getTime();
+};
+
 export default function ActiveAuction() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -43,6 +55,7 @@ export default function ActiveAuction() {
         allSuppliersAverage: 0
     });
     const [priceHistoryLoading, setPriceHistoryLoading] = useState(false);
+    const [secondsUntilStart, setSecondsUntilStart] = useState(0);
 
     const showNotification = (message, type = 'success', persist = false) => {
         setNotification({ message, type });
@@ -204,6 +217,23 @@ export default function ActiveAuction() {
 
         load();
     }, [id]);
+
+    useEffect(() => {
+        if (!auction) return;
+        
+        const timerStartTime = new Date(auction.effectiveStartTime);
+        
+        const updateCountdown = () => {
+            const now = Date.now();
+            const remaining = Math.max(timerStartTime.getTime() - now, 0);
+            setSecondsUntilStart(Math.ceil(remaining / 1000));
+        };
+        
+        updateCountdown(); // Initial update
+        const interval = setInterval(updateCountdown, 1000);
+        
+        return () => clearInterval(interval);
+    }, [auction?.effectiveStartTime]);
 
     const handleBuy = async () => {
         if (!auction || !activeLot) return;
@@ -382,16 +412,9 @@ export default function ActiveAuction() {
     const timerStartTime = new Date(auction.effectiveStartTime);
     const now = new Date();
     const elapsed = now - timerStartTime;
-    const remaining = Math.max(durationMs - elapsed, 0);
+    const timeUntilStart = Math.max(timerStartTime.getTime() - now.getTime(), 0);
     const hasStarted = elapsed >= 0;
-    const timeUntilStart = hasStarted ? 0 : timerStartTime.getTime() - now.getTime();
-    const parsedStartTime = auction.effectiveStartTime
-        ? Date.parse(auction.effectiveStartTime)
-        : Date.now();
-
-    // Ensure parsedStartTime is valid; if NaN, use current time
-    const validStartTime = isNaN(parsedStartTime) ? Date.now() : parsedStartTime;
-
+    const validStartTime = timerStartTime.getTime();
 
 
     // DEBUG
@@ -399,7 +422,6 @@ export default function ActiveAuction() {
         auctionId: auction.auction_id,
         effectiveStartTime: auction.effectiveStartTime,
         durationMinutes: auction.durationMinutes,
-        parsedStartTime,
         validStartTime,
         hasStarted,
         now: Date.now(),
@@ -583,16 +605,16 @@ export default function ActiveAuction() {
                     <div className="c-aa-clock-panel">
         {!hasStarted ? (
             <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                Auction starts in {Math.ceil(timeUntilStart / 1000)} seconds
+                Auction starts in {secondsUntilStart} seconds
             </div>
                      ) : (
                         <AuctionClock
-                            startPrice={auction.startPrice}
-                            minPrice={auction.minPrice}
-                            durationMs={durationMs}  // Always full duration, not adjusted
-                            onPriceUpdate={handlePriceUpdate}
-                            startTime={validStartTime}  // Effective start time (acceptance or original)
-                         />
+    startPrice={auction.startPrice}
+    minPrice={auction.minPrice}
+    durationMs={durationMs}
+    onPriceUpdate={handlePriceUpdate}
+    startTime={timerStartTime.getTime()}
+/>
                     )}
 
                     
@@ -686,7 +708,9 @@ export default function ActiveAuction() {
                                      </div>
                                      <div className="c-aa-detail-group">
                                          <label>Starts at:</label>
-                                         <div className="c-aa-detail-val box-white">{mk.start_time ? new Date(mk.start_time).toLocaleString() : "TBD"}</div>
+                                         <div className="c-aa-detail-val box-white">
+                                             {mk.start_time ? parseUtcDate(mk.start_time).toLocaleString('en-NL') : "TBD"}
+                                         </div>
                                      </div>
                                  </div>
                              </div>
