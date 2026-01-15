@@ -4,6 +4,7 @@ import "../../styles/login_registerPages/loginStyle.css";
 const API_BASE = process.env.REACT_APP_API_URL || "";
 const AUTH_ENDPOINT = `${API_BASE}/api/Auth/login`;
 
+// Functie om een JWT token te decoderen en de payload eruit te halen
 function decodeJwt(token) {
   try {
     const payload = token.split(".")[1];
@@ -15,6 +16,7 @@ function decodeJwt(token) {
   }
 }
 
+// Inlogpagina voor gebruikers om toegang te krijgen tot hun account
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +40,7 @@ export default function Login() {
       });
   }, []);
 
+// Leid de gebruiker door naar de juiste dashboard pagina gebaseerd op hun rol (bedrijf, leverancier of beheerder)
   function redirectForRole(role) {
     if (!role) {
       console.error("No role provided for redirect");
@@ -58,6 +61,7 @@ export default function Login() {
     }
   }
 
+// Verwerk het inlogformulier: verstuur login verzoek naar server en handel reactie af
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -69,7 +73,7 @@ export default function Login() {
       const res = await fetch(AUTH_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           email: email,
           password: password
         }),
@@ -91,17 +95,14 @@ export default function Login() {
         email: data?.email
       });
 
-      // Priority 1: Check for roles in response
       const roles = data?.roles || data?.Roles || [];
-      
+
       if (Array.isArray(roles) && roles.length > 0) {
         console.log(`✅ Roles found in response: ${roles.join(", ")}`);
-        
-        // Store user information
+
         localStorage.setItem("user_email", data?.email || "");
         localStorage.setItem("user_roles", JSON.stringify(roles));
-        
-        // Store supplier data if available
+
         if (data?.data) {
           localStorage.setItem("user_data", JSON.stringify(data.data));
           if (data.data.SupplierId) {
@@ -110,7 +111,6 @@ export default function Login() {
           }
         }
 
-        // Store token if provided
         if (data?.token) {
           localStorage.setItem("auth_token", data.token);
           console.log(`✅ JWT Token stored (length: ${data.token.length})`);
@@ -120,7 +120,6 @@ export default function Login() {
         return;
       }
 
-      // Priority 2: Check for token and decode roles from it
       const token = data?.token || data?.access_token || data?.accessToken;
       if (token) {
         console.log("✅ Token found in response, storing and decoding...");
@@ -130,22 +129,18 @@ export default function Login() {
         console.log("🔍 Token payload:", payload);
 
         if (payload) {
-          // Try different role claim formats
           const claimKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
-          let rolesFromToken = payload?.role || 
-                               payload?.roles || 
-                               payload?.[claimKey] || 
+          let rolesFromToken = payload?.role ||
+                               payload?.roles ||
+                               payload?.[claimKey] ||
                                [];
 
-          // Ensure it's an array
           if (typeof rolesFromToken === 'string') {
             rolesFromToken = [rolesFromToken];
           }
 
           if (Array.isArray(rolesFromToken) && rolesFromToken.length > 0) {
             console.log(`✅ Roles decoded from token: ${rolesFromToken.join(", ")}`);
-            
-            // Store user information
             localStorage.setItem("user_email", data?.email || "");
             localStorage.setItem("user_roles", JSON.stringify(rolesFromToken));
 
@@ -163,7 +158,6 @@ export default function Login() {
         }
       }
 
-      // If we reach here, we couldn't get roles or token
       console.error("❌ No roles or token found in login response");
       console.log("Full response:", data);
       setError("Login succeeded but no role information returned. Please contact support.");
@@ -177,7 +171,6 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      {/* Header */}
       <header className="login-topbar">
         <div className="login-logo" role="region" aria-label="logo-section">
           {logo ? (
@@ -186,9 +179,8 @@ export default function Login() {
             <span className="loading-label">Loading…</span>
           )}
         </div>
-      </header>
+          </header>
 
-      {/* Welcome Banner */}
       <section className="login-welcome-section" role="region" aria-label="welcome-banner">
         <div className="login-welcome-header">
           <div className="login-welcome-text">
@@ -201,16 +193,13 @@ export default function Login() {
         </div>
       </section>
 
-      {/* Main Content */}
       <div className="login-content-section">
-        {/* Error Message */}
         {error && (
           <div className="login-error-banner" role="alert">
             <span>⚠️ {error}</span>
           </div>
         )}
 
-        {/* Form Card */}
         <div className="login-form-card">
           <div className="login-form-header">
             <h2>Sign In</h2>

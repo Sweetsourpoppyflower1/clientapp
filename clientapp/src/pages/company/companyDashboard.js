@@ -1,3 +1,5 @@
+// Dit is het hoofdscherm voor bedrijven. Hier kunnen bedrijven hun dashboard bekijken,
+// veilingen zien en bestellingen beheren.
 import React, { useEffect, useState } from 'react';
 import '../../styles/companyPages/companyDashboardStyle.css';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +14,7 @@ export default function CompanyDashboard() {
     const [companyName, setCompanyName] = useState('');
     const navigate = useNavigate();
 
+    // Haal het hoofdlogo op van de server om bovenaan te tonen
     useEffect(() => {
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
@@ -23,9 +26,10 @@ export default function CompanyDashboard() {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
                 setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
-            .catch(() => { /* silent fallback */ });
+            .catch(() => {}); // Negeer fouten bij het ophalen van het logo
     }, []);
 
+    // Haal de logos voor de actieknoppen op (voor veilingen en bestellingen)
     useEffect(() => {
         const ids = [2, 4];
         Promise.all(
@@ -47,22 +51,25 @@ export default function CompanyDashboard() {
         });
     }, []);
 
+    // Haal de naam van het bedrijf op uit de lokale opslag van de browser
     useEffect(() => {
-        // Try to get company name from local storage or localStorage
         const storedCompanyName = localStorage.getItem('companyName');
         if (storedCompanyName) {
             setCompanyName(storedCompanyName);
         }
     }, []);
 
+    // Ga naar de pagina met alle beschikbare veilingen
     const handleButton1 = () => {
         window.location.href = '/CAuctions';
     };
 
+    // Ga naar de pagina met de bestellingen van dit bedrijf
     const handleButton2 = () => {
         window.location.href = '/CMyOrders';
     };
 
+    // Toon de juiste afbeelding voor een knop, of een standaard plaatshouder als er geen afbeelding is
     const renderTileContent = (index, placeholderSvg) => {
         const media = buttonLogos[index];
         if (media) {

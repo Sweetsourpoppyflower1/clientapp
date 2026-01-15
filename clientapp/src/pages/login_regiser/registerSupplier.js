@@ -4,6 +4,7 @@ import * as IBAN from "iban";
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
 
+// Registratiepagina voor leveranciers om een nieuw account aan te maken
 export default function RegisterSupplier() {
     const [form, setForm] = useState({
         email: "",
@@ -114,7 +115,6 @@ export default function RegisterSupplier() {
 
     return (
         <div className="r-parent">
-            {/* Header */}
             <header className="r-header">
                 <div className="r-logo" role="region" aria-label="logo-section">
                     {logo ? (
@@ -125,7 +125,6 @@ export default function RegisterSupplier() {
                 </div>
             </header>
 
-            {/* Welcome Banner */}
             <section className="r-welcome-section" role="region" aria-label="welcome-banner">
                 <div className="r-welcome-header">
                     <div className="r-welcome-text">
@@ -138,23 +137,19 @@ export default function RegisterSupplier() {
                 </div>
             </section>
 
-            {/* Main Content */}
             <div className="r-content-section">
-                {/* Error Message */}
                 {error && (
                     <div className="r-error-banner" role="alert">
                         <span>⚠️ {error}</span>
                     </div>
                 )}
 
-                {/* Success Message */}
                 {success && (
                     <div className="r-success-banner" role="status">
                         <span>✅ Registration successful! Redirecting to login...</span>
                     </div>
                 )}
 
-                {/* Form Card */}
                 <div className="r-form-card">
                     <div className="r-form-header">
                         <h2>Sign Up</h2>

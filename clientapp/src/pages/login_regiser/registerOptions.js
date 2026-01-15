@@ -4,6 +4,7 @@ import "../../styles/login_registerPages/registerOptionsStyle.css";
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
 
+// Pagina waar gebruikers kunnen kiezen tussen registreren als bedrijf of als leverancier
 export default function RegisterOptions() {
     const navigate = useNavigate();
     const [logo, setLogo] = useState(null);
@@ -24,7 +25,6 @@ export default function RegisterOptions() {
 
     return (
         <div className="op-parent">
-            {/* Header */}
             <header className="logo-au-header" role="banner" aria-label="logo-section">
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="u-top-logo" />
@@ -33,7 +33,6 @@ export default function RegisterOptions() {
                 )}
             </header>
 
-            {/* Welcome Banner */}
             <section className="op-welcome-section" role="region" aria-label="welcome-banner">
                 <div className="op-welcome-header">
                     <div className="op-welcome-text">
@@ -46,7 +45,6 @@ export default function RegisterOptions() {
                 </div>
             </section>
 
-            {/* Main Content */}
             <div className="body-upc">
                 <div className="op-action-box" role="group" aria-label="Register options">
                     <div className="register-as">

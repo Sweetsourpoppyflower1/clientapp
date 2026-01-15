@@ -39,11 +39,13 @@ const fetchArray = async (url) => {
 const getId = (a) => a?.id ?? a?.auction_id ?? a?.AuctionId ?? `${a?.auctionmaster_id}-${a?.plant_id}-${a?.startDate ?? a?.start_time}`;
 const priceOf = (a) => Number(a.startPrice ?? a.minPrice ?? 0);
 const dateOf = (a) => a.startDate || a.start_time || null;
+// Helper functie om een UTC datum te parsen
 const parseUtcDate = (s) => {
     if (!s) return null;
-    return new Date(s);  // Just parse as-is, no Z
+    return new Date(s);
 };
 
+// Component om een enkele veiling kaart weer te geven met afbeelding en details
 function AuctionCard({ a }) {
     const navigate = useNavigate();
     const [imageIndex, setImageIndex] = useState(0);
@@ -136,15 +138,13 @@ function AuctionCard({ a }) {
     );
 }
 
+// Hoofdpagina voor bedrijven om alle beschikbare veilingen te bekijken en te filteren
 export default function CAuctions() {
     const navigate = useNavigate();
     const [active, setActive] = useState([]);
     const [upcoming, setUpcoming] = useState([]);
     const [loading, setLoading] = useState(true);
     const [logo, setLogo] = useState(null);
-
-
-    // filters & controls
     const [query, setQuery] = useState("");
     const [priceMin, setPriceMin] = useState(0);
     const [priceMax, setPriceMax] = useState(100);
@@ -159,7 +159,6 @@ export default function CAuctions() {
     const perPage = 6;
 
     useEffect(() => {
-        // Top logo (media id 1)
         const mediaId = 1;
         fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
@@ -173,6 +172,7 @@ export default function CAuctions() {
             .catch(() => {});
     }, []);
 
+    // Laad alle benodigde gegevens voor veilingen: planten, afbeeldingen, leveranciers
     useEffect(() => {
         let mounted = true;
         const load = async () => {
@@ -187,7 +187,6 @@ export default function CAuctions() {
                 const plantIds = [...new Set(auctions.map((a) => a.plant_id ?? a.plantId).filter(Boolean))];
                 const supplierIds = [...new Set(auctions.map((a) => a.supplier_id ?? a.supplierId ?? a.auctionmaster_id).filter(Boolean))];
 
-                // plants
                 let plants = (await fetchMaybe(`${API_BASE}/api/Plants?ids=${plantIds.join(",")}`)) ?? (await fetchMaybe(`${API_BASE}/api/Plants/batch?ids=${plantIds.join(",")}`));
                 if (!plants || (Array.isArray(plants) && plants.length === 0)) {
                     const r = await Promise.all(plantIds.map((id) => fetchMaybe(`${API_BASE}/api/Plants/${id}`)));
@@ -196,10 +195,9 @@ export default function CAuctions() {
                 plants = plants?.flat?.() || [];
 
                 const plantsById = new Map(plants.map((p) => [Number(p?.plant_id ?? p?.id), p]).filter(Boolean));
-
-                // media 
                 const mediaPayload = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 const mediaByPlant = new Map();
+
                 if (Array.isArray(mediaPayload)) {
                     mediaPayload.filter(m => plantIds.includes(Number(m.plant_id))).forEach(m => {
                         const pid = Number(m.plant_id);
@@ -212,7 +210,6 @@ export default function CAuctions() {
                     });
                 }
 
-                // suppliers
                 let suppliers = (await fetchMaybe(`${API_BASE}/api/Suppliers?ids=${supplierIds.join(",")}`)) ?? null;
                 if (!suppliers || (Array.isArray(suppliers) && suppliers.length === 0)) {
                     const r = await Promise.all(supplierIds.map((id) => fetchMaybe(`${API_BASE}/api/Suppliers/${id}`)));
@@ -221,7 +218,6 @@ export default function CAuctions() {
                 suppliers = suppliers?.flat?.() || [];
                 const suppliersById = new Map(suppliers.map(s => [String(s?.id ?? s?.supplier_id), s]).filter(Boolean));
 
-                // merge auctions
                 const merged = [];
                 const mapByKey = new Map();
                 for (const a of auctions) {
@@ -253,7 +249,6 @@ export default function CAuctions() {
                         mapByKey.set(key, enriched);
                         merged.push(enriched);
                     } else {
-                        // merge images and fill missing fields
                         const ex = mapByKey.get(key);
                         ex.images = Array.from(new Set([...(ex.images || []), ...(enriched.images || [])]));
                         for (const f of ["plantName", "category", "form", "quality", "description", "startPrice", "minPrice", "supplierName", "startDate", "durationMinutes"]) {
@@ -279,20 +274,21 @@ export default function CAuctions() {
         return () => { mounted = false; };
     }, []);
 
-    // filter options
+    // Verzamel alle unieke opties voor filters uit de veilingen gegevens
     const options = useMemo(() => {
         const all = [...active, ...upcoming];
         const collect = (k) => [...new Set(all.map(a => a[k]).filter(Boolean))].sort();
         return { categories: collect("category"), forms: collect("form"), qualities: collect("quality"), maturities: collect("maturity") };
     }, [active, upcoming]);
 
+    // Helper functie om een waarde toe te voegen of te verwijderen uit een Set voor filters
     const toggleSet = (setter, value) => setter(prev => {
         const s = new Set(prev);
         s.has(value) ? s.delete(value) : s.add(value);
         return s;
     });
 
-    // filtered upcoming
+    // Filter en sorteer de aankomende veilingen op basis van de ingestelde criteria
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         const list = (upcoming || []).filter(a => {

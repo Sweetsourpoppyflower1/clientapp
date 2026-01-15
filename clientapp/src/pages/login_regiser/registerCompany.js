@@ -4,6 +4,7 @@ import * as IBAN from "iban";
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
 
+// Registratiepagina voor bedrijven om een nieuw account aan te maken
 export default function RegisterCompany() {
     const [form, setForm] = useState({
         email: "",
@@ -44,13 +45,13 @@ export default function RegisterCompany() {
             });
     }, []);
 
+    // Verwerk het registratieformulier: valideer alle velden en verstuur naar server
     const onSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
         setLoading(true);
 
-        // Client-side validation
         if (!form.email || !form.password || !form.companyName || !form.address || !form.postalCode || !form.country || !form.vat || !form.iban || !form.bic) {
             setError("All fields are required.");
             setLoading(false);
@@ -124,12 +125,10 @@ export default function RegisterCompany() {
                     iban: "",
                     bic: ""
                 });
-                // Redirect after 2 seconds
                 setTimeout(() => {
                     window.location.href = "/login";
                 }, 2000);
             } else {
-                // Try to parse JSON response
                 let errorMessage = `Registration failed (${res.status})`;
                 
                 try {
@@ -158,7 +157,6 @@ export default function RegisterCompany() {
 
     return (
         <div className="r-parent">
-            {/* Header */}
             <header className="r-header">
                 <div className="r-logo" role="region" aria-label="logo-section">
                     {logo ? (
@@ -169,7 +167,6 @@ export default function RegisterCompany() {
                 </div>
             </header>
 
-            {/* Welcome Banner */}
             <section className="r-welcome-section" role="region" aria-label="welcome-banner">
                 <div className="r-welcome-header">
                     <div className="r-welcome-text">
@@ -182,23 +179,20 @@ export default function RegisterCompany() {
                 </div>
             </section>
 
-            {/* Main Content */}
             <div className="r-content-section">
-                {/* Error Message */}
+
                 {error && (
                     <div className="r-error-banner" role="alert">
                         <span>⚠️ {error}</span>
                     </div>
                 )}
 
-                {/* Success Message */}
                 {success && (
                     <div className="r-success-banner" role="status">
                         <span>✅ Registration successful! Redirecting to login...</span>
                     </div>
                 )}
 
-                {/* Form Card */}
                 <div className="r-form-card">
                     <div className="r-form-header">
                         <h2>Sign Up</h2>

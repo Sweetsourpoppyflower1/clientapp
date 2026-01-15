@@ -19,7 +19,7 @@ const fetchMaybe = async (url) => {
 const parseUtcDate = (s) => {
     if (!s) return null;
     if (/(?:Z|[+\-]\d{2}:\d{2})$/i.test(s)) return new Date(s);
-    return new Date(s);  // Parse as-is (local time, no Z)
+    return new Date(s);  
 };
 
 const parseLocalDateTime = (s) => {
@@ -28,6 +28,7 @@ const parseLocalDateTime = (s) => {
     return isNaN(d.getTime()) ? Date.now() : d.getTime();
 };
 
+// Pagina voor een actieve veiling waar bedrijven kunnen bieden op producten
 export default function ActiveAuction() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -57,6 +58,7 @@ export default function ActiveAuction() {
     const [priceHistoryLoading, setPriceHistoryLoading] = useState(false);
     const [secondsUntilStart, setSecondsUntilStart] = useState(0);
 
+    // Toon een melding aan de gebruiker, bijvoorbeeld succes of fout
     const showNotification = (message, type = 'success', persist = false) => {
         setNotification({ message, type });
         setNotificationPersist(persist);
@@ -65,8 +67,8 @@ export default function ActiveAuction() {
         }
     };
 
+    // Opruimen van oude timer gegevens uit lokale opslag
     useEffect(() => {
-        // Clear old auction timer data from localStorage
         const keys = Object.keys(localStorage);
         keys.forEach(key => {
             if (key.startsWith('auction_timer_')) {
@@ -85,6 +87,7 @@ export default function ActiveAuction() {
             })
             .catch(() => {});
         
+        // Laad alle benodigde gegevens voor de veiling: plant, leverancier, loten, afbeeldingen, etc.
         const load = async () => {
             setLoading(true);
             try {
@@ -94,7 +97,6 @@ export default function ActiveAuction() {
                     return;
                 }
 
-                // 🔑 SERVER is source of truth
                 const effectiveStartTime = aData.effective_start_time;
                 const durationMinutes = aData.duration_minutes;
 
@@ -154,7 +156,7 @@ export default function ActiveAuction() {
 
                     effectiveStartTime,
                     durationMinutes,
-                    start_time: aData.start_time  // ADD THIS LINE
+                    start_time: aData.start_time
                 };
 
                 setAuction(enriched);
@@ -162,7 +164,6 @@ export default function ActiveAuction() {
                 setUserAmount(enriched.minPickup);
                 setCurrentPrice(enriched.startPrice);
 
-                // Upcoming auctions (ongewijzigd)
                 const allAuctions = await fetchMaybe(`${API_BASE}/api/Auctions`);
                 if (Array.isArray(allAuctions)) {
                     const allPlants = await fetchMaybe(`${API_BASE}/api/Plants`);
@@ -218,23 +219,25 @@ export default function ActiveAuction() {
         load();
     }, [id]);
 
+    // Start een countdown timer voor wanneer de veiling begint
     useEffect(() => {
         if (!auction) return;
-        
+
         const timerStartTime = new Date(auction.effectiveStartTime);
-        
+
         const updateCountdown = () => {
             const now = Date.now();
             const remaining = Math.max(timerStartTime.getTime() - now, 0);
             setSecondsUntilStart(Math.ceil(remaining / 1000));
         };
-        
-        updateCountdown(); // Initial update
+
+        updateCountdown();
         const interval = setInterval(updateCountdown, 1000);
-        
+
         return () => clearInterval(interval);
     }, [auction?.effectiveStartTime]);
 
+    // Verwerk het kopen van een hoeveelheid containers in de veiling
     const handleBuy = async () => {
         if (!auction || !activeLot) return;
         
@@ -255,7 +258,6 @@ export default function ActiveAuction() {
             return;
         }
         
-        // Format local time (not UTC) as ISO-like string
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -279,12 +281,13 @@ export default function ActiveAuction() {
         };
 
         try {
+            // Verstuur de aankoop naar de server
             const resAcc = await fetch(`${API_BASE}/api/Acceptances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(acceptance)
             });
-            
+
             if (!resAcc.ok) {
                 const txt = await resAcc.text();
                 throw new Error(`Purchase failed: ${txt}`);
@@ -308,7 +311,7 @@ export default function ActiveAuction() {
             const successMessage = `Purchased: ${userAmount} containers for €${totalAmount.toFixed(2)}`;
             showNotification(successMessage, "success", true);
 
-            // Refetch fresh auction and lot data
+            // Na een korte wachttijd, vernieuw de veiling gegevens om de interface bij te werken
             setTimeout(async () => {
                 try {
                     const freshData = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
@@ -380,17 +383,16 @@ export default function ActiveAuction() {
         }
     };
 
+    // Laad de prijsgeschiedenis voor deze plant en toon deze in een modal
     const handlePriceHistory = async () => {
         setShowPriceHistory(true);
         setPriceHistoryLoading(true);
         try {
             const plantId = auction.plant_id;
-
-            // Use the existing endpoint that returns PlantPriceHistory data
             const response = await fetchMaybe(
                 `${API_BASE}/api/PriceHistory/plant/${plantId}`
             );
-            
+
             if (response) {
                 setPriceHistory({
                     plantName: auction.productname,
@@ -416,22 +418,20 @@ export default function ActiveAuction() {
         }
     };
 
+    // Sluit het prijsgeschiedenis venster
     const closePriceHistory = () => {
         setShowPriceHistory(false);
     };
 
+    // Update de huidige prijs wanneer de klok deze aanpast
     const handlePriceUpdate = useCallback((price) => {
         setCurrentPrice(price);
     }, []);
 
-    // Guard clauses FIRST
     if (loading) return <div className="c-aa-loading">Loading...</div>;
     if (!auction) return <div className="c-aa-loading">Auction not found or invalid ID</div>;
 
-    // Duration in ms
     const durationMs = (auction.durationMinutes || 60) * 60 * 1000;
-
-    // Timer start time = effectiveStartTime from server
     const timerStartTime = new Date(auction.effectiveStartTime);
     const now = new Date();
     const elapsed = now - timerStartTime;
@@ -440,7 +440,6 @@ export default function ActiveAuction() {
     const validStartTime = timerStartTime.getTime();
 
 
-    // DEBUG
     console.log('Auction Data:', {
         auctionId: auction.auction_id,
         effectiveStartTime: auction.effectiveStartTime,
@@ -451,7 +450,7 @@ export default function ActiveAuction() {
         elapsed
     });
 
-    // Single return statement
+
     return (
         <div className="c-aa-page">
             {notification && (
@@ -466,7 +465,6 @@ export default function ActiveAuction() {
                 </div>
             )}
 
-            {/* Price History Modal */}
             {showPriceHistory && (
                 <div className="c-aa-price-history-modal">
                     <div className="c-aa-price-history-modal-content">
@@ -485,7 +483,6 @@ export default function ActiveAuction() {
                             <div className="c-aa-price-history-loading">Loading price history...</div>
                         ) : (
                             <div className="c-aa-price-history-tables">
-                                {/* Current Supplier Price Changes */}
                                 <div className="c-aa-price-history-table-section">
                                     <h3 className="c-aa-price-history-table-title">
                                         {priceHistory.currentSupplierName?.toUpperCase()} (LAST 10 CHANGES)
@@ -527,7 +524,6 @@ export default function ActiveAuction() {
                                     )}
                                 </div>
 
-                                {/* All Suppliers Price History */}
                                 <div className="c-aa-price-history-table-section">
                                     <h3 className="c-aa-price-history-table-title">
                                         ALL SUPPLIERS (LAST 10)

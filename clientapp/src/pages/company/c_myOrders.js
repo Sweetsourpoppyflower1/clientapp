@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from "react";
+﻿// Pagina met de bestellingen van het bedrijf, waar ze hun gekochte producten kunnen bekijken
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../../styles/companyPages/c_myOrdersStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -27,7 +28,7 @@ export default function CMyOrders() {
     return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
   };
 
-  // Fetch all MediaPlant data once on mount
+// Laad de afbeeldingen van planten om later te gebruiken bij bestellingsdetails
   useEffect(() => {
     async function loadMediaPlants() {
       try {
@@ -35,7 +36,7 @@ export default function CMyOrders() {
         if (res.ok) {
           const mediaList = await res.json();
           const mediaMap = {};
-          
+
           if (Array.isArray(mediaList)) {
             mediaList.forEach(media => {
               const plantId = media.plant_id;
@@ -45,7 +46,7 @@ export default function CMyOrders() {
               mediaMap[plantId].push(media);
             });
           }
-          
+
           setPlantMediaMap(mediaMap);
         }
       } catch (err) {
@@ -67,7 +68,7 @@ export default function CMyOrders() {
         const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
         setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text || m.altText || "Flauction" });
       })
-      .catch(() => { /* silent fallback */ });
+      .catch(() => {  });
   }, []);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function CMyOrders() {
     }
   }, []);
 
+// Laad de bestellingen voor dit bedrijf van de server
   useEffect(() => {
     let mounted = true;
     async function loadOrders() {
@@ -103,7 +105,7 @@ export default function CMyOrders() {
 
         const data = await res.json();
         if (mounted && Array.isArray(data)) {
-          const filteredOrders = companyId 
+          const filteredOrders = companyId
             ? data.filter(order => order.company_id === companyId)
             : data;
           setOrders(filteredOrders);
@@ -123,6 +125,7 @@ export default function CMyOrders() {
     };
   }, [API_ENDPOINT, companyId]);
 
+// Toon of verberg de details van een bestelling, en laad plantinformatie indien nodig
   const toggleExpand = async (index, auctionId) => {
     setExpandedIndex(expandedIndex === index ? null : index);
 
@@ -139,36 +142,33 @@ export default function CMyOrders() {
           const plantId = auctionData.plant_id;
 
           if (plantId) {
-            // Fetch plant details
             const plantRes = await fetch(`${API_BASE}/api/Plants/${plantId}`, {
               headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
 
             if (plantRes.ok) {
               const plant = await plantRes.json();
-              
-              // Get media for this plant from the already-loaded mediaMap
+
               let imageUrl = null;
               let imageAlt = null;
-              
+
               const mediaForPlant = plantMediaMap[plantId];
               if (mediaForPlant && mediaForPlant.length > 0) {
-                // Sort to get primary image first
                 const sortedMedia = [...mediaForPlant].sort((a, b) => {
                   const ai = a.is_primary ? 0 : 1;
                   const bi = b.is_primary ? 0 : 1;
                   return ai - bi;
                 });
-                
+
                 const primaryImage = sortedMedia[0];
                 if (primaryImage) {
                   imageUrl = normalizeUrl(primaryImage.url);
                   imageAlt = primaryImage.alt_text || plant.productname;
                 }
               }
-              
-              setPlantDetails(prev => ({ 
-                ...prev, 
+
+              setPlantDetails(prev => ({
+                ...prev,
                 [auctionId]: {
                   ...plant,
                   imageUrl,
@@ -186,6 +186,7 @@ export default function CMyOrders() {
     }
   };
 
+// Zet een ISO datum om naar een leesbare string
   function formatDate(iso) {
     try {
       return new Date(iso).toLocaleString();
@@ -274,7 +275,7 @@ export default function CMyOrders() {
                                 <div className="cmo-loading-details">Loading plant information...</div>
                               ) : plantDetails[o.auction_id] ? (
                                 <div className="cmo-details-container">
-                                  {/* Plant Image */}
+
                                   <div className="cmo-details-image">
                                     {plantDetails[o.auction_id].imageUrl ? (
                                       <img
@@ -287,7 +288,7 @@ export default function CMyOrders() {
                                     )}
                                   </div>
 
-                                  {/* Plant Details Grid */}
+
                                   <div className="cmo-details-grid">
                                     <div>
                                       <div><span className="cmo-label">Product</span>{plantDetails[o.auction_id].productname || "—"}</div>

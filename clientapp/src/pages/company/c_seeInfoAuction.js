@@ -15,6 +15,7 @@ const fetchMaybe = async (url) => {
     } catch { return null; }
 };
 
+// Pagina om gedetailleerde informatie over een veiling te bekijken voordat je meedoet
 export default function SeeInfoAuction() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -43,18 +44,19 @@ export default function SeeInfoAuction() {
             })
             .catch(() => {});
         
+// Laad alle informatie over de veiling, inclusief plant, leverancier, afbeeldingen en prijsgeschiedenis
         const load = async () => {
             setLoading(true);
             try {
                 const a = await fetchMaybe(`${API_BASE}/api/Auctions/${id}`);
                 if (!a) {
-                    setAuction(null); 
+                    setAuction(null);
                     setLoading(false);
-                    return; 
+                    return;
                 }
 
                 const plant = await fetchMaybe(`${API_BASE}/api/Plants/${a.plant_id}`);
-                
+
                 let supplier = null;
                 if (plant && plant.supplier_id) {
                      supplier = await fetchMaybe(`${API_BASE}/api/Suppliers/${plant.supplier_id}`);
@@ -63,7 +65,7 @@ export default function SeeInfoAuction() {
                 const lots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
                 let lot = null;
                 if (Array.isArray(lots)) {
-                    lot = lots.find(l => Number(l.plant_id) === Number(a.plant_id)); 
+                    lot = lots.find(l => Number(l.plant_id) === Number(a.plant_id));
                 }
 
                 const mediaAll = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
@@ -100,10 +102,10 @@ export default function SeeInfoAuction() {
                     startTime: a.start_time,
                     endTime: a.end_time
                 };
-                
+
                 setAuction(enriched);
 
-                // Fetch price history
+
                 await fetchPriceHistory(plant.plant_id, plant?.supplier_id);
 
             } catch (e) {
@@ -116,6 +118,7 @@ export default function SeeInfoAuction() {
         load();
     }, [id]);
 
+// Haal de prijsgeschiedenis op voor deze plant van de huidige leverancier en alle leveranciers
     const fetchPriceHistory = async (plantId, supplierId) => {
         setLoadingHistory(true);
         try {
@@ -148,9 +151,7 @@ export default function SeeInfoAuction() {
 
             <main className="sia-main">
                 <div className="sia-wrapper">
-                    {/* Main Product Card - Left Side */}
                     <div className="sia-info-card">
-                        {/* Header Section */}
                         <div className="sia-header">
                             <div className="sia-header-left">
                                 <h1 className="sia-title">{auction.productname}</h1>
@@ -166,9 +167,7 @@ export default function SeeInfoAuction() {
                             </div>
                         </div>
 
-                        {/* Content Section */}
                         <div className="sia-content">
-                            {/* Image Gallery on the left */}
                             <div className="sia-image-section">
                                 <div className="sia-img-container">
                                     <img src={plantImages[currentImageIndex]} alt={auction.productname} className="sia-product-img" />
@@ -196,7 +195,6 @@ export default function SeeInfoAuction() {
                                 </div>
                             </div>
 
-                            {/* Details Grid on the right */}
                             <div className="sia-details-section">
                                 <div className="sia-details-grid">
                                     <div className="sia-detail-item">
@@ -236,14 +234,12 @@ export default function SeeInfoAuction() {
                                     </div>
                                 </div>
 
-                                {/* Description Box */}
                                 <div className="sia-description-box">
                                     <div className="sia-description">{auction.description}</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="sia-actions">
                             <button 
                                 className="sia-btn sia-btn-primary"
@@ -260,7 +256,6 @@ export default function SeeInfoAuction() {
                         </div>
                     </div>
 
-                    {/* Price History Section - Right Side */}
                     {priceHistory.currentSupplierHistory.length > 0 || priceHistory.allSuppliersHistory.length > 0 ? (
                         <div className="sia-price-history-card">
                             <h2 className="sia-history-title">Price History</h2>
@@ -268,7 +263,6 @@ export default function SeeInfoAuction() {
                                 <div className="sia-history-loading">Loading price history...</div>
                             ) : (
                                 <div className="sia-price-history-tables">
-                                    {/* Current Supplier History */}
                                     <div className="sia-price-history-section">
                                         <h3 className="sia-history-section-title">
                                             {auction.supplierName.toUpperCase()} (LAST 10 CHANGES)
@@ -310,7 +304,6 @@ export default function SeeInfoAuction() {
                                         )}
                                     </div>
 
-                                    {/* All Suppliers History */}
                                     <div className="sia-price-history-section">
                                         <h3 className="sia-history-section-title">
                                             ALL SUPPLIERS (LAST 10)
