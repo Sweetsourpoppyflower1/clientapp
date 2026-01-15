@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import "../../styles/companyPages/c_auctionsStyle.css";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
-
-const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
+import { API_BASE } from '../../config/api';
 
 const inlinePlaceholder =
     "data:image/svg+xml;utf8," +

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/login_registerPages/registerOptionsStyle.css";
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
+import { API_BASE } from '../../config/api';
 
 // Pagina waar gebruikers kunnen kiezen tussen registreren als bedrijf of als leverancier
 export default function RegisterOptions() {

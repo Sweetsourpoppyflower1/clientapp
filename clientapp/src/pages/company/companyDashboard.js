@@ -5,8 +5,7 @@ import '../../styles/companyPages/companyDashboardStyle.css';
 import { useNavigate } from 'react-router-dom';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
+import { API_BASE } from '../../config/api';
 
 export default function CompanyDashboard() {
     const [logo, setLogo] = useState(null);

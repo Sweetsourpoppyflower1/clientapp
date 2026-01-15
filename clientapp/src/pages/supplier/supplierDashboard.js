@@ -3,8 +3,7 @@ import '../../styles/supplierPages/supplierDashboardStyle.css';
 import SupplierNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/supplier/supplier_navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
+import { API_BASE } from '../../config/api';
 
 export default function SupplierDashboard() {
     const [logo, setLogo] = useState(null);
@@ -72,11 +71,11 @@ export default function SupplierDashboard() {
     useEffect(() => {
         const fetchLogo = async () => {
             try {
-                const response = await fetch('/api/Media/1');
+                const response = await fetch(`${API_BASE}/api/Media/1`);
                 if (!response.ok) throw new Error('Failed to fetch logo');
                 const data = await response.json();
                 setLogo({
-                    url: normalizeUrl(data.url),
+                    url: `${API_BASE}${normalizeUrl(data.url)}`,
                     alt: data.alt_text || data.altText || data.Alt_Text || 'Logo'
                 });
             } catch (err) {
@@ -138,7 +137,7 @@ export default function SupplierDashboard() {
     }, []);
 
     useEffect(() => {
-        fetch("/api/AuctionLots")
+        fetch(`${API_BASE}/api/AuctionLots`)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch auction lots");
                 return res.json();
@@ -275,7 +274,7 @@ export default function SupplierDashboard() {
                                                                     <div className="sd-details-image">
                                                                         {plant.imageUrl ? (
                                                                             <img
-                                                                                src={normalizeUrl(plant.imageUrl)}
+                                                                                src={`${API_BASE}${normalizeUrl(plant.imageUrl)}`}
                                                                                 alt={plant.imageAlt || plant.productName}
                                                                                 className="sd-details-img"
                                                                             />

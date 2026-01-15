@@ -4,8 +4,8 @@ import '../../styles/companyPages/c_activeAuctionStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import CompanyNavigationDropdownMenu from "../../dropdown_menus/navigation_menus/company/company_navigation_dropdown_menu";
 import AuctionClock from "../../components/AuctionClock";
+import { API_BASE } from '../../config/api';
 
-const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 const resolveUrl = (url = "") =>
     !url ? "" : url.startsWith("http") ? url : `${API_BASE}${url.startsWith("/") ? url : `/${url}`}`;
 

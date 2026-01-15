@@ -1,8 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/registerStyle.css";
 import * as IBAN from "iban";
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
+import { API_BASE } from '../../config/api';
 
 // Registratiepagina voor bedrijven om een nieuw account aan te maken
 export default function RegisterCompany() {
@@ -103,7 +102,7 @@ export default function RegisterCompany() {
         try {
             console.log("📡 Sending registration request...", payload);
 
-            const res = await fetch("/api/companies/register", {
+            const res = await fetch(`${API_BASE}/api/companies/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)

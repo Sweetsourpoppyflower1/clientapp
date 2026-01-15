@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import "../../styles/login_registerPages/loginStyle.css";
+import { API_BASE } from '../../config/api';
 
-const API_BASE = process.env.REACT_APP_API_URL || "";
 const AUTH_ENDPOINT = `${API_BASE}/api/Auth/login`;
 
 // Functie om een JWT token te decoderen en de payload eruit te halen

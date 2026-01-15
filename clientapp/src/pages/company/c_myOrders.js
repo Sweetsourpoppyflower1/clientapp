@@ -162,7 +162,7 @@ export default function CMyOrders() {
 
                 const primaryImage = sortedMedia[0];
                 if (primaryImage) {
-                  imageUrl = normalizeUrl(primaryImage.url);
+                  imageUrl = `${API_BASE}${normalizeUrl(primaryImage.url)}`;
                   imageAlt = primaryImage.alt_text || plant.productname;
                 }
               }

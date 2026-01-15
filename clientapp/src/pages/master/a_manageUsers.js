@@ -3,8 +3,7 @@ import "../../styles/masterPages/a_manageUsersStyle.css";
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
+import { API_BASE } from '../../config/api';
 
 const fetchMaybe = async (url) => {
     try {
@@ -32,7 +31,7 @@ export default function AManageUsers() {
         setLoadingCompanies(true);
         try {
             const token = localStorage.getItem("auth_token");
-            const response = await fetch("/api/Companies", {
+            const response = await fetch(`${API_BASE}/api/Companies`, {
                 credentials: "same-origin",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
@@ -56,7 +55,7 @@ export default function AManageUsers() {
         setLoadingSuppliers(true);
         try {
             const token = localStorage.getItem("auth_token");
-            const response = await fetch("/api/Suppliers", {
+            const response = await fetch(`${API_BASE}/api/Suppliers`, {
                 credentials: "same-origin",
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
