@@ -10,7 +10,7 @@ const resolveUrl = (url = "") =>
 
 const fetchMaybe = async (url) => {
     try {
-        const r = await fetch(url, { credentials: "include" });
+        const r = await fetch(url, { credentials: "same-origin" });
         return r.ok ? r.json() : null;
     } catch { return null; }
 };
@@ -34,7 +34,7 @@ export default function SEditPlant() {
     // Fetch logo and plant data together
     useEffect(() => {
         const mediaId = 1;
-        fetch(`${API_BASE}/api/Media/${mediaId}`, { credentials: "include" })
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => res.ok ? res.json() : null)
             .then(m => {
                 if(m) {
@@ -144,7 +144,7 @@ export default function SEditPlant() {
             const response = await fetch(`${API_BASE}/api/Plants/${plantData.plant_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                credentials: 'same-origin',
                 body: JSON.stringify(updatedPlant)
             });
 
@@ -165,6 +165,11 @@ export default function SEditPlant() {
     };
 
     const handleAddContainers = async () => {
+        if (!auctionLotId) {
+            alert('Auction lot not found');
+            return;
+        }
+
         const containersNum = parseInt(containersToAdd, 10);
         if (isNaN(containersNum) || containersNum <= 0) {
             alert('Please enter a valid number of containers to add');
@@ -175,82 +180,36 @@ export default function SEditPlant() {
         setError(null);
 
         try {
-            let currentLotId = auctionLotId;
-            let currentQty = currentContainers;
+            const newTotal = currentContainers + containersNum;
+            const updatedLot = {
+                auctionlot_id: auctionLotId,
+                plant_id: plantData.plant_id,
+                remaining_quantity: newTotal,
+                unit_per_container: 0,
+                min_pickup: 0
+            };
 
-            
-            if (!currentLotId) {
-                const newLot = {
-                    plant_id: plantData.plant_id,
-                    remaining_quantity: containersNum,
-                    start_quantity: containersNum,
-                    unit_per_container: 1,
-                    containers_in_lot: 1,
-                    min_pickup: 1
-                };
+            console.log('Updating auction lot with data:', updatedLot);
 
-                console.log('Creating new auction lot:', newLot);
+            const response = await fetch(`${API_BASE}/api/AuctionLots/${auctionLotId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(updatedLot)
+            });
 
-                const createResponse = await fetch(`${API_BASE}/api/AuctionLots`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(newLot)
-                });
-
-                if (!createResponse.ok) {
-                    const errorText = await createResponse.text();
-                    console.error('Create lot error response:', errorText);
-                    throw new Error(`Failed to create auction lot: ${createResponse.status}`);
-                }
-
-                const createdLot = await createResponse.json();
-                currentLotId = createdLot.auctionlot_id;
-                currentQty = createdLot.remaining_quantity || 0;
-                setAuctionLotId(currentLotId);
-                console.log('Created auction lot with ID:', currentLotId);
-            } else {
-                // Update existing lot - first fetch current data
-                const existingLot = await fetchMaybe(`${API_BASE}/api/AuctionLots/${currentLotId}`);
-                if (!existingLot) {
-                    throw new Error('Failed to fetch existing auction lot data');
-                }
-
-                const newTotal = currentQty + containersNum;
-                const updatedLot = {
-                    auctionlot_id: currentLotId,
-                    plant_id: existingLot.plant_id,
-                    remaining_quantity: newTotal,
-                    start_quantity: existingLot.start_quantity,
-                    unit_per_container: existingLot.unit_per_container,
-                    containers_in_lot: existingLot.containers_in_lot,
-                    min_pickup: existingLot.min_pickup
-                };
-
-                console.log('Updating auction lot with data:', updatedLot);
-
-                const response = await fetch(`${API_BASE}/api/AuctionLots/${currentLotId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(updatedLot)
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Update lot error response:', errorText);
-                    throw new Error(`Failed to update containers: ${response.status}`);
-                }
-
-                currentQty = newTotal;
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Save error response:', errorText);
+                throw new Error(`Failed to update containers: ${response.status}`);
             }
 
-            setCurrentContainers(currentQty);
+            setCurrentContainers(newTotal);
             setContainersToAdd('');
-            alert(`Successfully added ${containersNum} containers. Total: ${currentQty}`);
+            alert(`Successfully added ${containersNum} containers. Total: ${newTotal}`);
         } catch (err) {
-            console.error('Error managing containers:', err);
-            setError('Error managing containers: ' + err.message);
+            console.error('Error updating containers:', err);
+            setError('Error updating containers: ' + err.message);
         } finally {
             setIsSaving(false);
         }
