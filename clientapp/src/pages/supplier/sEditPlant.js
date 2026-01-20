@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../styles/supplierPages/sEditPlantStyle.css';
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
@@ -68,7 +68,7 @@ export default function SEditPlant() {
                 setStartPrice(String(plant.startPrice || plant.start_price || ''));
 
                 // Fetch plant images
-                const mediaAll = await fetchMaybe("/api/MediaPlant");
+                const mediaAll = await fetchMaybe(`${API_BASE}/api/MediaPlant`);
                 let imageUrl = null;
                 if (Array.isArray(mediaAll)) {
                     const plantMedia = mediaAll.filter(m => Number(m.plant_id) === Number(plant.plant_id));
@@ -81,7 +81,7 @@ export default function SEditPlant() {
                 setPlantImage(imageUrl);
 
                 // Fetch auction lot data
-                const lots = await fetchMaybe("/api/AuctionLots");
+                const lots = await fetchMaybe(`${API_BASE}/api/AuctionLots`);
                 if (Array.isArray(lots)) {
                     const plantLot = lots.find(l => Number(l.plant_id) === Number(plant.plant_id));
                     if (plantLot) {
