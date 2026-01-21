@@ -160,7 +160,7 @@ const AuctionLog = () => {
             const effectiveStartTime = new Date(auction.effective_start_time || auction.start_time);
             const durationMs = (auction.duration_minutes || 60) * 60 * 1000;
             const now = new Date();
-            const elapsed = now - effectiveStartTime;
+            const elapsed = (now-1) - effectiveStartTime;
             const remaining = Math.max(durationMs - elapsed, 0);
 
             const progressPercent = Math.min((elapsed / durationMs) * 100, 100);
@@ -217,7 +217,7 @@ const AuctionLog = () => {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">LoadingÂ…</span>
                 )}
             </div>
 
@@ -263,23 +263,23 @@ const AuctionLog = () => {
                             </div>
                             <div className="a-auction-log-info-row">
                                 <label>Form</label>
-                                <span>{plant?.form || "—"}</span>
+                                <span>{plant?.form || "Â—"}</span>
                             </div>
                             <div className="a-auction-log-info-row">
                                 <label>Quality</label>
-                                <span>{plant?.quality || "—"}</span>
+                                <span>{plant?.quality || "Â—"}</span>
                             </div>
                             <div className="a-auction-log-info-row">
                                 <label>Stems / Bunch</label>
-                                <span>{plant?.stems_bunch || "—"}</span>
+                                <span>{plant?.stems_bunch || "Â—"}</span>
                             </div>
                             <div className="a-auction-log-info-row">
                                 <label>Min Stem Length</label>
-                                <span>{plant?.min_stem || "—"} cm</span>
+                                <span>{plant?.min_stem || "Â—"} cm</span>
                             </div>
                             <div className="a-auction-log-info-row">
                                 <label>Maturity</label>
-                                <span>{plant?.maturity || "—"}</span>
+                                <span>{plant?.maturity || "Â—"}</span>
                             </div>
                         </div>
                     </div>
