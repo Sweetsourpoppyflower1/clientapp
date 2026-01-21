@@ -28,7 +28,6 @@ const AuctionClock = ({
     };
 
     useEffect(() => {
-        console.log('AuctionClock received startTime:', startTime, typeof startTime);
         const updateClock = () => {
             const now = Date.now();
             const elapsedTime = now - startTime;
