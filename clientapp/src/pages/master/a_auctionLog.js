@@ -160,7 +160,7 @@ const AuctionLog = () => {
             const effectiveStartTime = new Date(auction.effective_start_time || auction.start_time);
             const durationMs = (auction.duration_minutes || 60) * 60 * 1000;
             const now = new Date();
-            const elapsed = (now+3600000) - effectiveStartTime;
+            const elapsed = now + effectiveStartTime;
             const remaining = Math.max(durationMs - elapsed, 0);
 
             const progressPercent = Math.min((elapsed / durationMs) * 100, 100);
