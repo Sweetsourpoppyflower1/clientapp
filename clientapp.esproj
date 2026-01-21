@@ -9,6 +9,10 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="clientapp\src\pages\NewFolder\**" />
+    <TypeScriptConfiguration Remove="clientapp\src\pages\NewFolder\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include=".bin\git.cmd" />
     <None Include=".bin\node.cmd" />
     <None Include=".bin\npm.cmd" />
@@ -53,7 +57,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="clientapp\src\pages\NewFolder\" />
+    <Folder Include="clientapp\src\dropdown_menus\navigation_menus\company\" />
     <Folder Include="clientapp\src\styles\supplierPages\" />
   </ItemGroup>
 </Project>

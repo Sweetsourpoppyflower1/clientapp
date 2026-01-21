@@ -1,0 +1,269 @@
+/* Root styling */
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.op-parent {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header/Topbar */
+.logo-au-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.u-top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.loading-label {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Welcome Banner Section - Compact */
+.op-welcome-section {
+    background: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
+    color: white;
+    padding: 24px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.op-welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.op-welcome-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.op-welcome-greeting {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin: 0;
+    text-transform: uppercase;
+    opacity: 0.95;
+}
+
+.op-welcome-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.op-welcome-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 550px;
+    line-height: 1.4;
+}
+
+/* Content Section */
+.body-upc {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Action Box Container */
+.op-action-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 380px;
+}
+
+/* Register Label */
+.register-as {
+    text-align: center;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.register-as h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+/* Button Container */
+.combtn-place,
+.supbtn-place {
+    width: 100%;
+}
+
+/* Shared button base */
+.company-btn,
+.supplier-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 120ms ease;
+    outline: none;
+}
+
+/* Company Button - Primary (pink) */
+.company-btn {
+    background: #B35678;
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.company-btn:hover {
+    background: #a0456a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.company-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(179, 86, 120, 0.2);
+}
+
+/* Supplier Button - Secondary (light gray) */
+.supplier-btn {
+    background: #f0f0f0;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.supplier-btn:hover {
+    background: #e8e8e8;
+    border-color: #bbb;
+    transform: translateY(-1px);
+}
+
+.supplier-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Deprecated/Old Classes - Kept for compatibility */
+.op-header {
+    position: absolute;
+    top: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.ro-logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a4a4a;
+    letter-spacing: 0.6px;
+}
+
+.op-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 20px;
+}
+
+.empty {
+    display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .op-welcome-title {
+        font-size: 28px;
+    }
+
+    .op-welcome-greeting {
+        font-size: 13px;
+        letter-spacing: 0.8px;
+    }
+
+    .op-welcome-subtitle {
+        font-size: 12px;
+    }
+
+    .op-welcome-section {
+        padding: 20px 20px;
+    }
+
+    .body-upc {
+        padding: 30px 16px;
+    }
+
+    .op-action-box {
+        max-width: 100%;
+    }
+
+    .register-as h3 {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .op-welcome-title {
+        font-size: 24px;
+    }
+
+    .op-welcome-greeting {
+        font-size: 12px;
+    }
+
+    .op-welcome-subtitle {
+        font-size: 11px;
+    }
+
+    .body-upc {
+        padding: 24px 16px;
+    }
+
+    .register-as h3 {
+        font-size: 13px;
+    }
+
+    .company-btn,
+    .supplier-btn {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+}

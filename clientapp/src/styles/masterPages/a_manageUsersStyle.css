@@ -1,0 +1,355 @@
+/* Color and Background Styles */
+:root {
+    --primary-teal: #5A786B;
+    --primary-pink: #B35678;
+    --gradient: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
+}
+
+/* Manage Users Page */
+.manage-users-page {
+    min-height: 100vh;
+    background-color: #ffffff;
+    color: #222;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dropdown Menu Icons - Make them white */
+.manage-users-page .nav-icon,
+.manage-users-page .nav-icon svg,
+.manage-users-page .acc-avatar-icon,
+.manage-users-page .acc-avatar-icon svg,
+.manage-users-page .nav-menu-btn,
+.manage-users-page .nav-menu-btn svg,
+.manage-users-page .acc-avatar-btn,
+.manage-users-page .acc-avatar-btn svg {
+    color: #fff !important;
+    fill: #fff !important;
+    stroke: #fff !important;
+}
+
+/* Welcome Section */
+.manage-users-welcome-section {
+    background: var(--gradient);
+    color: white;
+    padding: 24px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.manage-users-welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.manage-users-welcome-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.manage-users-welcome-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 550px;
+    line-height: 1.4;
+}
+
+/* Main Content */
+.manage-users-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 20px;
+}
+
+.manage-users-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Tables Wrapper - Side by Side Layout */
+.manage-users-tables-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Table Section */
+.manage-users-table-section {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.manage-users-section-header {
+    background-color: var(--primary-teal);
+    color: white;
+    padding: 16px;
+    flex-shrink: 0;
+}
+
+.manage-users-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+}
+
+.manage-users-section-subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Loading & Empty States */
+.manage-users-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 16px;
+    flex: 1;
+}
+
+.manage-users-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #999;
+    text-align: center;
+    flex: 1;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.empty-message {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Table Container */
+.manage-users-table-container {
+    overflow-x: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Table Styles */
+.manage-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+}
+
+.manage-users-table thead {
+    background-color: #f5f5f5;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.manage-users-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.manage-users-table tbody tr {
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+}
+
+.manage-users-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.manage-users-table td {
+    padding: 12px;
+    color: #555;
+}
+
+.manage-users-table .name-cell {
+    font-weight: 600;
+    color: #222;
+}
+
+/* Delete Button */
+.delete-btn {
+    padding: 8px 16px;
+    background: var(--primary-pink);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 120ms ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.delete-btn:hover {
+    background: #a0456a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.delete-btn:active {
+    transform: translateY(0);
+}
+
+/* Footer Actions */
+.manage-users-footer-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    flex-shrink: 0;
+}
+
+.manage-users-back-btn {
+    padding: 10px 14px;
+    background: var(--primary-pink);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 120ms ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.manage-users-back-btn:hover {
+    background: #a0456a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.manage-users-back-btn:active {
+    transform: translateY(0);
+}
+
+/* Scrollbar styling */
+.manage-users-table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.manage-users-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.manage-users-table-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.manage-users-table-container::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .manage-users-tables-wrapper {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .manage-users-main {
+        padding: 16px;
+    }
+
+    .manage-users-welcome-section {
+        padding: 20px 16px;
+    }
+
+    .manage-users-welcome-title {
+        font-size: 28px;
+    }
+
+    .manage-users-welcome-subtitle {
+        font-size: 12px;
+    }
+
+    .manage-users-table {
+        font-size: 12px;
+    }
+
+    .manage-users-table th,
+    .manage-users-table td {
+        padding: 8px;
+    }
+
+    .delete-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .manage-users-main {
+        padding: 12px;
+    }
+
+    .manage-users-welcome-section {
+        padding: 16px 12px;
+    }
+
+    .manage-users-welcome-title {
+        font-size: 24px;
+    }
+
+    .manage-users-section-title {
+        font-size: 14px;
+    }
+
+    .manage-users-table {
+        font-size: 11px;
+        min-width: 600px;
+    }
+
+    .manage-users-table th,
+    .manage-users-table td {
+        padding: 8px 6px;
+    }
+
+    .delete-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}

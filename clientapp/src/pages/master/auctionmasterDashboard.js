@@ -3,6 +3,7 @@ import '../../styles/masterPages/auctionmasterDashboardStyle.css';
 import NavigationDropdownMenu from "../../dropdown_menus/navigation_menus/master/navigation_dropdown_menu";
 import AccountDropdownMenu from "../../dropdown_menus/account_menus/master/account_dropdown_menu";
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from '../../config/api';
 
 export default function AuctionmasterDashboard() {
     const [logo, setLogo] = useState(null);
@@ -10,34 +11,35 @@ export default function AuctionmasterDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Top logo (media id 1)
+        // het logo ophalen uit de database (altijd media ID 1)
         const mediaId = 1;
-        fetch(`/api/Media/${mediaId}`)
+        fetch(`${API_BASE}/api/Media/${mediaId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch media');
                 return res.json();
             })
             .then(m => {
                 const normalizedUrl = m.url && !m.url.startsWith('/') ? `/${m.url}` : m.url;
-                setLogo({ url: normalizedUrl, alt: m.alt_text });
+                setLogo({ url: `${API_BASE}${normalizedUrl}`, alt: m.alt_text });
             })
             .catch(() => { /* silent fallback */ });
     }, []);
 
     useEffect(() => {
-        // Button media IDs: tile1 -> 2, tile2 -> 3, tile3 -> 4, tile4 -> 5
+        // de button logos ophalen uit de database (media ID 2 t/m 5)
         const ids = [2, 3, 4, 5];
         Promise.all(
             ids.map(id =>
-                fetch(`/api/Media/${id}`)
+                fetch(`${API_BASE}/api/Media/${id}`)
                     .then(res => (res.ok ? res.json() : null))
                     .catch(() => null)
             )
         ).then(results => {
             const normalized = results.map(r => {
                 if (!r || !r.url) return null;
+                const normalizedUrl = r.url.startsWith('/') ? r.url : `/${r.url}`;
                 return {
-                    url: r.url.startsWith('/') ? r.url : `/${r.url}`,
+                    url: `${API_BASE}${normalizedUrl}`,
                     alt: r.alt_text ?? ''
                 };
             });
@@ -46,19 +48,19 @@ export default function AuctionmasterDashboard() {
     }, []);
 
     const handleCreateAuction = () => {
-        window.location.href = '/master/createAuction';
+        window.location.href = '/aCreateAuction';
     };
 
-    const handleOverviewAuctionCalendar = () => {
-        window.location.href = '/master/overviewAuctionCalendar';
+    const handleUpcomingAuctions = () => {
+        window.location.href = '/auctionCalender';
     };
 
     const handleOverviewStock = () => {
-        window.location.href = '/master/overviewStock';
+        window.location.href = '/aStockOverview';
     };
 
     const handleOverviewAcceptances = () => {
-        window.location.href = '/master/overviewAcceptances';
+        window.location.href = '/AOverviewAcceptances';
     };
 
     const renderTileContent = (index, placeholderSvg) => {
@@ -89,7 +91,7 @@ export default function AuctionmasterDashboard() {
                 {logo ? (
                     <img src={logo.url} alt={logo.alt} className="top-logo" />
                 ) : (
-                    <span className="loading-label">Loading…</span>
+                    <span className="loading-label">Loadingâ€¦</span>
                 )}
             </div>
 
@@ -109,7 +111,7 @@ export default function AuctionmasterDashboard() {
                         {renderTileContent(0, placeholderSvg)}
                     </button>
 
-                    <button className="tile tile2" aria-label="Auction Calendar" onClick={handleOverviewAuctionCalendar}>
+                    <button className="tile tile2" aria-label="Auction Calendar" onClick={handleUpcomingAuctions}>
                         {renderTileContent(1, placeholderSvg)}
                     </button>
 

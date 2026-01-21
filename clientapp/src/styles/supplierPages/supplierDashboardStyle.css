@@ -1,0 +1,598 @@
+/* Color and Background Styles */
+:root {
+    --primary-teal: #5A786B;
+    --primary-pink: #B35678;
+    --gradient: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
+}
+
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Supplier Dashboard Page */
+.sd-page {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: #222;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #fff;
+}
+
+/* Top Bar */
+.sd-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sd-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sd-top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+    
+}
+
+.sd-loading-label {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Welcome Section */
+.sd-welcome-section {
+    background: var(--gradient);
+    color: white;
+    padding: 24px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.sd-welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.sd-welcome-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.sd-welcome-greeting {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin: 0;
+    text-transform: uppercase;
+    opacity: 0.95;
+}
+
+.sd-welcome-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.sd-welcome-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 550px;
+    line-height: 1.4;
+}
+
+/* Main Content */
+.sd-main {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+/* Content Grid - Tiles and Stock Side by Side */
+.sd-content-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    padding: 20px;
+    width: 100%;
+}
+
+/* Buttons Section - Tile Style */
+.sd-buttons-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.sd-action-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 440px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 18px;
+    transition: all 120ms ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    gap: 16px;
+}
+
+.sd-add-products-btn {
+    background: var(--primary-pink);
+    color: #fff;
+}
+
+.sd-add-products-btn:hover {
+    background: #a0456a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sd-add-products-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(179, 86, 120, 0.2);
+}
+
+.sd-btn-icon {
+    width: 96px;
+    height: 96px;
+    color: #fff;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.sd-btn-label {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Stock Section */
+.sd-stock {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    min-height: 0;
+    flex: 1;
+}
+
+.sd-stock-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--primary-teal);
+    color: white;
+    padding: 12px 16px;
+    flex-shrink: 0;
+}
+
+.sd-stock-icon {
+    font-size: 20px;
+    opacity: 0.95;
+}
+
+.sd-stock-title {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.sd-stock-body {
+    background: #fff;
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Table */
+.sd-table-wrapper {
+    overflow-x: auto;
+}
+
+.sd-stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+}
+
+    .sd-stock-table thead {
+        background-color: #f5f5f5;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .sd-stock-table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #ddd;
+        font-size: 13px;
+    }
+
+    .sd-stock-table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s;
+    }
+
+.sd-stock-row {
+    cursor: pointer;
+    user-select: none;
+}
+
+    .sd-stock-row:hover {
+        background-color: #f9f9f9;
+    }
+
+    .sd-stock-row.sd-expanded {
+        background-color: #f9f9f9;
+    }
+
+.sd-stock-table td {
+    padding: 12px;
+    color: #555;
+}
+
+/* Details Row */
+.sd-details-row {
+    background-color: #f9f9f9;
+}
+
+.sd-details-cell {
+    padding: 20px !important;
+}
+
+.sd-details-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 20px;
+    background-color: white;
+    padding: 16px;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-teal);
+    margin-bottom: 12px;
+}
+
+/* Image Box */
+.sd-details-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+    overflow: hidden;
+    min-height: 200px;
+    border: 1px solid #e0e0e0;
+}
+
+.sd-details-img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.sd-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #999;
+    font-size: 13px;
+    text-align: center;
+    padding: 16px;
+}
+
+/* Details Grid */
+.sd-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+    .sd-details-grid > div {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sd-details-grid div div {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+.sd-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sd-details-grid div div:last-child {
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Description Box */
+.sd-description-box {
+    background-color: white;
+    padding: 16px;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-teal);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .sd-description-box p {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+    }
+
+
+.btn_editPlant {
+    display: flex;
+    width: 50px;
+    background-color: #5a786b;
+    font: bold;
+    margin-top: 10px;
+}
+
+/* Loading State */
+.sd-loading-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 16px;
+}
+
+.sd-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f0f0f0;
+    border-top: 3px solid var(--primary-teal);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.sd-empty-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #999;
+    text-align: center;
+}
+
+.sd-empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.sd-empty-message p {
+    margin: 4px 0;
+    font-size: 16px;
+}
+
+.sd-empty-hint {
+    font-size: 13px;
+    color: #bbb;
+}
+
+/* Error Message */
+.sd-error-message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: #ffebee;
+    border-left: 4px solid #d32f2f;
+    color: #b71c1c;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.sd-error-icon {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Scrollbar styling for webkit browsers */
+.sd-stock-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sd-stock-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.sd-stock-body::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.sd-stock-body::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .sd-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sd-action-btn {
+        height: 180px;
+    }
+
+    .sd-btn-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .sd-btn-label {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sd-topbar {
+        min-height: 80px;
+    }
+
+    .sd-welcome-section {
+        padding: 20px 20px;
+    }
+
+        .sd-welcome-title {
+            font-size: 28px;
+        }
+
+        .sd-welcome-greeting {
+            font-size: 13px;
+            letter-spacing: 0.8px;
+        }
+
+        .sd-welcome-subtitle {
+            font-size: 12px;
+        }
+
+    .sd-main {
+        padding: 0;
+    }
+
+    .sd-content-grid {
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .sd-action-btn {
+        height: 160px;
+    }
+
+    .sd-btn-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .sd-stock-table {
+        font-size: 12px;
+    }
+
+        .sd-stock-table th,
+        .sd-stock-table td {
+            padding: 8px;
+        }
+
+    .sd-details-container {
+        grid-template-columns: 1fr;
+    }
+
+    .sd-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .sd-main {
+        padding: 0;
+    }
+
+    .sd-content-grid {
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .sd-stock-body {
+        padding: 16px;
+    }
+
+    .sd-details-cell {
+        padding: 12px !important;
+    }
+
+    .sd-details-container {
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .sd-details-image {
+        min-height: 150px;
+    }
+
+    .sd-label {
+        font-size: 11px;
+    }
+
+    .sd-action-btn {
+        height: 140px;
+    }
+
+    .sd-btn-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .sd-btn-label {
+        font-size: 14px;
+    }
+}

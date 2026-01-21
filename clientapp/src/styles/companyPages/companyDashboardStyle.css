@@ -1,0 +1,212 @@
+/* enforce white background at the root level */
+html, body, #root {
+    background: #ffffff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.company-dashboard {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.cd-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Use the same top-logo sizing as auctionmasterDashboardStyle.css */
+.company-dashboard .cd-logo .top-logo,
+.top-logo {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+}
+
+.cd-logo h1 {
+    letter-spacing: 8px;
+    margin: 0;
+    font-weight: 600;
+    font-size: 28px;
+}
+
+/* Welcome section */
+.cd-welcome-section {
+    background: linear-gradient(135deg, #5A786B 0%, #B35678 100%);
+    color: white;
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.cd-welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+.cd-welcome-logo {
+    max-height: 100px;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
+}
+
+.cd-welcome-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.cd-welcome-greeting {
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    margin: 0;
+    text-transform: uppercase;
+    opacity: 0.95;
+}
+
+.cd-welcome-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.cd-welcome-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 600px;
+    line-height: 1.4;
+}
+
+.cd-buttons-section {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 20px;
+}
+
+.cd-buttons-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.cd-tiles-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 700px;
+    box-sizing: border-box;
+}
+
+.cd-tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 340px;
+    height: 320px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    background-clip: padding-box;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.cd-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.cd-tile1 {
+    background-color: #5A786B;
+    border-radius: 10px 0 0 10px;
+}
+
+.cd-tile2 {
+    background-color: #B35678;
+    border-radius: 0 10px 10px 0;
+}
+
+.tile-img {
+    max-width: 70%;
+    max-height: 70%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.cd-tile:focus {
+    outline: 3px solid rgba(0,0,0,0.12);
+    outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cd-welcome-section {
+        padding: 24px 24px;
+    }
+
+    .cd-welcome-greeting {
+        font-size: 18px;
+        letter-spacing: 1.2px;
+    }
+
+    .cd-welcome-title {
+        font-size: 28px;
+    }
+
+    .cd-welcome-subtitle {
+        font-size: 13px;
+    }
+
+    .cd-welcome-logo {
+        max-height: 80px;
+    }
+
+    .cd-tiles-row {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .cd-tile {
+        width: 100%;
+        height: 260px;
+    }
+
+    .cd-tile1 {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .cd-tile2 {
+        border-radius: 0 0 10px 10px;
+    }
+}

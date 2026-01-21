@@ -1,4 +1,21 @@
 .nav-dropdown-root {
+  pointer-events: none; 
+}
+
+.nav-dropdown-root .nav-hamburger {
+  pointer-events: auto;
+}
+
+.nav-menu-card.open {
+  pointer-events: auto;
+  z-index: 1400;
+}
+
+.nav-menu-card.closed {
+  pointer-events: none;
+}
+
+.nav-dropdown-root {
   position: fixed;
   top: 12px;
   left: 12px;
